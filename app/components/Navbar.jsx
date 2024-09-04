@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Modal } from "react-bootstrap";
+import { Dropdown, Modal } from "react-bootstrap";
 import axios from "axios";
 import axiosInstance from "../utils/axiosConfig";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
@@ -104,54 +104,26 @@ export default function Navbar() {
                     </Link>
                   </li>
                   <li className="nav-item">
-                    <div className="btn-group">
-                      <button
-                        type="button"
-                        className="btn btn-primary dropdown-toggle"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
+                    <Dropdown>
+                      <Dropdown.Toggle variant="primary" id="dropdown-basic">
                         Opciones
-                      </button>
-                      <ul className="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <Link
-                            href="/nutriologo/agregar-articulo"
-                            className="dropdown-item"
-                          >
-                            Agregar articulo
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/nutriologo/agenda"
-                            className="dropdown-item"
-                          >
-                            Agenda
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/nutriologo/pacientes"
-                            className="dropdown-item"
-                          >
-                            Pacientes
-                          </Link>
-                        </li>
-                        <li>
-                          <hr className="dropdown-divider" />
-                        </li>
-                        <li>
-                          <a
-                            className="dropdown-item"
-                            href="#"
-                            onClick={handleLogout}
-                          >
-                            Cerrar Sesión
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item href="/nutriologo/agregar-articulo">
+                          Agregar articulo
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/nutriologo/agenda">
+                          Agenda
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/nutriologo/pacientes">
+                          Pacientes
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item href="#/action-3" onClick={handleLogout}>
+                          Cerrar Sesión
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </li>
                 </>
               ) : (
