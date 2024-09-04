@@ -105,9 +105,19 @@ export default function Navbar() {
                         Opciones
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item href="/nutriologo/agregar-articulo">Agregar articulo</Dropdown.Item>
-                        <Dropdown.Item href="/nutriologo/agenda">Agenda</Dropdown.Item>
-                        <Dropdown.Item href="/nutriologo/pacientes">Pacientes</Dropdown.Item>
+                        <Dropdown.Item as={Link} href="/nutriologo">
+                          Dashboard
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item as={Link} href="/nutriologo/agregar-articulo">
+                          Agregar articulo
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} href="/nutriologo/agenda">
+                          Agenda
+                        </Dropdown.Item>
+                        <Dropdown.Item as={Link} href="/nutriologo/pacientes">
+                          Pacientes
+                        </Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item href="#/action-3" onClick={handleLogout}>
                           Cerrar Sesión
