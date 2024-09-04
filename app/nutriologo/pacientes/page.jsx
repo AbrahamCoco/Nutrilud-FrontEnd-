@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Col, Container, Modal, Row, Table } from "react-bootstrap";
 import Link from "next/link";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -25,7 +26,7 @@ export default function Pacientes() {
 
   const loadPacientes = async () => {
     try {
-      const response = await axios.get("/api/v1/pacientes");
+      const response = await axiosInstance.get("/api/v1/pacientes");
       setPacientes(response.data.pacientes);
       console.log(response.data.pacientes);
     } catch (error) {
@@ -53,7 +54,7 @@ export default function Pacientes() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await axios.post("/api/v1/upload/image", formData, {
+      const response = await axiosInstance.post("/api/v1/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -88,7 +89,7 @@ export default function Pacientes() {
         sexo,
       };
 
-      const response = await axios.post("/api/v1/auth/register", userData, {
+      const response = await axiosInstance.post("/api/v1/auth/register", userData, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -133,16 +134,13 @@ export default function Pacientes() {
               {pacientes.map((paciente) => (
                 <tr key={paciente.id}>
                   <td>
-                    {paciente.user.nombre} {paciente.user.primer_apellido}{" "}
-                    {paciente.user.segundo_apellido}
+                    {paciente.user.nombre} {paciente.user.primer_apellido} {paciente.user.segundo_apellido}
                   </td>
                   <td>{paciente.sexo}</td>
                   <td>{paciente.user.correo}</td>
                   <td>{paciente.telefono}</td>
                   <td className="text-center">
-                    <Link
-                      href={`/nutriologo/pacientes/consulta/${paciente.id}`}
-                    >
+                    <Link href={`/nutriologo/pacientes/consulta/${paciente.id}`}>
                       <div>
                         <button className="btn btn-success pb-2">
                           <FaFolderOpen />
@@ -175,11 +173,7 @@ export default function Pacientes() {
         </Row>
       </Container>
 
-      <Modal
-        show={showModal}
-        onHide={closeModal}
-        dialogClassName="modal-custom"
-      >
+      <Modal show={showModal} onHide={closeModal} dialogClassName="modal-custom">
         <Modal.Header closeButton>
           <Modal.Title>Agregar nuevo paciente</Modal.Title>
         </Modal.Header>
@@ -189,145 +183,62 @@ export default function Pacientes() {
               <label htmlFor="image" className="form-label">
                 Imagen
               </label>
-              <input
-                type="file"
-                className="form-control"
-                id="image"
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-              />
+              <input type="file" className="form-control" id="image" onChange={(e) => setSelectedFile(e.target.files[0])} />
               <Col md={6}>
                 <label htmlFor="" className="form-label">
                   Nombre
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="nombre"
-                  value={nombre}
-                  onChange={(e) => setNombre(e.target.value)}
-                />
+                <input type="text" className="form-control" id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Primer apellido
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="primer_apellido"
-                  value={primer_apellido}
-                  onChange={(e) => setPrimer_apellido(e.target.value)}
-                />
+                <input type="text" className="form-control" id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimer_apellido(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Segundo apellido
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="segundo_apellido"
-                  value={segundo_apellido}
-                  onChange={(e) => setSegundo_apellido(e.target.value)}
-                />
+                <input type="text" className="form-control" id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundo_apellido(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Usuario
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="usuario"
-                  value={usuario}
-                  onChange={(e) => setUsuario(e.target.value)}
-                />
+                <input type="text" className="form-control" id="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Correo electronico
                 </label>
-                <input
-                  type="email"
-                  className="form-control"
-                  id="correo"
-                  value={correo}
-                  onChange={(e) => setCorreo(e.target.value)}
-                />
+                <input type="email" className="form-control" id="correo" value={correo} onChange={(e) => setCorreo(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Alergias
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="alergias"
-                  value={alergias}
-                  onChange={(e) => setAlergias(e.target.value)}
-                />
+                <input type="text" className="form-control" id="alergias" value={alergias} onChange={(e) => setAlergias(e.target.value)} />
               </Col>
               <Col md={6}>
                 <label htmlFor="" className="form-label">
                   Contraseña
                 </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="contrasenia"
-                  value={contrasenia}
-                  onChange={(e) => setContrasenia(e.target.value)}
-                />
+                <input type="password" className="form-control" id="contrasenia" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   ID paciente
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="id_paciente"
-                  value={id_paciente}
-                  onChange={(e) => setId_paciente(e.target.value)}
-                />
+                <input type="text" className="form-control" id="id_paciente" value={id_paciente} onChange={(e) => setId_paciente(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Fecha de nacimiento
                 </label>
-                <input
-                  type="date"
-                  className="form-control"
-                  id="fecha_nacimiento"
-                  value={fecha_nacimiento}
-                  onChange={(e) => setFecha_nacimiento(e.target.value)}
-                />
+                <input type="date" className="form-control" id="fecha_nacimiento" value={fecha_nacimiento} onChange={(e) => setFecha_nacimiento(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Telefono
                 </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="telefono"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                />
+                <input type="text" className="form-control" id="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
                 <label htmlFor="" className="form-label">
                   Sexo
                 </label>
                 <div className="mb-2">
                   <div className="form-check-inline">
                     <label htmlFor="" className="form-check-label">
-                      <input
-                        type="radio"
-                        className="form-check-input"
-                        name="sexo"
-                        id="masculino"
-                        value="Masculino"
-                        checked={sexo === "Masculino"}
-                        onChange={() => setSexo("Masculino")}
-                      />{" "}
-                      Masculino
+                      <input type="radio" className="form-check-input" name="sexo" id="masculino" value="Masculino" checked={sexo === "Masculino"} onChange={() => setSexo("Masculino")} /> Masculino
                     </label>
                   </div>
                   <div className="form-check-inline">
                     <label htmlFor="" className="form-check-label">
-                      <input
-                        type="radio"
-                        className="form-check-input"
-                        name="sexo"
-                        id="femenino"
-                        value="Femenino"
-                        checked={sexo === "Femenino"}
-                        onChange={() => setSexo("Femenino")}
-                      />{" "}
-                      Femenino
+                      <input type="radio" className="form-check-input" name="sexo" id="femenino" value="Femenino" checked={sexo === "Femenino"} onChange={() => setSexo("Femenino")} /> Femenino
                     </label>
                   </div>
                 </div>

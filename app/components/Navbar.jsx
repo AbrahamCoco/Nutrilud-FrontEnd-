@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Dropdown, Modal } from "react-bootstrap";
-import axios from "axios";
 import axiosInstance from "../utils/axiosConfig";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
@@ -20,14 +19,11 @@ export default function Navbar() {
       })
       .then((response) => {
         console.log(response.data);
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("admin_id", response.data.admin_id ?? null);
-        localStorage.setItem(
-          "nutriologo_id",
-          response.data.nutriologo_id ?? null
-        );
-        localStorage.setItem("paciente_id", response.data.paciente_id ?? null);
-        localStorage.setItem("trol_id", response.data.trol_id);
+        sessionStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
+        sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
+        sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
+        sessionStorage.setItem("trol_id", response.data.trol_id);
         closeModal();
         setIsLoggedIn(true);
       })
@@ -38,20 +34,20 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "/api/v1/auth/logout",
         {},
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           },
         }
       );
 
-      localStorage.removeItem("token");
-      localStorage.removeItem("nutriologo_id");
-      localStorage.removeItem("admin_id");
-      localStorage.removeItem("paciente_id");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("nutriologo_id");
+      sessionStorage.removeItem("admin_id");
+      sessionStorage.removeItem("paciente_id");
       setIsLoggedIn(false);
       console.log("Cerró sesión correctamente");
     } catch (error) {
@@ -109,15 +105,9 @@ export default function Navbar() {
                         Opciones
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item href="/nutriologo/agregar-articulo">
-                          Agregar articulo
-                        </Dropdown.Item>
-                        <Dropdown.Item href="/nutriologo/agenda">
-                          Agenda
-                        </Dropdown.Item>
-                        <Dropdown.Item href="/nutriologo/pacientes">
-                          Pacientes
-                        </Dropdown.Item>
+                        <Dropdown.Item href="/nutriologo/agregar-articulo">Agregar articulo</Dropdown.Item>
+                        <Dropdown.Item href="/nutriologo/agenda">Agenda</Dropdown.Item>
+                        <Dropdown.Item href="/nutriologo/pacientes">Pacientes</Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item href="#/action-3" onClick={handleLogout}>
                           Cerrar Sesión
@@ -129,10 +119,7 @@ export default function Navbar() {
               ) : (
                 <>
                   <li className="nav-item ms-2">
-                    <Link
-                      href="/registro"
-                      className="text-white text-decoration-none"
-                    >
+                    <Link href="/registro" className="text-white text-decoration-none">
                       <button className="btn btn-primary">Registrarse</button>
                     </Link>
                   </li>
@@ -154,19 +141,9 @@ export default function Navbar() {
         </Modal.Header>
         <Modal.Body>
           <label htmlFor="usuario">Usuario</label>
-          <input
-            type="text"
-            name="usuario"
-            id="usuario"
-            className="form-control"
-          />
+          <input type="text" name="usuario" id="usuario" className="form-control" />
           <label htmlFor="contrasenia">Contraseña</label>
-          <input
-            type="password"
-            name="contrasenia"
-            id="contrasenia"
-            className="form-control"
-          />
+          <input type="password" name="contrasenia" id="contrasenia" className="form-control" />
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-secondary" onClick={closeModal}>

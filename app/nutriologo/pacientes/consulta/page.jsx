@@ -1,3 +1,4 @@
+import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useParams } from "react-router-dom";
@@ -28,7 +29,7 @@ export default function Consulta() {
 
   const loadPaciente = async () => {
     try {
-      const response = await axios.get(`/api/v1/paciente/${id}`);
+      const response = await axiosInstance.get(`/api/v1/paciente/${id}`);
       setPaciente(response.data.paciente);
       console.log(response.data);
     } catch (error) {
@@ -41,11 +42,7 @@ export default function Consulta() {
     const hoy = new Date();
     const edad = hoy.getFullYear() - fechaNac.getFullYear();
 
-    if (
-      hoy.getMonth() < fechaNac.getMonth() ||
-      (hoy.getMonth() === fechaNac.getMonth() &&
-        hoy.getDate() < fechaNac.getDate())
-    ) {
+    if (hoy.getMonth() < fechaNac.getMonth() || (hoy.getMonth() === fechaNac.getMonth() && hoy.getDate() < fechaNac.getDate())) {
       return edad - 1;
     }
 
@@ -54,7 +51,7 @@ export default function Consulta() {
 
   const loadDatosConsulta = async () => {
     try {
-      const response = await axios.get(`/api/v1/consultadatos/${id}`);
+      const response = await axiosInstance.get(`/api/v1/consultadatos/${id}`);
       console.log(response.data);
       setConsulta(response.data.consulta || []);
     } catch (error) {
@@ -85,10 +82,7 @@ export default function Consulta() {
       //Para sacar el porcentaje de musculo se necesita sacar el area muscular del brazo
       //Logica para calcular el area muscular del brazo
       let areaMuscularBrazo = 0;
-      if (
-        !isNaN(datosFormulario.circunferencia_brazo) &&
-        !isNaN(datosFormulario.pliegue_tricipital)
-      ) {
+      if (!isNaN(datosFormulario.circunferencia_brazo) && !isNaN(datosFormulario.pliegue_tricipital)) {
         // Define el valor del área del brazo según el género
         let genero = 0;
         if (datosFormulario.sexo === "Masculino") {
@@ -97,21 +91,13 @@ export default function Consulta() {
           genero = 6.5;
         }
         // Calcula el área muscular del brazo
-        areaMuscularBrazo =
-          Math.pow(
-            datosFormulario.circunferencia_brazo -
-              datosFormulario.pliegue_tricipital * Math.PI,
-            2
-          ) /
-            (4 * Math.PI) -
-          genero;
+        areaMuscularBrazo = Math.pow(datosFormulario.circunferencia_brazo - datosFormulario.pliegue_tricipital * Math.PI, 2) / (4 * Math.PI) - genero;
       }
 
       //Logica para calcular el porcentaje de musculo
       let porcentajeMusculo = 0;
       if (!isNaN(areaMuscularBrazo)) {
-        porcentajeMusculo =
-          datosFormulario.estatura * (0.0264 + 0.0029 * areaMuscularBrazo);
+        porcentajeMusculo = datosFormulario.estatura * (0.0264 + 0.0029 * areaMuscularBrazo);
       }
 
       //Logica para mandar los datos faltantes al formulario
@@ -126,15 +112,11 @@ export default function Consulta() {
     console.log(datosFormulario);
 
     try {
-      const response = await axios.post(
-        `/api/v1/insertardatos/${id}`,
-        datosFormulario,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await axiosInstance.post(`/api/v1/insertardatos/${id}`, datosFormulario, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       console.log(response.data);
 
       setDatosFormulario({
@@ -187,8 +169,7 @@ export default function Consulta() {
                 <tr>
                   <td>
                     <strong>
-                      {paciente.user.nombre} {paciente.user.primer_apellido}{" "}
-                      {paciente.user.segundo_apellido}
+                      {paciente.user.nombre} {paciente.user.primer_apellido} {paciente.user.segundo_apellido}
                     </strong>
                   </td>
                   <td>{paciente.alergias}</td>
@@ -231,11 +212,7 @@ export default function Consulta() {
                   consulta.slice(-3).map((datos) => (
                     <tr key={datos.id}>
                       <td>
-                        {new Date(
-                          new Date(
-                            datos.fecha_medicion.split(" ")[0]
-                          ).getTime() + 86400000
-                        ).toLocaleDateString("es-ES", {
+                        {new Date(new Date(datos.fecha_medicion.split(" ")[0]).getTime() + 86400000).toLocaleDateString("es-ES", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
@@ -265,16 +242,7 @@ export default function Consulta() {
             <label htmlFor="peso" className="form-label">
               Peso
             </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="peso"
-              value={datosFormulario.peso}
-              onChange={(e) =>
-                setDatosFormulario({ ...datosFormulario, peso: e.target.value })
-              }
-            />
+            <input type="number" step="0.001" className="form-control" name="peso" value={datosFormulario.peso} onChange={(e) => setDatosFormulario({ ...datosFormulario, peso: e.target.value })} />
             <label htmlFor="estatura" className="form-label">
               Estatura
             </label>

@@ -1,8 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { FaImage } from "react-icons/fa";
+import { Editor } from "@tinymce/tinymce-react";
+import { Button } from "react-bootstrap";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function AgregarArticulo() {
   const [titulo, setTitulo] = useState("");
@@ -11,6 +14,13 @@ export default function AgregarArticulo() {
   const [imagePrevisualizada, setImagePrevisualizada] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const editorRef = useRef(null);
+
+  const log = () => {
+    if (editorRef.current) {
+      console.log(editorRef.current.getContent());
+    }
+  };
 
   const handleDragEnter = (e) => {
     e.preventDefault();
@@ -46,7 +56,7 @@ export default function AgregarArticulo() {
     const formData = new FormData();
     formData.append("image", selectedFile);
     try {
-      const response = await axios.post("/api/v1/upload/image", formData, {
+      const response = await axiosInstance.post("/api/v1/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -62,7 +72,7 @@ export default function AgregarArticulo() {
 
   const handleAgregarArticulo = async () => {
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "/api/v1/nutriologo/articulos",
         {
           titulo: titulo,
@@ -93,49 +103,18 @@ export default function AgregarArticulo() {
       <div className="row my-2">
         <div className="col-sm-6 my-1">
           <label htmlFor="titulo">Título del Artículo</label>
-          <ReactQuill
-            value={titulo}
-            onChange={(value) => setTitulo(value)}
-            theme="snow"
-          />
+          <ReactQuill value={titulo} onChange={(value) => setTitulo(value)} theme="snow" />
         </div>
         <div className="col-sm-6 my-1">
           <label htmlFor="">Subir imagen</label>
-          <div
-            className={`container bg-cardimage rounded ${
-              dragging ? "drag-over" : ""
-            }`}
-            onDragOver={(e) => e.preventDefault()}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-          >
+          <div className={`container bg-cardimage rounded ${dragging ? "drag-over" : ""}`} onDragOver={(e) => e.preventDefault()} onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDrop={handleDrop}>
             <div className="row">
-              <div className="col-sm-4">
-                {imagePrevisualizada ? (
-                  <img
-                    src={imagePrevisualizada}
-                    alt="Previsualizacion de la imagen"
-                    style={{ width: "100px", height: "100px" }}
-                  />
-                ) : (
-                  <FaImage size={100} />
-                )}
-              </div>
+              <div className="col-sm-4">{imagePrevisualizada ? <img src={imagePrevisualizada} alt="Previsualizacion de la imagen" style={{ width: "100px", height: "100px" }} /> : <FaImage size={100} />}</div>
               <div className="col-sm-8 pt-4 text-center">
-                <label
-                  htmlFor="file-update"
-                  className="file-upload-label text-center"
-                >
+                <label htmlFor="file-update" className="file-upload-label text-center">
                   Elegir archivo
                 </label>
-                <input
-                  type="file"
-                  className="sr-only"
-                  id="file-update"
-                  name="file-update"
-                  onChange={handleImageChange}
-                />
+                <input type="file" className="sr-only" id="file-update" name="file-update" onChange={handleImageChange} />
                 <label htmlFor="file-update" className="px-2">
                   O
                 </label>
@@ -152,14 +131,23 @@ export default function AgregarArticulo() {
           <label htmlFor="contenido">Contenido del Artículo</label>
           <ReactQuill theme="snow" value={contenido} onChange={setContenido} />
         </div>
+        <Editor
+          apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
+          onInit={(_evt, editor) => (editorRef.current = editor)}
+          initialValue="<p>Contenido del Artículo</p>"
+          init={{
+            height: 500,
+            menubar: true,
+            plugins: ["advlist", "autolink", "lists", "link", "image", "charmap", "preview", "anchor", "searchreplace", "visualblocks", "code", "fullscreen", "insertdatetime", "media", "table", "help", "wordcount"],
+            toolbar: "undo redo | blocks | " + "bold italic backcolor | alignleft aligncenter " + "alignright alignjustify | bullist numlist outdent indent | " + "removeformat | help",
+            content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
+          }}
+        />
+        <Button onClick={log}>Log content</Button>
       </div>
       <div className="row  flex-row-reverse">
         <div className="col-sm-12 my-1">
-          <button
-            className="btn btn-primary mx-2"
-            onClick={handleAgregarArticulo}
-            disabled={!titulo || !contenido}
-          >
+          <button className="btn btn-primary mx-2" onClick={handleAgregarArticulo} disabled={!titulo || !contenido}>
             Agregar Artículo
           </button>
           <button className="btn btn-secondary">Cancelar</button>

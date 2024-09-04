@@ -7,6 +7,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import esLocale from "@fullcalendar/core/locales/es";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function Agenda() {
   const [agenda, setAgenda] = useState(null);
@@ -17,7 +18,7 @@ export default function Agenda() {
 
   const loadAgenda = async () => {
     try {
-      const response = await axios.get("/api/v1/nutriologo/agenda");
+      const response = await axiosInstance.get("/api/v1/nutriologo/agenda");
       const eventos = response.data.agenda.map((evento) => {
         const fechaInicio = new Date(evento.siguiente_consulta);
         const fechaFin = new Date(fechaInicio);
@@ -59,16 +60,7 @@ export default function Agenda() {
           </div>
         </div>
         <div className="col-md-4">
-          <FullCalendar
-            locale={esLocale}
-            plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
-            headerToolbar={{ left: "", center: "title", right: "" }}
-            initialView="listWeek"
-            events={agenda}
-            slotMinTime={"08:00:00"}
-            slotMaxTime={"18:00:00"}
-            themeSystem="bootstrap4"
-          />
+          <FullCalendar locale={esLocale} plugins={[dayGridPlugin, timeGridPlugin, listPlugin]} headerToolbar={{ left: "", center: "title", right: "" }} initialView="listWeek" events={agenda} slotMinTime={"08:00:00"} slotMaxTime={"18:00:00"} themeSystem="bootstrap4" />
         </div>
       </div>
     </Container>
