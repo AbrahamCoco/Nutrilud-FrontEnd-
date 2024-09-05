@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Container, Image, Row, Col } from "react-bootstrap";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { Utils } from "@/app/utils/utils";
 
 export default function Perfil() {
   const [perfilData, setPerfilData] = useState({});
@@ -15,11 +16,13 @@ export default function Perfil() {
 
     if (nutriologoId) {
       axiosInstance
-        .get(`auth/user/${nutriologoId}`)
+        .get(`/auth/user/${nutriologoId}`)
         .then((response) => {
-          console.log(response.data.data);
           setPerfilData(response.data.data);
           setIsLoading(false);
+        })
+        .then(() => {
+          Utils.swalSuccess("Perfil cargado correctamente");
         })
         .catch((error) => {
           setError(error);
@@ -27,11 +30,13 @@ export default function Perfil() {
         });
     } else if (adminId) {
       axiosInstance
-        .get(`auth/user/${adminId}`)
+        .get(`/auth/user/${adminId}`)
         .then((response) => {
-          console.log(response.data.data);
           setPerfilData(response.data.data);
           setIsLoading(false);
+        })
+        .then(() => {
+          Utils.swalSuccess("Perfil cargado correctamente");
         })
         .catch((error) => {
           setError(error);
@@ -39,11 +44,13 @@ export default function Perfil() {
         });
     } else if (pacienteId) {
       axiosInstance
-        .get(`auth/user/${pacienteId}`)
+        .get(`/auth/user/${pacienteId}`)
         .then((response) => {
-          console.log(response.data.data);
           setPerfilData(response.data.data);
           setIsLoading(false);
+        })
+        .then(() => {
+          Utils.swalSuccess("Perfil cargado correctamente");
         })
         .catch((error) => {
           setError(error);

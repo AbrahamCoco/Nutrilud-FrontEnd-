@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Dropdown, Modal } from "react-bootstrap";
 import axiosInstance from "../utils/axiosConfig";
+import { Utils } from "@/app/utils/utils";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
@@ -13,12 +14,11 @@ export default function Navbar() {
     const contrasenia = document.getElementById("contrasenia").value;
 
     axiosInstance
-      .post("auth/login", {
+      .post("/auth/login", {
         usuario: usuario,
         contrasenia: contrasenia,
       })
       .then((response) => {
-        console.log(response.data);
         sessionStorage.setItem("token", response.data.token);
         sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
         sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
@@ -27,15 +27,18 @@ export default function Navbar() {
         closeModal();
         setIsLoggedIn(true);
       })
+      .then(() => {
+        Utils.swalSuccess("Inicio de sesión correcto");
+      })
       .catch((error) => {
-        console.log("Error", error);
+        Utils.swalFailure("Error al iniciar sesión", error.message);
       });
   };
 
   const handleLogout = async () => {
     try {
       const response = await axiosInstance.post(
-        "/api/v1/auth/logout",
+        "/auth/logout",
         {},
         {
           headers: {
@@ -49,14 +52,12 @@ export default function Navbar() {
       sessionStorage.removeItem("admin_id");
       sessionStorage.removeItem("paciente_id");
       setIsLoggedIn(false);
-      console.log("Cerró sesión correctamente");
+      Utils.swalSuccess("Cerró sesión correctamente");
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        // El token es inválido
-        console.log("El token es inválido. Necesita iniciar sesión nuevamente");
+        Utils.swalError("El token es inválido. Necesita iniciar sesión nuevamente");
       } else {
-        // Otro error
-        console.log("Error no cerró sesión", error);
+        Utils.swalError("Error al cerrar sesión", error.message);
       }
     }
   };

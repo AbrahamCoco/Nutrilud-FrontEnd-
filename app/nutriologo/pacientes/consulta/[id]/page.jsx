@@ -3,6 +3,7 @@ import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import { useParams } from "next/navigation";
+import { Utils } from "@/app/utils/utils";
 
 export default function Consulta() {
   const { id } = useParams();
@@ -30,11 +31,11 @@ export default function Consulta() {
 
   const loadPaciente = async () => {
     try {
-      const response = await axiosInstance.get(`paciente/${id}`);
+      const response = await axiosInstance.get(`/paciente/${id}`);
       setPaciente(response.data.paciente);
-      console.log(response.data);
+      Utils.swalSuccess("Paciente cargado correctamente");
     } catch (error) {
-      console.log(error);
+      Utils.swalFailure("Error al cargar el paciente", error.message);
     }
   };
 
@@ -52,11 +53,11 @@ export default function Consulta() {
 
   const loadDatosConsulta = async () => {
     try {
-      const response = await axiosInstance.get(`consultadatos/${id}`);
-      console.log(response.data);
+      const response = await axiosInstance.get(`/consultadatos/${id}`);
       setConsulta(response.data.consulta || []);
+      Utils.swalSuccess("Datos de consulta cargados correctamente");
     } catch (error) {
-      console.log(error);
+      Utils.swalFailure("Error al cargar los datos de consulta", error.message);
     }
   };
 
@@ -110,15 +111,12 @@ export default function Consulta() {
       }));
     }
 
-    console.log(datosFormulario);
-
     try {
-      const response = await axiosInstance.post(`insertardatos/${id}`, datosFormulario, {
+      const response = await axiosInstance.post(`/insertardatos/${id}`, datosFormulario, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-      console.log(response.data);
 
       setDatosFormulario({
         peso: "",
@@ -135,8 +133,9 @@ export default function Consulta() {
         siguiente_consulta: "",
       });
       loadDatosConsulta();
+      Utils.swalSuccess("Datos de consulta guardados correctamente");
     } catch (error) {
-      console.log(error);
+      Utils.swalFailure("Error al guardar los datos de consulta", error.message);
     }
   };
 
