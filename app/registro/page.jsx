@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import axiosInstance from "../utils/axiosConfig";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function Registro() {
   const [nombre, setNombre] = useState("");

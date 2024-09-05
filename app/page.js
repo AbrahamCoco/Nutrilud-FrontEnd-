@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import ReactQuill from "react-quill";
-import axiosInstance from "./utils/axiosConfig";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function Home() {
   const [articulos, setArticulos] = useState([]);
@@ -13,7 +13,7 @@ export default function Home() {
 
   const loadArticulos = async () => {
     try {
-      const response = await axiosInstance.get("/api/v1/");
+      const response = await axiosInstance.get("");
       setArticulos(response.data.articulos);
     } catch (error) {
       console.log(error);

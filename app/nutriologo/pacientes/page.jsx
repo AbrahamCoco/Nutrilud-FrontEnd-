@@ -26,7 +26,7 @@ export default function Pacientes() {
 
   const loadPacientes = async () => {
     try {
-      const response = await axiosInstance.get("/api/v1/pacientes");
+      const response = await axiosInstance.get("pacientes");
       setPacientes(response.data.pacientes);
       console.log(response.data.pacientes);
     } catch (error) {
@@ -54,7 +54,7 @@ export default function Pacientes() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await axiosInstance.post("/api/v1/upload/image", formData, {
+      const response = await axiosInstance.post("upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -89,7 +89,7 @@ export default function Pacientes() {
         sexo,
       };
 
-      const response = await axiosInstance.post("/api/v1/auth/register", userData, {
+      const response = await axiosInstance.post("auth/register", userData, {
         headers: {
           "Content-Type": "application/json",
         },

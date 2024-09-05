@@ -1,7 +1,8 @@
+"use client";
 import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
-import { useParams } from "react-router-dom";
+import { useParams } from "next/navigation";
 
 export default function Consulta() {
   const { id } = useParams();
@@ -29,7 +30,7 @@ export default function Consulta() {
 
   const loadPaciente = async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/paciente/${id}`);
+      const response = await axiosInstance.get(`paciente/${id}`);
       setPaciente(response.data.paciente);
       console.log(response.data);
     } catch (error) {
@@ -51,7 +52,7 @@ export default function Consulta() {
 
   const loadDatosConsulta = async () => {
     try {
-      const response = await axiosInstance.get(`/api/v1/consultadatos/${id}`);
+      const response = await axiosInstance.get(`consultadatos/${id}`);
       console.log(response.data);
       setConsulta(response.data.consulta || []);
     } catch (error) {
@@ -112,7 +113,7 @@ export default function Consulta() {
     console.log(datosFormulario);
 
     try {
-      const response = await axiosInstance.post(`/api/v1/insertardatos/${id}`, datosFormulario, {
+      const response = await axiosInstance.post(`insertardatos/${id}`, datosFormulario, {
         headers: {
           "Content-Type": "application/json",
         },

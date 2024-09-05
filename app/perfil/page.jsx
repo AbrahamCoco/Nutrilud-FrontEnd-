@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Container, Image, Row, Col } from "react-bootstrap";
-import axiosInstance from "../utils/axiosConfig";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function Perfil() {
   const [perfilData, setPerfilData] = useState({});
@@ -50,11 +50,7 @@ export default function Perfil() {
           setIsLoading(false);
         });
     } else {
-      setError(
-        new Error(
-          "El ID del nutriólogo no está definido en el almacenamiento local."
-        )
-      );
+      setError(new Error("El ID del nutriólogo no está definido en el almacenamiento local."));
       setIsLoading(false);
     }
   }, []);
@@ -80,18 +76,12 @@ export default function Perfil() {
       <h1>Perfil</h1>
       <Row>
         <Col md={3}>
-          <Image
-            src={perfilData.foto}
-            alt={perfilData.user.nombre}
-            fluid
-            roundedCircle
-          />
+          <Image src={perfilData.foto} alt={perfilData.user.nombre} fluid roundedCircle />
         </Col>
         <Col md={9}>
           <h4>Nombre</h4>
           <h5>
-            {perfilData.user.nombre} {perfilData.user.primer_apellido}{" "}
-            {perfilData.user.segundo_apellido}{" "}
+            {perfilData.user.nombre} {perfilData.user.primer_apellido} {perfilData.user.segundo_apellido}{" "}
           </h5>
           <h4>Correo</h4>
           <h5>{perfilData.user.correo}</h5>
