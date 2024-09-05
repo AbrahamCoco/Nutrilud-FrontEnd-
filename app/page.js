@@ -1,95 +1,104 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import ReactQuill from "react-quill";
+import axiosInstance from "@/app/utils/axiosConfig";
 
 export default function Home() {
+  const [articulos, setArticulos] = useState([]);
+
+  useEffect(() => {
+    loadArticulos();
+  }, []);
+
+  const loadArticulos = async () => {
+    try {
+      const response = await axiosInstance.get("");
+      setArticulos(response.data.articulos);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <>
+      <div className="carousel slide" id="carouselExampleCaptions">
+        <div className="carousel-indicators">
+          {articulos.map((articulo, index) => (
+            <button key={index} type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-href={index} className={index === 0 ? "active" : ""} aria-current={index === 0 ? "true" : "false"} aria-label={`Slide ${index + 1}`}></button>
+          ))}
+        </div>
+        <div className="carousel-inner">
+          {articulos.map((articulo, index) => (
+            <div key={articulo.id} className={`carousel-item ${index === 0 ? "active" : ""}`}>
+              <Link href={`/articulo/${articulo.id}`}>
+                {/* <img
+                  src={articulo.foto}
+                  className="d-block w-100"
+                  alt={articulo.titulo}
+                /> */}
+                <div className="carousel-caption d-none d-md-block">
+                  <ReactQuill
+                    value={articulo.titulo}
+                    readOnly={true}
+                    theme="bubble"
+                    className="title-article"
+                    style={{
+                      fontSize: "1em",
+                      color: "black",
+                      textAlign: "center !important",
+                    }}
+                  />
+                  <p>
+                    <small className="text-muted">
+                      Publicado el{" "}
+                      {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </small>
+                  </p>
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+        <button type="button" className="carousel-control-prev" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+          <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Anterior</span>
+        </button>
+        <button type="button" className="carousel-control-next" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+          <span className="carousel-control-next-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Siguiente</span>
+        </button>
+      </div>
+      <div className="container">
+        <h1>Artículos Nutricionales</h1>
+        <div className="row">
+          {articulos.map((articulo) => (
+            <div className="col-md-4 mb-4" key={articulo.id}>
+              <div className="card">
+                <div className="card-body">
+                  <Link href={`/articulo/${articulo.id}`}>
+                    <ReactQuill value={articulo.titulo} readOnly={true} theme="bubble" className="title-article" style={{ fontSize: "0.7em" }} />
+                  </Link>
+                  <p className="card-text">
+                    <small className="text-muted">
+                      Publicado el{" "}
+                      {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </small>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </>
   );
 }
