@@ -8,6 +8,7 @@ import { Utils } from "@/app/utils/utils";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [rol, setRol] = useState(null);
 
   const handleLogin = () => {
     const usuario = document.getElementById("usuario").value;
@@ -24,6 +25,7 @@ export default function Navbar() {
         sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
         sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
         sessionStorage.setItem("trol_id", response.data.trol_id);
+        setRol(response.data.trol_id);
         closeModal();
         setIsLoggedIn(true);
       })
@@ -106,19 +108,31 @@ export default function Navbar() {
                         Opciones
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item as={Link} href="/nutriologo">
-                          Dashboard
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item as={Link} href="/nutriologo/agregar-articulo">
-                          Agregar articulo
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} href="/nutriologo/agenda">
-                          Agenda
-                        </Dropdown.Item>
-                        <Dropdown.Item as={Link} href="/nutriologo/pacientes">
-                          Pacientes
-                        </Dropdown.Item>
+                        {rol === 1 ? (
+                          <Dropdown.Item as={Link} href="/administrador">
+                            Dashboard
+                          </Dropdown.Item>
+                        ) : rol === 2 ? (
+                          <>
+                            <Dropdown.Item as={Link} href="/nutriologo">
+                              Dashboard
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item as={Link} href="/nutriologo/agregar-articulo">
+                              Agregar articulo
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} href="/nutriologo/agenda">
+                              Agenda
+                            </Dropdown.Item>
+                            <Dropdown.Item as={Link} href="/nutriologo/pacientes">
+                              Pacientes
+                            </Dropdown.Item>
+                          </>
+                        ) : rol === 3 ? (
+                          <Dropdown.Item as={Link} href="/paciente">
+                            Dashboard
+                          </Dropdown.Item>
+                        ) : null}
                         <Dropdown.Divider />
                         <Dropdown.Item href="#/action-3" onClick={handleLogout}>
                           Cerrar Sesión
