@@ -23,7 +23,7 @@ export default function Agenda() {
       const eventos = response.data.agenda.map((evento) => {
         const fechaInicio = new Date(evento.siguiente_consulta);
         const fechaFin = new Date(fechaInicio);
-        fechaFin.setMinutes(fechaFin.getMinutes() + 30);
+        fechaFin.setMinutes(fechaFin.getMinutes() + 29);
 
         return {
           title: `Cita con el paciente: ${evento.consulta.user.nombre} ${evento.consulta.user.primer_apellido} ${evento.consulta.user.segundo_apellido}`,

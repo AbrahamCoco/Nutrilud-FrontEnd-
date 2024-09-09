@@ -4,11 +4,13 @@ import Link from "next/link";
 import { Dropdown, Modal } from "react-bootstrap";
 import axiosInstance from "../utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
+import { useRouter } from "next/navigation";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [rol, setRol] = useState(null);
+  const router = useRouter();
 
   const handleLogin = () => {
     const usuario = document.getElementById("usuario").value;
@@ -21,6 +23,7 @@ export default function Navbar() {
       })
       .then((response) => {
         sessionStorage.setItem("token", response.data.token);
+        sessionStorage.setItem("id_user", response.data.user);
         sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
         sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
         sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
@@ -28,6 +31,13 @@ export default function Navbar() {
         setRol(response.data.trol_id);
         closeModal();
         setIsLoggedIn(true);
+        if (response.data.trol_id == 1) {
+          router.push("/administrador");
+        } else if (response.data.trol_id == 2) {
+          router.push("/nutriologo");
+        } else if (response.data.trol_id == 3) {
+          router.push("/paciente");
+        }
       })
       .then(() => {
         Utils.swalSuccess("Inicio de sesión correcto");
@@ -109,9 +119,12 @@ export default function Navbar() {
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         {rol === 1 ? (
-                          <Dropdown.Item as={Link} href="/administrador">
-                            Dashboard
-                          </Dropdown.Item>
+                          <>
+                            <Dropdown.Item as={Link} href="/administrador">
+                              Dashboard
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                          </>
                         ) : rol === 2 ? (
                           <>
                             <Dropdown.Item as={Link} href="/nutriologo">
@@ -129,12 +142,15 @@ export default function Navbar() {
                             </Dropdown.Item>
                           </>
                         ) : rol === 3 ? (
-                          <Dropdown.Item as={Link} href="/paciente">
-                            Dashboard
-                          </Dropdown.Item>
+                          <>
+                            <Dropdown.Item as={Link} href="/paciente">
+                              Dashboard
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                          </>
                         ) : null}
                         <Dropdown.Divider />
-                        <Dropdown.Item href="#/action-3" onClick={handleLogout}>
+                        <Dropdown.Item as={Link} href="/" onClick={handleLogout}>
                           Cerrar Sesión
                         </Dropdown.Item>
                       </Dropdown.Menu>

@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 export class Utils {
   static swalFailure(title, message) {
     Swal.fire({
-      position: "top-end",
+      position: "bottom-end",
       toast: true,
       showConfirmButton: false,
       icon: "warning",
@@ -17,7 +17,7 @@ export class Utils {
 
   static swalError(message) {
     Swal.fire({
-      position: "top-end",
+      position: "bottom-end",
       toast: true,
       showConfirmButton: false,
       icon: "error",
@@ -31,7 +31,7 @@ export class Utils {
 
   static swalSuccess(message) {
     Swal.fire({
-      position: "top-end",
+      position: "bottom-end",
       toast: true,
       showConfirmButton: false,
       icon: "success",
