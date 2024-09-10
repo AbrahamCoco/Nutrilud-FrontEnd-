@@ -12,12 +12,10 @@ export default function Footer() {
                 <strong>Teléfono:</strong> 246 265 3921
               </li>
               <li>
-                <strong>Email:</strong> info@nutrilud.com o
-                karinetza09@gmail.com
+                <strong>Email:</strong> info@nutrilud.com o karinetza09@gmail.com
               </li>
               <li>
-                <strong>Horario de consultas:</strong> Lunes a Viernes de 9:00
-                A.M. a 5:00 P.M.
+                <strong>Horario de consultas:</strong> Lunes a Viernes de 9:00 A.M. a 5:00 P.M.
               </li>
             </ul>
           </div>
@@ -27,10 +25,7 @@ export default function Footer() {
               <li>
                 {" "}
                 <FaFacebook />{" "}
-                <a
-                  href="https://www.facebook.com/NutriLud"
-                  className="text-light"
-                >
+                <a href="https://www.facebook.com/NutriLud" className="text-light">
                   {" "}
                   Facebook
                 </a>
@@ -38,10 +33,7 @@ export default function Footer() {
               <li>
                 {" "}
                 <FaInstagram />{" "}
-                <a
-                  href="https://www.instagram.com/nutrilud/"
-                  className="text-light"
-                >
+                <a href="https://www.instagram.com/nutrilud/" className="text-light">
                   {" "}
                   Instagram
                 </a>
@@ -59,26 +51,17 @@ export default function Footer() {
             <h5 className="">Recursos útiles:</h5>
             <ul className="list-unstyled">
               <li>
-                <a
-                  href="[Enlace a recursos de nutrición]"
-                  className="text-light"
-                >
+                <a href="[Enlace a recursos de nutrición]" className="text-light">
                   Recursos de nutrición
                 </a>
               </li>
               <li>
-                <a
-                  href="[Enlace a guías de alimentación saludable]"
-                  className="text-light"
-                >
+                <a href="[Enlace a guías de alimentación saludable]" className="text-light">
                   Guías de alimentación saludable
                 </a>
               </li>
               <li>
-                <a
-                  href="[Enlace a información sobre estilos de vida activos]"
-                  className="text-light"
-                >
+                <a href="[Enlace a información sobre estilos de vida activos]" className="text-light">
                   Información sobre estilos de vida activos
                 </a>
               </li>
@@ -87,10 +70,7 @@ export default function Footer() {
         </div>
         <div className="row">
           <div className="col-md-12 text-center">
-            <p className="text-light">
-              © {new Date().getFullYear()} NutriLud. Todos los derechos
-              reservados.
-            </p>
+            <p className="text-light">© {new Date().getFullYear()} NutriLud. Todos los derechos reservados.</p>
           </div>
         </div>
       </div>

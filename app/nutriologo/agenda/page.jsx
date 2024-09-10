@@ -8,6 +8,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import esLocale from "@fullcalendar/core/locales/es";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { Utils } from "@/app/utils/utils";
 
 export default function Agenda() {
   const [agenda, setAgenda] = useState(null);
@@ -18,11 +19,11 @@ export default function Agenda() {
 
   const loadAgenda = async () => {
     try {
-      const response = await axiosInstance.get("/api/v1/nutriologo/agenda");
+      const response = await axiosInstance.get("/nutriologo/agenda");
       const eventos = response.data.agenda.map((evento) => {
         const fechaInicio = new Date(evento.siguiente_consulta);
         const fechaFin = new Date(fechaInicio);
-        fechaFin.setMinutes(fechaFin.getMinutes() + 30);
+        fechaFin.setMinutes(fechaFin.getMinutes() + 29);
 
         return {
           title: `Cita con el paciente: ${evento.consulta.user.nombre} ${evento.consulta.user.primer_apellido} ${evento.consulta.user.segundo_apellido}`,
@@ -31,9 +32,9 @@ export default function Agenda() {
         };
       });
       setAgenda(eventos);
-      console.log(eventos);
+      Utils.swalSuccess("Agenda cargada correctamente");
     } catch (error) {
-      console.log(error);
+      Utils.swalFailure("Error al cargar la agenda", error.response.data.message);
     }
   };
 

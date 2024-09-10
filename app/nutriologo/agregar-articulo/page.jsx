@@ -1,25 +1,20 @@
 "use client";
 import { useRef, useState } from "react";
-import "react-quill/dist/quill.snow.css";
 import { FaImage } from "react-icons/fa";
 import { Editor } from "@tinymce/tinymce-react";
 import { Image } from "react-bootstrap";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { useRouter } from "next/navigation";
+import { Utils } from "@/app/utils/utils";
 
 export default function AgregarArticulo() {
-  const [titulo, setTitulo] = useState("");
   const [contenido, setContenido] = useState("");
   const [error, setError] = useState("");
   const [imagePrevisualizada, setImagePrevisualizada] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [dragging, setDragging] = useState(false);
   const editorRef = useRef(null);
-
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
-    }
-  };
+  const router = useRouter();
 
   const handleDragEnter = (e) => {
     e.preventDefault();
@@ -55,16 +50,15 @@ export default function AgregarArticulo() {
     const formData = new FormData();
     formData.append("image", selectedFile);
     try {
-      const response = await axiosInstance.post("upload/image", formData, {
+      const response = await axiosInstance.post("/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log(response.data);
       console.log("URL de la Imagen: ", response.data.url);
       return response.data.url;
     } catch (error) {
-      console.error("Error al subir la imagen", error);
+      Utils.swalError("Error al subir la imagen", error.message);
       return "image.jpg";
     }
   };
@@ -72,9 +66,8 @@ export default function AgregarArticulo() {
   const handleAgregarArticulo = async () => {
     try {
       const response = await axiosInstance.post(
-        "/api/v1/nutriologo/articulos",
+        "/nutriologo/articulos",
         {
-          titulo: titulo,
           contenido: contenido,
           foto: await uploadImage(),
           nutriologo_id: localStorage.getItem("nutriologo_id"),
@@ -87,12 +80,13 @@ export default function AgregarArticulo() {
         }
       );
 
-      console.log(response.data);
-      setTitulo("");
       setContenido("");
+      setSelectedFile(null);
+      router.push("/");
+      Utils.swalSuccess("Artículo guardado correctamente");
     } catch (error) {
-      console.log("Error al guardar el artículo", error.response.data);
       setError("Error al guardar el artículo. Por favor, inténtalo de nuevo.");
+      Utils.swalError("Error al guardar el artículo", error.message);
     }
   };
 
@@ -105,6 +99,7 @@ export default function AgregarArticulo() {
             apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
             onInit={(_evt, contenido) => (editorRef.current = contenido)}
             initialValue="<p>Contenido del Artículo</p>"
+            onEditorChange={(content) => setContenido(content)}
             init={{
               height: 500,
               menubar: true,

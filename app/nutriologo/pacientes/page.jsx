@@ -4,6 +4,7 @@ import { Col, Container, Modal, Row, Table } from "react-bootstrap";
 import Link from "next/link";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { Utils } from "@/app/utils/utils";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -26,11 +27,12 @@ export default function Pacientes() {
 
   const loadPacientes = async () => {
     try {
-      const response = await axiosInstance.get("pacientes");
+      const response = await axiosInstance.get("/pacientes");
       setPacientes(response.data.pacientes);
       console.log(response.data.pacientes);
+      Utils.swalSuccess("Pacientes cargados correctamente");
     } catch (error) {
-      console.log(error);
+      Utils.swalFailure("Error al cargar los pacientes", error.message);
     }
   };
 
@@ -54,17 +56,16 @@ export default function Pacientes() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await axiosInstance.post("upload/image", formData, {
+      const response = await axiosInstance.post("/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
-      console.log(response.data);
       console.log("URL de la Imagen:", response.data.url);
       return response.data.url;
     } catch (error) {
-      console.error("Error al subir la imagen", error);
+      Utils.swalError("Error al subir la imagen", error.message);
       return null;
     }
   };
@@ -89,18 +90,18 @@ export default function Pacientes() {
         sexo,
       };
 
-      const response = await axiosInstance.post("auth/register", userData, {
+      const response = await axiosInstance.post("/auth/register", userData, {
         headers: {
           "Content-Type": "application/json",
         },
       });
 
-      console.log(response.data);
       loadPacientes();
       closeModal();
+      Utils.swalSuccess("Paciente guardado correctamente");
       return response;
     } catch (error) {
-      console.log("Error al guardar al paciente", error);
+      Utils.swalFailure("Error al guardar el paciente", error.message);
     }
   };
 

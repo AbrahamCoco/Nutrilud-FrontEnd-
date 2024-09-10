@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { Utils } from "@app/utils/utils";
 
 export default function Registro() {
   const [nombre, setNombre] = useState("");
@@ -43,16 +44,15 @@ export default function Registro() {
     const formData = new FormData();
     formData.append("image", selectedFile);
     try {
-      const response = await axiosInstance.post("/api/v1/upload/image", formData, {
+      const response = await axiosInstance.post("/upload/image", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log(response.data);
       console.log("URL de la Imagen: ", response.data.url);
       return response.data.url;
     } catch (error) {
-      console.error("Error al subir la imagen", error);
+      Utils.swalError("Error al subir la imagen", error.message);
       return "image.jpg";
     }
   };
@@ -101,19 +101,17 @@ export default function Registro() {
           break;
       }
 
-      console.log(`Datos a enviar: ${JSON.stringify({ ...userData, ...tipoUsuarioData })}`);
-
       const response = await axiosInstance
-        .post("/api/v1/auth/register", JSON.stringify({ ...userData, ...tipoUsuarioData }), {
+        .post("/auth/register", JSON.stringify({ ...userData, ...tipoUsuarioData }), {
           headers: {
             "Content-Type": "application/json",
           },
         })
         .then((response) => {
-          console.log(response.data);
+          Utils.swalSuccess("Usuario registrado correctamente");
         })
         .catch((error) => {
-          console.log("Error al guardar el usuario", error.response.data);
+          Utils.swalFailure("Error al registrar el usuario", error.message);
         });
 
       setTrolId(null);
@@ -143,7 +141,7 @@ export default function Registro() {
         setAlergias("");
       }
     } catch (error) {
-      console.error("Error", error);
+      Utils.swalFailure("Error al registrar el usuario", error.message);
     }
   };
 
