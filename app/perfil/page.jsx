@@ -2,105 +2,143 @@
 import { useState, useEffect } from "react";
 import { Container, Image, Row, Col } from "react-bootstrap";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { Utils } from "@/app/utils/utils";
+import "boxicons/css/boxicons.min.css";
 
 export default function Perfil() {
-  const [perfilData, setPerfilData] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [rol, setRol] = useState(null);
+  const [perfilData, setPerfilData] = useState([]);
+
+  const handleDatosPerfil = () => {
+    axiosInstance
+      .get(`auth/user/${sessionStorage.getItem("id_user")}`)
+      .then((response) => {
+        setPerfilData(response.data);
+        console.log(response.data);
+      })
+      .then(() => {
+        Utils.swalSuccess("Datos de perfil cargados correctamente");
+      })
+      .catch((error) => {
+        Utils.swalError("Error al cargar datos de perfil del administrador", error.message);
+      });
+  };
+
+  function calcularEdad(fechaNacimiento) {
+    const hoy = new Date();
+    const cumpleanos = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - cumpleanos.getFullYear();
+    const mes = hoy.getMonth() - cumpleanos.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < cumpleanos.getDate())) {
+      edad--;
+    }
+    return edad;
+  }
 
   useEffect(() => {
-    const nutriologoId = localStorage.getItem("nutriologo_id");
-    const adminId = localStorage.getItem("admin_id");
-    const pacienteId = localStorage.getItem("paciente_id");
-
-    if (nutriologoId) {
-      axiosInstance
-        .get(`auth/user/${nutriologoId}`)
-        .then((response) => {
-          console.log(response.data.data);
-          setPerfilData(response.data.data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          setError(error);
-          setIsLoading(false);
-        });
-    } else if (adminId) {
-      axiosInstance
-        .get(`auth/user/${adminId}`)
-        .then((response) => {
-          console.log(response.data.data);
-          setPerfilData(response.data.data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          setError(error);
-          setIsLoading(false);
-        });
-    } else if (pacienteId) {
-      axiosInstance
-        .get(`auth/user/${pacienteId}`)
-        .then((response) => {
-          console.log(response.data.data);
-          setPerfilData(response.data.data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          setError(error);
-          setIsLoading(false);
-        });
-    } else {
-      setError(new Error("El ID del nutriólogo no está definido en el almacenamiento local."));
-      setIsLoading(false);
+    const storedRol = parseInt(sessionStorage.getItem("trol_id"), 10);
+    if (storedRol) {
+      setRol(storedRol);
+      handleDatosPerfil();
     }
   }, []);
 
-  if (isLoading) {
-    return (
-      <div className="container">
-        <h1>Cargando...</h1>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container">
-        <h1>Error: {error.message}</h1>
-      </div>
-    );
-  }
-
   return (
     <Container>
-      <h1>Perfil</h1>
-      <Row>
-        <Col md={3}>
-          <Image src={perfilData.foto} alt={perfilData.user.nombre} fluid roundedCircle />
-        </Col>
-        <Col md={9}>
-          <h4>Nombre</h4>
-          <h5>
-            {perfilData.user.nombre} {perfilData.user.primer_apellido} {perfilData.user.segundo_apellido}{" "}
-          </h5>
-          <h4>Correo</h4>
-          <h5>{perfilData.user.correo}</h5>
-          <h4>Telefono</h4>
-          <h5>{perfilData.telefono}</h5>
-        </Col>
-      </Row>
-      <Row>
-        <Col md={6}>
-          <h4>Descripcion</h4>
-          <h5>{perfilData.descripcion}</h5>
-          <h4>Direccion</h4>
-          <h5>{perfilData.direccion}</h5>
-        </Col>
-        <Col md={6}>
-          <h4>Cedula profesional</h4>
-          <h5>{perfilData.cedula_profesional}</h5>
-        </Col>
-      </Row>
+      {rol === 1 ? (
+        <>
+          <h1>Perfil de Administrador</h1>
+          <Row>
+            <Col md={3}>{perfilData.data?.admin?.foto ? <Image src={perfilData.data?.admin?.foto} alt={perfilData.data.nombre} fluid roundedCircle /> : <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>}</Col>
+            <Col md={9}>
+              <h4>Nombre</h4>
+              <h5>
+                {perfilData.data?.nombre} {perfilData.data?.primer_apellido} {perfilData.data?.segundo_apellido}
+              </h5>
+              <h4>Correo</h4>
+              <h5>{perfilData.data?.correo}</h5>
+              <h4>Teléfono</h4>
+              <h5>{perfilData.data?.admin?.telefono}</h5>
+            </Col>
+          </Row>
+        </>
+      ) : rol === 2 ? (
+        <>
+          <h1>Perfil de Nutriólogo</h1>
+          <Row>
+            <Col md={3}>
+              {perfilData.data?.nutriologo?.foto ? <Image src={perfilData.data.nutriologo?.foto} alt={perfilData.data?.nombre} fluid roundedCircle /> : <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>}
+            </Col>
+            <Col md={9}>
+              <h4>Nombre</h4>
+              <h5>
+                {perfilData.data?.nombre} {perfilData.data?.primer_apellido} {perfilData.data?.segundo_apellido}
+              </h5>
+              <h4>Correo</h4>
+              <h5>{perfilData.data?.correo}</h5>
+              <h4>Teléfono</h4>
+              <h5>{perfilData.data?.nutriologo?.telefono}</h5>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={6}>
+              <h4>Descripción</h4>
+              <h5>{perfilData.data?.nutriologo?.descripcion}</h5>
+              <h4>Dirección</h4>
+              <h5>{perfilData.data?.nutriologo?.direccion}</h5>
+            </Col>
+            <Col md={6}>
+              <h4>Cédula Profesional</h4>
+              <h5>{perfilData.data?.nutriologo?.cedula_profesional}</h5>
+            </Col>
+          </Row>
+        </>
+      ) : rol === 3 ? (
+        <>
+          <h1>Perfil de Paciente</h1>
+          <Row>
+            <Col md={3}>
+              {perfilData.data?.paciente?.foto ? <Image src={perfilData.data?.paciente?.foto} alt={perfilData.data?.nombre} fluid roundedCircle /> : <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>}
+            </Col>
+            <Col md={9}>
+              <h4>Nombre</h4>
+              <h5>
+                {perfilData.data?.nombre} {perfilData.data?.primer_apellido} {perfilData.data?.segundo_apellido}
+              </h5>
+              <h4>Correo</h4>
+              <h5>{perfilData.data?.correo}</h5>
+              <h4>Teléfono</h4>
+              <h5>{perfilData.data?.paciente?.telefono}</h5>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={4}>
+              <h4>Fecha de Nacimiento</h4>
+              <h5>
+                {new Date(perfilData.data?.paciente?.fecha_nacimiento).toLocaleDateString("es-ES", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </h5>
+              <h4>Edad</h4>
+              <h5> {calcularEdad(perfilData.data?.paciente?.fecha_nacimiento)} años</h5>
+            </Col>
+            <Col md={4}>
+              <h4>Estatura</h4>
+              {perfilData.data?.paciente?.consulta?.estatura ? <h5>{perfilData.data?.paciente?.consulta[0]?.estatura} cm </h5> : <h5>No hay datos de estatura</h5>}
+              <h4>Peso</h4>
+              {perfilData.data?.paciente?.consulta?.peso ? <h5>{perfilData.data?.paciente?.consulta[0]?.peso} kg </h5> : <h5>No hay datos de peso</h5>}
+            </Col>
+            <Col md={4}>
+              <h4>Sexo</h4>
+              <h5>{perfilData.data?.paciente?.sexo}</h5>
+            </Col>
+          </Row>
+        </>
+      ) : (
+        <h1>Cargando datos de perfil...</h1>
+      )}
     </Container>
   );
 }

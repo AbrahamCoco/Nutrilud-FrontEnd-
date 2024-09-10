@@ -1,78 +1,68 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import ReactQuill from "react-quill";
 import axiosInstance from "@/app/utils/axiosConfig";
+import { Carousel, Image } from "react-bootstrap";
+import { Utils } from "@/app/utils/utils";
 
 export default function Home() {
   const [articulos, setArticulos] = useState([]);
+  const [primerEncabezado, setPrimerEncabezado] = useState({});
 
   useEffect(() => {
     loadArticulos();
-  }, []);
+  }, []); // Ejecutar solo una vez al montar el componente
 
   const loadArticulos = async () => {
     try {
-      const response = await axiosInstance.get("");
+      const response = await axiosInstance.get("/");
       setArticulos(response.data.articulos);
+
+      const encabezados = response.data.articulos.reduce((acc, articulo) => {
+        const encabezado = extraerPrimerEncabezado(articulo.contenido);
+        acc[articulo.id] = encabezado;
+        return acc;
+      }, {});
+
+      setPrimerEncabezado(encabezados);
+      Utils.swalSuccess("Artículos cargados correctamente");
     } catch (error) {
-      console.log(error);
+      Utils.swalFailure("Error al cargar los artículos", error.message);
     }
+  };
+
+  const extraerPrimerEncabezado = (htmlContent) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, "text/html");
+
+    const heading = doc.querySelector("h1, h2, h3, h4, h5, h6");
+    return heading ? heading.outerHTML : "No hay encabezado";
   };
 
   return (
     <>
-      <div className="carousel slide" id="carouselExampleCaptions">
-        <div className="carousel-indicators">
-          {articulos.map((articulo, index) => (
-            <button key={index} type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-href={index} className={index === 0 ? "active" : ""} aria-current={index === 0 ? "true" : "false"} aria-label={`Slide ${index + 1}`}></button>
-          ))}
-        </div>
-        <div className="carousel-inner">
-          {articulos.map((articulo, index) => (
-            <div key={articulo.id} className={`carousel-item ${index === 0 ? "active" : ""}`}>
-              <Link href={`/articulo/${articulo.id}`}>
-                {/* <img
-                  src={articulo.foto}
-                  className="d-block w-100"
-                  alt={articulo.titulo}
-                /> */}
-                <div className="carousel-caption d-none d-md-block">
-                  <ReactQuill
-                    value={articulo.titulo}
-                    readOnly={true}
-                    theme="bubble"
-                    className="title-article"
-                    style={{
-                      fontSize: "1em",
-                      color: "black",
-                      textAlign: "center !important",
-                    }}
-                  />
-                  <p>
-                    <small className="text-muted">
-                      Publicado el{" "}
-                      {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </small>
-                  </p>
-                </div>
-              </Link>
-            </div>
-          ))}
-        </div>
-        <button type="button" className="carousel-control-prev" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-          <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span className="visually-hidden">Anterior</span>
-        </button>
-        <button type="button" className="carousel-control-next" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-          <span className="carousel-control-next-icon" aria-hidden="true"></span>
-          <span className="visually-hidden">Siguiente</span>
-        </button>
-      </div>
+      <Carousel>
+        {articulos.map((articulo, index) => (
+          <Carousel.Item key={articulo.id}>
+            <Link href={`/articulo/${articulo.id}`}>
+              <Image src={articulo.foto} className="d-block w-100" alt={primerEncabezado[articulo.id]} />
+              <Carousel.Caption>
+                <div dangerouslySetInnerHTML={{ __html: primerEncabezado[articulo.id] }} />
+                <p>
+                  <small className="text-muted">
+                    Publicado el{" "}
+                    {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </small>
+                </p>
+              </Carousel.Caption>
+            </Link>
+          </Carousel.Item>
+        ))}
+      </Carousel>
       <div className="container">
         <h1>Artículos Nutricionales</h1>
         <div className="row">
@@ -81,7 +71,7 @@ export default function Home() {
               <div className="card">
                 <div className="card-body">
                   <Link href={`/articulo/${articulo.id}`}>
-                    <ReactQuill value={articulo.titulo} readOnly={true} theme="bubble" className="title-article" style={{ fontSize: "0.7em" }} />
+                    <div dangerouslySetInnerHTML={{ __html: primerEncabezado[articulo.id] }} />
                   </Link>
                   <p className="card-text">
                     <small className="text-muted">
