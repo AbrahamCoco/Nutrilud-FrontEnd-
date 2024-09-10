@@ -9,19 +9,14 @@ export default function Perfil() {
   const [rol, setRol] = useState(null);
   const [perfilData, setPerfilData] = useState([]);
 
-  const handleDatosPerfil = () => {
-    axiosInstance
-      .get(`auth/user/${sessionStorage.getItem("id_user")}`)
-      .then((response) => {
-        setPerfilData(response.data);
-        console.log(response.data);
-      })
-      .then(() => {
-        Utils.swalSuccess("Datos de perfil cargados correctamente");
-      })
-      .catch((error) => {
-        Utils.swalError("Error al cargar datos de perfil del administrador", error.message);
-      });
+  const handleDatosPerfil = async () => {
+    try {
+      const response = await axiosInstance.get(`auth/user/${sessionStorage.getItem("id_user")}`);
+      setPerfilData(response.data);
+      Utils.swalSuccess("Datos cargados correctamente");
+    } catch (error) {
+      Utils.swalError("Error al cargar datos del perfil", error.message);
+    }
   };
 
   function calcularEdad(fechaNacimiento) {
@@ -49,7 +44,13 @@ export default function Perfil() {
         <>
           <h1>Perfil de Administrador</h1>
           <Row>
-            <Col md={3}>{perfilData.data?.admin?.foto ? <Image src={perfilData.data?.admin?.foto} alt={perfilData.data.nombre} fluid roundedCircle /> : <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>}</Col>
+            <Col md={3}>
+              {perfilData.data?.admin?.foto ? (
+                <Image src={perfilData.data?.admin?.foto} alt={perfilData.data.nombre} fluid roundedCircle />
+              ) : (
+                <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>
+              )}
+            </Col>
             <Col md={9}>
               <h4>Nombre</h4>
               <h5>
@@ -67,7 +68,11 @@ export default function Perfil() {
           <h1>Perfil de Nutriólogo</h1>
           <Row>
             <Col md={3}>
-              {perfilData.data?.nutriologo?.foto ? <Image src={perfilData.data.nutriologo?.foto} alt={perfilData.data?.nombre} fluid roundedCircle /> : <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>}
+              {perfilData.data?.nutriologo?.foto ? (
+                <Image src={perfilData.data.nutriologo?.foto} alt={perfilData.data?.nombre} fluid roundedCircle />
+              ) : (
+                <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>
+              )}
             </Col>
             <Col md={9}>
               <h4>Nombre</h4>
@@ -98,7 +103,11 @@ export default function Perfil() {
           <h1>Perfil de Paciente</h1>
           <Row>
             <Col md={3}>
-              {perfilData.data?.paciente?.foto ? <Image src={perfilData.data?.paciente?.foto} alt={perfilData.data?.nombre} fluid roundedCircle /> : <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>}
+              {perfilData.data?.paciente?.foto ? (
+                <Image src={perfilData.data?.paciente?.foto} alt={perfilData.data?.nombre} fluid roundedCircle />
+              ) : (
+                <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>
+              )}
             </Col>
             <Col md={9}>
               <h4>Nombre</h4>
@@ -126,9 +135,13 @@ export default function Perfil() {
             </Col>
             <Col md={4}>
               <h4>Estatura</h4>
-              {perfilData.data?.paciente?.consulta?.estatura ? <h5>{perfilData.data?.paciente?.consulta[0]?.estatura} cm </h5> : <h5>No hay datos de estatura</h5>}
+              {perfilData.data?.paciente?.consulta?.length > 0 ? (
+                <h5>{perfilData.data.paciente.consulta[perfilData.data.paciente.consulta.length - 1]?.estatura} m</h5>
+              ) : (
+                <h5>No hay datos de estatura</h5>
+              )}
               <h4>Peso</h4>
-              {perfilData.data?.paciente?.consulta?.peso ? <h5>{perfilData.data?.paciente?.consulta[0]?.peso} kg </h5> : <h5>No hay datos de peso</h5>}
+              {perfilData.data?.paciente?.consulta?.length > 0 ? <h5>{perfilData.data.paciente.consulta[perfilData.data.paciente.consulta.length - 1]?.peso} kg</h5> : <h5>No hay datos de peso</h5>}
             </Col>
             <Col md={4}>
               <h4>Sexo</h4>

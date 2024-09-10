@@ -5,6 +5,9 @@ import { Dropdown, Modal } from "react-bootstrap";
 import axiosInstance from "../utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
 import { useRouter } from "next/navigation";
+import MenuAdmin from "./users/administrador/MenuAdmin";
+import MenuNutri from "./users/nutriologo/MenuNutri";
+import MenuPaciente from "./users/paciente/MenuPaciente";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
@@ -12,39 +15,41 @@ export default function Navbar() {
   const [rol, setRol] = useState(null);
   const router = useRouter();
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     const usuario = document.getElementById("usuario").value;
     const contrasenia = document.getElementById("contrasenia").value;
 
-    axiosInstance
-      .post("/auth/login", {
+    try {
+      const response = await axiosInstance.post("/auth/login", {
         usuario: usuario,
         contrasenia: contrasenia,
-      })
-      .then((response) => {
-        sessionStorage.setItem("token", response.data.token);
-        sessionStorage.setItem("id_user", response.data.user);
-        sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
-        sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
-        sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
-        sessionStorage.setItem("trol_id", response.data.trol_id);
-        setRol(response.data.trol_id);
-        closeModal();
-        setIsLoggedIn(true);
-        if (response.data.trol_id == 1) {
-          router.push("/administrador");
-        } else if (response.data.trol_id == 2) {
-          router.push("/nutriologo");
-        } else if (response.data.trol_id == 3) {
-          router.push("/paciente");
-        }
-      })
-      .then(() => {
-        Utils.swalSuccess("Inicio de sesión correcto");
-      })
-      .catch((error) => {
-        Utils.swalFailure("Error al iniciar sesión", error.message);
       });
+
+      sessionStorage.setItem("token", response.data.token);
+      sessionStorage.setItem("id_user", response.data.user);
+      sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
+      sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
+      sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
+      sessionStorage.setItem("trol_id", response.data.trol_id);
+      setRol(response.data.trol_id);
+      closeModal();
+      setIsLoggedIn(true);
+
+      if (response.data.trol_id == 1) {
+        router.push("/administrador");
+      } else if (response.data.trol_id == 2) {
+        router.push("/nutriologo");
+      } else if (response.data.trol_id == 3) {
+        router.push("/paciente");
+      } else if (response.data.trol_id == null) {
+        Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesion nuevamente");
+        router.push("/");
+      }
+
+      Utils.swalSuccess("Inicio de sesión correcto");
+    } catch (error) {
+      Utils.swalFailure("Error al iniciar sesión", error.message);
+    }
   };
 
   const handleLogout = async () => {
@@ -118,37 +123,7 @@ export default function Navbar() {
                         Opciones
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        {rol === 1 ? (
-                          <>
-                            <Dropdown.Item as={Link} href="/administrador">
-                              Dashboard
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                          </>
-                        ) : rol === 2 ? (
-                          <>
-                            <Dropdown.Item as={Link} href="/nutriologo">
-                              Dashboard
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item as={Link} href="/nutriologo/agregar-articulo">
-                              Agregar articulo
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} href="/nutriologo/agenda">
-                              Agenda
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} href="/nutriologo/pacientes">
-                              Pacientes
-                            </Dropdown.Item>
-                          </>
-                        ) : rol === 3 ? (
-                          <>
-                            <Dropdown.Item as={Link} href="/paciente">
-                              Dashboard
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                          </>
-                        ) : null}
+                        {rol === 1 ? <MenuAdmin /> : rol === 2 ? <MenuNutri /> : rol === 3 ? <MenuPaciente /> : null}
                         <Dropdown.Divider />
                         <Dropdown.Item as={Link} href="/" onClick={handleLogout}>
                           Cerrar Sesión

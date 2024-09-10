@@ -1,7 +1,5 @@
 "use client";
 import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import esLocale from "@fullcalendar/core/locales/es";
 import axiosInstance from "@/app/utils/axiosConfig";
@@ -81,7 +79,23 @@ export default function Nutriologo() {
           </Row>
         </Col>
         <Col md={4}>
-          <FullCalendar locale={esLocale} plugins={[dayGridPlugin, timeGridPlugin, listPlugin]} headerToolbar={{ left: "", center: "title", right: "" }} initialView="listWeek" events={agenda} slotMinTime={"08:00:00"} slotMaxTime={"18:00:00"} themeSystem="bootstrap4" />
+          <FullCalendar
+            locale={esLocale}
+            plugins={[listPlugin]}
+            headerToolbar={{ left: "prev", center: "title", right: "next" }}
+            initialView="listWeek"
+            events={agenda}
+            slotMinTime={"08:00:00"}
+            slotMaxTime={"18:00:00"}
+            themeSystem="bootstrap4"
+            eventDidMount={(info) => {
+              if (info.event.extendedProps.status === "done") {
+                info.el.style.backgroundColor = "green";
+              } else if (info.event.extendedProps.status === "pending") {
+                info.el.style.backgroundColor = "red";
+              }
+            }}
+          />
         </Col>
       </Row>
       <Row>Hola Nutriologo</Row>

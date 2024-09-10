@@ -2,44 +2,39 @@ import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="footer mt-auto py-4 bg-success bg-gradient text-light">
+    <footer className="footer py-4 bg-success bg-gradient text-light mt-auto">
       <div className="container">
         <div className="row">
           <div className="col-md-4">
-            <h5 className="">Información de contacto:</h5>
+            <h5>Información de contacto:</h5>
             <ul className="list-unstyled">
               <li>
-                <strong>Teléfono:</strong> 246 265 3921
+                Telefono: <strong>246 265 3921</strong>
               </li>
               <li>
-                <strong>Email:</strong> info@nutrilud.com o karinetza09@gmail.com
+                Email: <strong>info@nutrilud.com o karinetza09@gmail.com</strong>
               </li>
               <li>
-                <strong>Horario de consultas:</strong> Lunes a Viernes de 9:00 A.M. a 5:00 P.M.
+                Horario de consultas: <strong>Lunes a Viernes de 9:00 A.M. a 5:00 P.M.</strong>
               </li>
             </ul>
           </div>
           <div className="col-md-4 text-center">
-            <h5 className="">Redes sociales:</h5>
+            <h5>Redes sociales:</h5>
             <ul className="list-unstyled">
               <li>
-                {" "}
                 <FaFacebook />{" "}
                 <a href="https://www.facebook.com/NutriLud" className="text-light">
-                  {" "}
                   Facebook
                 </a>
               </li>
               <li>
-                {" "}
                 <FaInstagram />{" "}
                 <a href="https://www.instagram.com/nutrilud/" className="text-light">
-                  {" "}
                   Instagram
                 </a>
               </li>
               <li>
-                {" "}
                 <FaTwitter />{" "}
                 <a href="#" className="text-light">
                   Twitter
@@ -48,7 +43,7 @@ export default function Footer() {
             </ul>
           </div>
           <div className="col-md-4 text-end">
-            <h5 className="">Recursos útiles:</h5>
+            <h5>Recursos útiles:</h5>
             <ul className="list-unstyled">
               <li>
                 <a href="[Enlace a recursos de nutrición]" className="text-light">

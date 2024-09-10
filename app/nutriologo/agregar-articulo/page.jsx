@@ -58,8 +58,8 @@ export default function AgregarArticulo() {
       console.log("URL de la Imagen: ", response.data.url);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("Error al subir la imagen", error.message);
-      return "image.jpg";
+      Utils.swalError("No se subio ninguna imagen", error.message);
+      return null;
     }
   };
 
@@ -103,7 +103,25 @@ export default function AgregarArticulo() {
             init={{
               height: 500,
               menubar: true,
-              plugins: ["advlist", "autolink", "lists", "link", "image", "charmap", "preview", "anchor", "searchreplace", "visualblocks", "code", "fullscreen", "insertdatetime", "media", "table", "help", "wordcount"],
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
+              ],
               toolbar: "undo redo | blocks | " + "bold italic backcolor | alignleft aligncenter " + "alignright alignjustify | bullist numlist outdent indent | " + "removeformat | help",
               content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
             }}
@@ -111,9 +129,16 @@ export default function AgregarArticulo() {
         </div>
         <div className="col-sm-4 my-1">
           <label htmlFor="">Subir imagen de portada</label>
-          <div className={`container bg-cardimage rounded ${dragging ? "drag-over" : ""}`} onDragOver={(e) => e.preventDefault()} onDragEnter={handleDragEnter} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+          <div
+            className={`container bg-cardimage rounded ${dragging ? "drag-over" : ""}`}
+            onDragOver={(e) => e.preventDefault()}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}>
             <div className="row">
-              <div className="col-sm-4">{imagePrevisualizada ? <Image src={imagePrevisualizada} alt="Previsualizacion de la imagen" style={{ width: "100px", height: "100px" }} /> : <FaImage size={100} />}</div>
+              <div className="col-sm-4">
+                {imagePrevisualizada ? <Image src={imagePrevisualizada} alt="Previsualizacion de la imagen" style={{ width: "100px", height: "100px" }} /> : <FaImage size={100} />}
+              </div>
               <div className="col-sm-8 pt-4 text-center">
                 <label htmlFor="file-update" className="file-upload-label text-center">
                   Elegir archivo
