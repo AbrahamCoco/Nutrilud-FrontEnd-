@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Dropdown, Modal } from "react-bootstrap";
 import axiosInstance from "../utils/axiosConfig";
@@ -11,9 +11,15 @@ import MenuPaciente from "./users/paciente/MenuPaciente";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [rol, setRol] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const storedRol = sessionStorage.getItem("trol_id");
+    if (storedRol) {
+      setRol(Number(storedRol));
+    }
+  }, []);
 
   const handleLogin = async () => {
     const usuario = document.getElementById("usuario").value;
@@ -33,7 +39,6 @@ export default function Navbar() {
       sessionStorage.setItem("trol_id", response.data.trol_id);
       setRol(response.data.trol_id);
       closeModal();
-      setIsLoggedIn(true);
 
       if (response.data.trol_id == 1) {
         router.push("/administrador");
@@ -64,11 +69,8 @@ export default function Navbar() {
         }
       );
 
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("nutriologo_id");
-      sessionStorage.removeItem("admin_id");
-      sessionStorage.removeItem("paciente_id");
-      setIsLoggedIn(false);
+      sessionStorage.clear();
+      setRol(null);
       Utils.swalSuccess("Cerró sesión correctamente");
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -110,7 +112,7 @@ export default function Navbar() {
           </div>
           <div className="row lg-6">
             <ul className="nav">
-              {isLoggedIn ? (
+              {rol ? (
                 <>
                   <li className="nav-item">
                     <Link href="/perfil" className="nav-link text-white">
@@ -124,7 +126,6 @@ export default function Navbar() {
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         {rol === 1 ? <MenuAdmin /> : rol === 2 ? <MenuNutri /> : rol === 3 ? <MenuPaciente /> : null}
-                        <Dropdown.Divider />
                         <Dropdown.Item as={Link} href="/" onClick={handleLogout}>
                           Cerrar Sesión
                         </Dropdown.Item>

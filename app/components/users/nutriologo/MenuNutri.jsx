@@ -17,6 +17,7 @@ export default function MenuNutri() {
       <Dropdown.Item as={Link} href="/nutriologo/pacientes">
         Pacientes
       </Dropdown.Item>
+      <Dropdown.Divider />
     </>
   );
 }
