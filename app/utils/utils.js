@@ -54,4 +54,18 @@ export class Utils {
       confirmButtonText: "Si, eliminar!",
     });
   }
+
+  static swalWarning(message) {
+    Swal.fire({
+      position: "bottom-end",
+      toast: true,
+      showConfirmButton: false,
+      icon: "warning",
+      width: 300,
+      title: "¡Atención...!",
+      text: message,
+      timer: 3000,
+      timerProgressBar: true,
+    });
+  }
 }

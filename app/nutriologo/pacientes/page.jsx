@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { Col, Container, Modal, Row, Table } from "react-bootstrap";
 import Link from "next/link";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
+import { BsWhatsapp } from "react-icons/bs";
+import { ImStatsDots } from "react-icons/im";
 import axiosInstance from "@/app/utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
 
@@ -126,6 +128,7 @@ export default function Pacientes() {
                 <th>Sexo</th>
                 <th>Correo</th>
                 <th>Telefono</th>
+                <th>Estadisticas</th>
                 <th>Dar consulta</th>
                 <th>Modificar</th>
                 <th>Eliminar</th>
@@ -139,7 +142,21 @@ export default function Pacientes() {
                   </td>
                   <td>{paciente.sexo}</td>
                   <td>{paciente.user.correo}</td>
-                  <td>{paciente.telefono}</td>
+                  <td>
+                    {paciente.telefono}{" "}
+                    <Link href={`https://wa.me/${paciente.telefono}`} target="_blank" rel="noopener noreferrer">
+                      <BsWhatsapp />
+                    </Link>
+                  </td>
+                  <td className="text-center">
+                    <Link href={`/nutriologo/pacientes/estadisticas/${paciente.user.id}`}>
+                      <div>
+                        <button className="btn btn-success pb-2">
+                          <ImStatsDots />
+                        </button>
+                      </div>
+                    </Link>
+                  </td>
                   <td className="text-center">
                     <Link href={`/nutriologo/pacientes/consulta/${paciente.id}`}>
                       <div>

@@ -1,29 +1,32 @@
 "use client";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { Utils } from "../utils/utils";
-import { useEffect, useState } from "react";
-import axiosInstance from "../utils/axiosConfig";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import axiosInstance from "@/app/utils/axiosConfig";
+import { Utils } from "@/app/utils/utils";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-export default function Paciente() {
+export default function EstadisticasPaciente() {
+  const { id } = useParams();
   const [data, setData] = useState(null);
 
-  const fetchData = async () => {
-    try {
-      const response = await axiosInstance.get(`auth/user/${sessionStorage.getItem("id_user")}`);
-      setData(response.data);
-      Utils.swalSuccess("Datos cargados correctamente");
-    } catch (error) {
-      Utils.swalError("Error al cargar datos del paciente", error.message);
-    }
-  };
-
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axiosInstance.get(`auth/user/${id}`);
+        setData(response.data);
+        console.log(response.data);
+        Utils.swalSuccess("Datos cargados correctamente");
+      } catch (error) {
+        Utils.swalError("Error al cargar datos del paciente", error.message);
+      }
+    };
+
     fetchData();
-  }, []);
+  }, [id]);
 
   if (!data) {
     return (
@@ -96,7 +99,6 @@ export default function Paciente() {
   return (
     <Container>
       <Row>
-        <h1>Dashboard</h1>
         <Col md={4}>
           <Card>
             <Card.Header>Grafica de peso</Card.Header>
@@ -107,7 +109,7 @@ export default function Paciente() {
         </Col>
         <Col md={4}>
           <Card>
-            <Card.Header>Grafica de estatura</Card.Header>
+            <Card.Header>Grafica de altura</Card.Header>
             <Card.Body>
               <Line data={dataEstatura} />
             </Card.Body>
@@ -121,15 +123,15 @@ export default function Paciente() {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4} className="py-4">
+        <Col md={4}>
           <Card>
-            <Card.Header>Grafica de porcentaje de grasa</Card.Header>
+            <Card.Header>Grafica de porcentaje de grasa corporal</Card.Header>
             <Card.Body>
               <Line data={porcentajegrasa} />
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4} className="py-4">
+        <Col md={4}>
           <Card>
             <Card.Header>Grafica de porcentaje de musculo</Card.Header>
             <Card.Body>
