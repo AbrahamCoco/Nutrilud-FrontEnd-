@@ -99,6 +99,7 @@ export default function EstadisticasPaciente() {
   return (
     <Container>
       <Row>
+        <h1>Estadisticas del paciente</h1>
         <Col md={4}>
           <Card>
             <Card.Header>Grafica de peso</Card.Header>

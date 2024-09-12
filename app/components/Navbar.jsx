@@ -12,6 +12,9 @@ import MenuPaciente from "./users/paciente/MenuPaciente";
 
 export default function Navbar() {
   const [rol, setRol] = useState(null);
+  const [usuario, setUsuario] = useState("");
+  const [contrasenia, setContrasenia] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,9 +25,6 @@ export default function Navbar() {
   }, []);
 
   const handleLogin = async () => {
-    const usuario = document.getElementById("usuario").value;
-    const contrasenia = document.getElementById("contrasenia").value;
-
     try {
       const response = await axiosInstance.post("/auth/login", {
         usuario: usuario,
@@ -40,14 +40,14 @@ export default function Navbar() {
       setRol(response.data.trol_id);
       closeModal();
 
-      if (response.data.trol_id == 1) {
+      if (response.data.trol_id === 1) {
         router.push("/administrador");
-      } else if (response.data.trol_id == 2) {
+      } else if (response.data.trol_id === 2) {
         router.push("/nutriologo");
-      } else if (response.data.trol_id == 3) {
+      } else if (response.data.trol_id === 3) {
         router.push("/paciente");
-      } else if (response.data.trol_id == null) {
-        Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesion nuevamente");
+      } else {
+        Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesión nuevamente");
         router.push("/");
       }
 
@@ -59,7 +59,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const response = await axiosInstance.post(
+      await axiosInstance.post(
         "/auth/logout",
         {},
         {
@@ -68,7 +68,6 @@ export default function Navbar() {
           },
         }
       );
-
       sessionStorage.clear();
       setRol(null);
       Utils.swalSuccess("Cerró sesión correctamente");
@@ -80,8 +79,6 @@ export default function Navbar() {
       }
     }
   };
-
-  const [showModal, setShowModal] = useState(false);
 
   const openModal = () => {
     setShowModal(true);
@@ -154,13 +151,13 @@ export default function Navbar() {
 
       <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Iniciar Sesion</Modal.Title>
+          <Modal.Title>Iniciar Sesión</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <label htmlFor="usuario">Usuario</label>
-          <input type="text" name="usuario" id="usuario" className="form-control" />
+          <input type="text" name="usuario" id="usuario" className="form-control" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
           <label htmlFor="contrasenia">Contraseña</label>
-          <input type="password" name="contrasenia" id="contrasenia" className="form-control" />
+          <input type="password" name="contrasenia" id="contrasenia" className="form-control" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)} />
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-secondary" onClick={closeModal}>

@@ -12,6 +12,7 @@ export default function Consulta() {
   const [paciente, setPaciente] = useState(null);
   const [consulta, setConsulta] = useState([]);
   const [datosFormulario, setDatosFormulario] = useState({
+    nutriologo_id: "",
     peso: "",
     estatura: "",
     imc: "",
@@ -26,42 +27,42 @@ export default function Consulta() {
     siguiente_consulta: "",
   });
 
-  useEffect(() => {
-    const loadPaciente = async () => {
-      try {
-        const response = await axiosInstance.get(`/paciente/${id}`);
-        setPaciente(response.data.paciente);
-        Utils.swalSuccess("Paciente cargado correctamente");
-      } catch (error) {
-        Utils.swalFailure("Error al cargar el paciente", error.message);
-      }
-    };
+  const loadDatosConsulta = async () => {
+    try {
+      const response = await axiosInstance.get(`/consultadatos/${id}`);
+      const consulta = response.data.consulta;
 
-    const loadDatosConsulta = async () => {
-      try {
-        const response = await axiosInstance.get(`/consultadatos/${id}`);
-        const consulta = response.data.consulta;
-
-        if (!consulta || consulta.length === 0) {
-          setConsulta(null);
-          Utils.swalWarning("No hay datos de consulta previos");
-        } else {
-          setConsulta(consulta);
-          Utils.swalSuccess("Datos de consulta cargados correctamente");
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 400) {
-          Utils.swalWarning(error.response.data.message || "No se encontraron datos de consulta.");
-        } else {
-          Utils.swalFailure("Error al cargar los datos de consulta", error.message);
-        }
+      if (!consulta || consulta.length === 0) {
         setConsulta(null);
+        Utils.swalWarning("No hay datos de consulta previos");
+      } else {
+        setConsulta(consulta);
+        Utils.swalSuccess("Datos de consulta cargados correctamente");
       }
-    };
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        Utils.swalWarning(error.response.data.message || "No se encontraron datos de consulta.");
+      } else {
+        Utils.swalFailure("Error al cargar los datos de consulta", error.message);
+      }
+      setConsulta(null);
+    }
+  };
 
+  const loadPaciente = async () => {
+    try {
+      const response = await axiosInstance.get(`/paciente/${id}`);
+      setPaciente(response.data.paciente);
+      Utils.swalSuccess("Paciente cargado correctamente");
+    } catch (error) {
+      Utils.swalFailure("Error al cargar el paciente", error.message);
+    }
+  };
+
+  useEffect(() => {
     loadPaciente();
     loadDatosConsulta();
-  }, [id]);
+  }, []);
 
   const calcularEdad = (fechaNacimiento) => {
     const fechaNac = new Date(fechaNacimiento);
@@ -84,10 +85,8 @@ export default function Consulta() {
     const edad = calcularEdad(paciente.fecha_nacimiento);
 
     if (!isNaN(peso) && !isNaN(estatura && estatura !== 0)) {
-      //Logica para calcular el IMC
       const imc = peso / (estatura * estatura);
 
-      //Logica para calcular el porcentaje de grasa
       let porcentajeGrasa = 0;
       if (sexo === "Masculino") {
         porcentajeGrasa = 1.2 * imc + 0.23 * edad - 16.2;
@@ -95,9 +94,6 @@ export default function Consulta() {
         porcentajeGrasa = 1.2 * imc + 0.23 * edad - 5.4;
       }
 
-      //Para sacar el porcentaje de musculo se necesita sacar el area muscular del brazo
-      //Logica para calcular el area muscular del brazo
-      // Define el valor del área del brazo según el género
       let genero = 0;
       let areaMuscularBrazo = 0;
       if (!isNaN(datosFormulario.circunferencia_brazo) && !isNaN(datosFormulario.pliegue_tricipital)) {
@@ -106,19 +102,18 @@ export default function Consulta() {
         } else if (datosFormulario.sexo === "Femenino") {
           genero = 6.5;
         }
-        // Calcula el área muscular del brazo
+
         areaMuscularBrazo = Math.pow(datosFormulario.circunferencia_brazo - datosFormulario.pliegue_tricipital * Math.PI, 2) / (4 * Math.PI) - genero;
       }
 
-      //Logica para calcular el porcentaje de musculo
       let porcentajeMusculo = 0;
       if (!isNaN(areaMuscularBrazo)) {
         porcentajeMusculo = datosFormulario.estatura * (0.0264 + 0.0029 * areaMuscularBrazo);
       }
 
-      //Logica para mandar los datos faltantes al formulario
       setDatosFormulario((prevDatosFormulario) => ({
         ...prevDatosFormulario,
+        nutriologo_id: sessionStorage.getItem("id_user"),
         imc: imc.toFixed(3),
         porcentaje_grasa: porcentajeGrasa.toFixed(3),
         porcentaje_musculo: porcentajeMusculo.toFixed(3),
@@ -146,6 +141,7 @@ export default function Consulta() {
         fecha_medicion: "",
         siguiente_consulta: "",
       });
+
       loadDatosConsulta();
       Utils.swalSuccess("Datos de consulta guardados correctamente");
     } catch (error) {

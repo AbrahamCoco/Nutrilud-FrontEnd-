@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import axiosInstance from "@/app/utils/axiosConfig";
-import { Utils } from "@app/utils/utils";
+import { Utils } from "../utils/utils";
+import { Image } from "react-bootstrap";
 
 export default function Registro() {
   const [nombre, setNombre] = useState("");
@@ -49,11 +50,10 @@ export default function Registro() {
           "Content-Type": "multipart/form-data",
         },
       });
-      console.log("URL de la Imagen: ", response.data.url);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("Error al subir la imagen", error.message);
-      return "image.jpg";
+      Utils.swalError("No se subio ninguna imagen", error.message);
+      return null;
     }
   };
 
@@ -149,7 +149,7 @@ export default function Registro() {
     <div className="container my-4">
       <form>
         <div className="row">
-          <div className="col-sm-3">{selectedImage && <img src={selectedImage} className="img-fluid imagen" alt="Previsualización" />}</div>
+          <div className="col-sm-3">{selectedImage && <Image src={selectedImage} className="img-fluid imagen" alt="Previsualización" />}</div>
           <div className="col-sm-9">
             <div className="mb-2">
               <label htmlFor="imagen" className="form-label">
