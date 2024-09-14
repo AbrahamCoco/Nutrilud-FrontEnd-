@@ -18,7 +18,6 @@ export default function EstadisticasPaciente() {
       try {
         const response = await axiosInstance.get(`auth/user/${id}`);
         setData(response.data);
-        console.log(response.data);
         Utils.swalSuccess("Datos cargados correctamente");
       } catch (error) {
         Utils.swalError("Error al cargar datos del paciente", error.message);
@@ -99,7 +98,9 @@ export default function EstadisticasPaciente() {
   return (
     <Container>
       <Row>
-        <h1>Estadisticas del paciente</h1>
+        <h1>
+          Estadisticas del paciente {data.data.nombre} {data.data.primer_apellido} {data.data.segundo_apellido}
+        </h1>
         <Col md={4}>
           <Card>
             <Card.Header>Grafica de peso</Card.Header>

@@ -28,7 +28,7 @@ export default function Nutriologo() {
         fechaFin.setMinutes(fechaFin.getMinutes() + 29);
 
         return {
-          title: `Cita con el paciente: ${evento.consulta.user.nombre} ${evento.consulta.user.primer_apellido} ${evento.consulta.user.segundo_apellido}`,
+          title: `Cita con el paciente: ${evento.paciente.user.nombre} ${evento.paciente.user.primer_apellido} ${evento.paciente.user.segundo_apellido}`,
           start: fechaInicio,
           end: fechaFin,
         };
@@ -36,7 +36,7 @@ export default function Nutriologo() {
       setAgenda(eventos);
       Utils.swalSuccess("Agenda cargada correctamente");
     } catch (error) {
-      Utils.swalFailure("Error al cargar la agenda", error.response.data.message);
+      Utils.swalFailure("Error al cargar la agenda: ", error.response.data.message);
     }
   };
 

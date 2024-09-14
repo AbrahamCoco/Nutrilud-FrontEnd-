@@ -20,13 +20,17 @@ export default function Agenda() {
   const loadAgenda = async () => {
     try {
       const response = await axiosInstance.get("/nutriologo/agenda");
+      if (response.data.agenda.length === 0) {
+        Utils.swalInfo("No hay eventos en la agenda");
+        return;
+      }
       const eventos = response.data.agenda.map((evento) => {
         const fechaInicio = new Date(evento.siguiente_consulta);
         const fechaFin = new Date(fechaInicio);
         fechaFin.setMinutes(fechaFin.getMinutes() + 29);
 
         return {
-          title: `Cita con el paciente: ${evento.consulta.user.nombre} ${evento.consulta.user.primer_apellido} ${evento.consulta.user.segundo_apellido}`,
+          title: `Cita con el paciente: ${evento.paciente.user.nombre} ${evento.paciente.user.primer_apellido} ${evento.paciente.user.segundo_apellido}`,
           start: fechaInicio,
           end: fechaFin,
         };
@@ -34,7 +38,7 @@ export default function Agenda() {
       setAgenda(eventos);
       Utils.swalSuccess("Agenda cargada correctamente");
     } catch (error) {
-      Utils.swalFailure("Error al cargar la agenda", error.response.data.message);
+      Utils.swalFailure("Error al cargar la agenda: ", error.response.data.message);
     }
   };
 
@@ -61,7 +65,16 @@ export default function Agenda() {
           </div>
         </div>
         <div className="col-md-4">
-          <FullCalendar locale={esLocale} plugins={[dayGridPlugin, timeGridPlugin, listPlugin]} headerToolbar={{ left: "", center: "title", right: "" }} initialView="listWeek" events={agenda} slotMinTime={"08:00:00"} slotMaxTime={"18:00:00"} themeSystem="bootstrap4" />
+          <FullCalendar
+            locale={esLocale}
+            plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
+            headerToolbar={{ left: "", center: "title", right: "" }}
+            initialView="listWeek"
+            events={agenda}
+            slotMinTime={"08:00:00"}
+            slotMaxTime={"18:00:00"}
+            themeSystem="bootstrap4"
+          />
         </div>
       </div>
     </Container>

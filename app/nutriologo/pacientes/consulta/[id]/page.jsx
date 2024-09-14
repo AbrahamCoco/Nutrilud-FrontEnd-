@@ -1,7 +1,7 @@
 "use client";
 import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { useParams } from "next/navigation";
 import { Utils } from "@/app/utils/utils";
 import { BsWhatsapp } from "react-icons/bs";
@@ -395,9 +395,14 @@ export default function Consulta() {
               }
             />
             <div className="text-center my-4">
-              <button className="btn btn-primary" type="submit">
+              <button className="btn btn-primary mx-1" type="submit">
                 Guardar datos
               </button>
+              <Link href={`/nutriologo/pacientes/consulta/${id}/recordatorios`}>
+                <Button variant="secondary" className="mx-1">
+                  Recordatorios
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
