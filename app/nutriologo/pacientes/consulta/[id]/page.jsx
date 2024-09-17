@@ -5,6 +5,7 @@ import { Button, Container } from "react-bootstrap";
 import { useParams } from "next/navigation";
 import { Utils } from "@/app/utils/utils";
 import { BsWhatsapp } from "react-icons/bs";
+import { BsFileEarmarkMedicalFill } from "react-icons/bs";
 import Link from "next/link";
 
 export default function Consulta() {
@@ -173,6 +174,7 @@ export default function Consulta() {
                   <th>Edad</th>
                   <th>Correo</th>
                   <th>Telefono</th>
+                  <th>Recordatorios</th>
                 </tr>
               </thead>
               <tbody className="text-center">
@@ -190,6 +192,13 @@ export default function Consulta() {
                     {paciente.telefono}{" "}
                     <Link href={`https://wa.me/${paciente.telefono}`} target="_blank" rel="noopener noreferrer">
                       <BsWhatsapp />
+                    </Link>
+                  </td>
+                  <td>
+                    <Link href={`/nutriologo/pacientes/consulta/${id}/recordatorios`}>
+                      <Button variant="info" className="mx-1">
+                        <BsFileEarmarkMedicalFill />
+                      </Button>
                     </Link>
                   </td>
                 </tr>
@@ -398,11 +407,6 @@ export default function Consulta() {
               <button className="btn btn-primary mx-1" type="submit">
                 Guardar datos
               </button>
-              <Link href={`/nutriologo/pacientes/consulta/${id}/recordatorios`}>
-                <Button variant="secondary" className="mx-1">
-                  Recordatorios
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
