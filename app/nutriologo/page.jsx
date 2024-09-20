@@ -2,11 +2,10 @@
 import FullCalendar from "@fullcalendar/react";
 import listPlugin from "@fullcalendar/list";
 import esLocale from "@fullcalendar/core/locales/es";
-import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { Utils } from "../utils/utils";
 import Clock from "../components/Clock";
+import { NutriologoController } from "./nutriologoController";
 
 export default function Nutriologo() {
   const [agenda, setAgenda] = useState(null);
@@ -17,26 +16,10 @@ export default function Nutriologo() {
 
   const loadAgenda = async () => {
     try {
-      const response = await axiosInstance.get("/nutriologo/agenda");
-      if (response.data.agenda.length === 0) {
-        Utils.swalInfo("No hay eventos en la agenda");
-        return;
-      }
-      const eventos = response.data.agenda.map((evento) => {
-        const fechaInicio = new Date(evento.siguiente_consulta);
-        const fechaFin = new Date(fechaInicio);
-        fechaFin.setMinutes(fechaFin.getMinutes() + 29);
-
-        return {
-          title: `Cita con el paciente: ${evento.paciente.user.nombre} ${evento.paciente.user.primer_apellido} ${evento.paciente.user.segundo_apellido}`,
-          start: fechaInicio,
-          end: fechaFin,
-        };
-      });
-      setAgenda(eventos);
-      Utils.swalSuccess("Agenda cargada correctamente");
+      const response = await NutriologoController.getAgenda();
+      setAgenda(response);
     } catch (error) {
-      Utils.swalFailure("Error al cargar la agenda: ", error.response.data.message);
+      setAgenda(null);
     }
   };
 
