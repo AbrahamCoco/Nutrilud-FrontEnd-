@@ -7,6 +7,7 @@ import { Utils } from "@/app/utils/utils";
 import { BsWhatsapp } from "react-icons/bs";
 import { BsFileEarmarkMedicalFill } from "react-icons/bs";
 import Link from "next/link";
+import { ConsultaController } from "./consultaController";
 
 export default function Consulta() {
   const { id } = useParams();
@@ -30,7 +31,7 @@ export default function Consulta() {
 
   const loadDatosConsulta = async () => {
     try {
-      const response = await axiosInstance.get(`/consultadatos/${id}`);
+      const response = await ConsultaController.getAllConsultas(id);
       const consulta = response.data.consulta;
 
       if (!consulta || consulta.length === 0) {
@@ -52,11 +53,10 @@ export default function Consulta() {
 
   const loadPaciente = async () => {
     try {
-      const response = await axiosInstance.get(`/paciente/${id}`);
+      const response = await ConsultaController.getPacienteId(id);
       setPaciente(response.data.paciente);
-      Utils.swalSuccess("Paciente cargado correctamente");
     } catch (error) {
-      Utils.swalFailure("Error al cargar el paciente", error.message);
+      setPaciente(null);
     }
   };
 
@@ -122,11 +122,7 @@ export default function Consulta() {
     }
 
     try {
-      const response = await axiosInstance.post(`/insertardatos/${id}`, datosFormulario, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await ConsultaController.addConsulta(id, datosFormulario);
 
       setDatosFormulario({
         peso: "",
@@ -144,7 +140,6 @@ export default function Consulta() {
       });
 
       loadDatosConsulta();
-      Utils.swalSuccess("Datos de consulta guardados correctamente");
     } catch (error) {
       Utils.swalFailure("Error al guardar los datos de consulta", error.message);
     }

@@ -1,10 +1,10 @@
-import axiosInstance from "@/app/utils/axiosConfig";
+import { Tarjet } from "@/app/utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
 
 export class ArticuloController {
   static async getArticulo(id) {
     try {
-      const response = await axiosInstance.get(`/articulo/${id}`);
+      const response = await Tarjet.nutriologoApi.getArticuloId(id);
       const articuloData = response.data.articulo;
 
       if (!articuloData || !articuloData.contenido) {

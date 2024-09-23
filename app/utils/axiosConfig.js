@@ -25,4 +25,27 @@ axiosInstance.interceptors.request.use(
   }
 );
 
+// Exporta los métodos de la API
+export const Tarjet = {
+  userApi: {
+    login: (data) => axiosInstance.post("/auth/login", data),
+    logout: () => axiosInstance.post("/auth/logout"),
+    register: (data) => axiosInstance.post("/auth/register", data),
+    upluoadImage: (data) => axiosInstance.post("/upload/image", data),
+    getUser: () => axiosInstance.get(`/auth/user/${id}`),
+  },
+  adminApi: {},
+  nutriologoApi: {
+    getAllArticulos: () => axiosInstance.get("/nutriologo/"),
+    getArticuloId: (id) => axiosInstance.get(`/nutriologo/articulo/${id}`),
+    getAgenda: () => axiosInstance.get("/nutriologo/agenda"),
+    addArticulo: (data) => axiosInstance.post("/nutriologo/articulo", data),
+    getAllPacientes: () => axiosInstance.get("/nutriologo/pacientes"),
+    getPacienteId: (id) => axiosInstance.get(`/nutriologo/paciente/${id}`),
+    getAllConsultas: (id) => axiosInstance.get(`/nutriologo/consultadatos/${id}`),
+    addConsulta: (id, data) => axiosInstance.post(`/nutriologo/insertardatos/${id}`, data),
+  },
+  pacienteApi: {},
+};
+
 export default axiosInstance;

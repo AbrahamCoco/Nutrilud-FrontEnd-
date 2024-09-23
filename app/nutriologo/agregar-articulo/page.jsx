@@ -3,9 +3,8 @@ import { useRef, useState } from "react";
 import { FaImage } from "react-icons/fa";
 import { Editor } from "@tinymce/tinymce-react";
 import { Image } from "react-bootstrap";
-import axiosInstance from "@/app/utils/axiosConfig";
 import { useRouter } from "next/navigation";
-import { Utils } from "@/app/utils/utils";
+import { AgregarArticuloController } from "./agregarArticuloController";
 
 export default function AgregarArticulo() {
   const [contenido, setContenido] = useState("");
@@ -50,43 +49,26 @@ export default function AgregarArticulo() {
     const formData = new FormData();
     formData.append("image", selectedFile);
     try {
-      const response = await axiosInstance.post("/upload/image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log("URL de la Imagen: ", response.data.url);
+      const response = await AgregarArticuloController.uploadImage(formData);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("No se subio ninguna imagen", error.message);
       return null;
     }
   };
 
   const handleAgregarArticulo = async () => {
     try {
-      const response = await axiosInstance.post(
-        "/nutriologo/articulos",
-        {
-          contenido: contenido,
-          foto: await uploadImage(),
-          nutriologo_id: localStorage.getItem("nutriologo_id"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await AgregarArticuloController.AddArticulo({
+        contenido: contenido,
+        foto: await uploadImage(),
+        nutriologo_id: localStorage.getItem("nutriologo_id"),
+      });
 
       setContenido("");
       setSelectedFile(null);
       router.push("/");
-      Utils.swalSuccess("Artículo guardado correctamente");
     } catch (error) {
-      setError("Error al guardar el artículo. Por favor, inténtalo de nuevo.");
-      Utils.swalError("Error al guardar el artículo", error.message);
+      setError("Error al guardar el artículo");
     }
   };
 

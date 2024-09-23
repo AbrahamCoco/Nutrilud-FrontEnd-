@@ -2,12 +2,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Dropdown, Modal } from "react-bootstrap";
-import axiosInstance from "../utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
 import { useRouter } from "next/navigation";
 import MenuAdmin from "./users/administrador/MenuAdmin";
 import MenuNutri from "./users/nutriologo/MenuNutri";
 import MenuPaciente from "./users/paciente/MenuPaciente";
+import { NavbarController } from "./navbarController";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
@@ -26,19 +26,7 @@ export default function Navbar() {
 
   const handleLogin = async () => {
     try {
-      const response = await axiosInstance.post("/auth/login", {
-        usuario: usuario,
-        contrasenia: contrasenia,
-      });
-
-      sessionStorage.setItem("token", response.data.token);
-      sessionStorage.setItem("id_user", response.data.user);
-      sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
-      sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
-      sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
-      sessionStorage.setItem("trol_id", response.data.trol_id);
-      setRol(response.data.trol_id);
-      closeModal();
+      const response = await NavbarController.login(usuario, contrasenia);
 
       if (response.data.trol_id === 1) {
         router.push("/administrador");
@@ -51,33 +39,16 @@ export default function Navbar() {
         router.push("/");
       }
 
-      Utils.swalSuccess("Inicio de sesión correcto");
+      setRol(response.data.trol_id);
+      closeModal();
     } catch (error) {
-      Utils.swalFailure("Error al iniciar sesión", error.message);
+      setRol(null);
     }
   };
 
   const handleLogout = async () => {
-    try {
-      await axiosInstance.post(
-        "/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-          },
-        }
-      );
-      sessionStorage.clear();
-      setRol(null);
-      Utils.swalSuccess("Cerró sesión correctamente");
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        Utils.swalError("El token es inválido. Necesita iniciar sesión nuevamente");
-      } else {
-        Utils.swalError("Error al cerrar sesión", error.message);
-      }
-    }
+    await NavbarController.logout();
+    setRol(null);
   };
 
   const openModal = () => {

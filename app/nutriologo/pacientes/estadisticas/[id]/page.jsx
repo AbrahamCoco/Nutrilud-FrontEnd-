@@ -4,8 +4,7 @@ import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import axiosInstance from "@/app/utils/axiosConfig";
-import { Utils } from "@/app/utils/utils";
+import { EstadisticasController } from "./estadisticasController";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -16,11 +15,10 @@ export default function EstadisticasPaciente() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axiosInstance.get(`auth/user/${id}`);
+        const response = await EstadisticasController.getDatosPaciente(id);
         setData(response.data);
-        Utils.swalSuccess("Datos cargados correctamente");
       } catch (error) {
-        Utils.swalError("Error al cargar datos del paciente", error.message);
+        setData(null);
       }
     };
 

@@ -5,9 +5,9 @@ import Link from "next/link";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
 import { BsWhatsapp } from "react-icons/bs";
 import { ImStatsDots } from "react-icons/im";
-import axiosInstance from "@/app/utils/axiosConfig";
-import { Utils } from "@/app/utils/utils";
 import DataTable from "react-data-table-component";
+import { PacientesController } from "./pacientesController";
+import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -31,11 +31,10 @@ export default function Pacientes() {
 
   const loadPacientes = async () => {
     try {
-      const response = await axiosInstance.get("/pacientes");
+      const response = PacientesController.getAllPacientes();
       setPacientes(response.data.pacientes);
-      Utils.swalSuccess("Pacientes cargados correctamente");
     } catch (error) {
-      Utils.swalFailure("Error al cargar los pacientes", error.message);
+      setPacientes([]);
     }
   };
 
@@ -52,13 +51,9 @@ export default function Pacientes() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await axiosInstance.post("/upload/image", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
+      const response = await AgregarArticuloController.uploadImage(formData);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("Error al subir la imagen", error.message);
       return null;
     }
   };
@@ -83,16 +78,13 @@ export default function Pacientes() {
         sexo,
       };
 
-      const response = await axiosInstance.post("/auth/register", userData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await PacientesController.addPaciente(userData);
 
       loadPacientes();
       closeModal();
-      Utils.swalSuccess("Paciente guardado correctamente");
       return response;
     } catch (error) {
-      Utils.swalFailure("Error al guardar el paciente", error.message);
+      return null;
     }
   };
 
