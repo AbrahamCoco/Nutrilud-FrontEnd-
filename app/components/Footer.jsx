@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Col, Container, Row } from "react-bootstrap";
 import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
 
@@ -47,19 +48,19 @@ export default function Footer() {
             <h5>Recursos útiles:</h5>
             <ul className="list-unstyled">
               <li>
-                <a href="[Enlace a recursos de nutrición]" className="text-light">
+                <Link href="/nutriologo/recursos" className="text-light">
                   Recursos de nutrición
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="[Enlace a guías de alimentación saludable]" className="text-light">
+                <Link href="/nutriologo/guias" className="text-light">
                   Guías de alimentación saludable
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="[Enlace a información sobre estilos de vida activos]" className="text-light">
+                <Link href="/nutriologo/estilos" className="text-light">
                   Información sobre estilos de vida activos
-                </a>
+                </Link>
               </li>
             </ul>
           </Col>
