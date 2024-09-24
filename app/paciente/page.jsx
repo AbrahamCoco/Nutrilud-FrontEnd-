@@ -1,10 +1,9 @@
 "use client";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { Utils } from "../utils/utils";
 import { useEffect, useState } from "react";
-import axiosInstance from "../utils/axiosConfig";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { PacienteController } from "./pacienteController";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -13,11 +12,10 @@ export default function Paciente() {
 
   const fetchData = async () => {
     try {
-      const response = await axiosInstance.get(`auth/user/${sessionStorage.getItem("id_user")}`);
+      const response = await PacienteController.getUser(sessionStorage.getItem("id_user"));
       setData(response.data);
-      Utils.swalSuccess("Datos cargados correctamente");
     } catch (error) {
-      Utils.swalError("Error al cargar datos del paciente", error.message);
+      setData(null);
     }
   };
 

@@ -37,4 +37,27 @@ export class ConsultaController {
       return null;
     }
   }
+
+  static async porcentajeGrasa(sexo, imc, edad) {
+    let porcentajeGrasa = 0;
+    if (sexo === "Masculino") {
+      porcentajeGrasa = 1.2 * imc + 0.23 * edad - 16.2;
+    } else if (sexo === "Femenino") {
+      porcentajeGrasa = 1.2 * imc + 0.23 * edad - 5.4;
+    }
+    return porcentajeGrasa;
+  }
+
+  static async areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo) {
+    let genero = 0;
+    let areaMuscularBrazo = 0;
+    if (sexo === "Masculino") {
+      genero = 10;
+    } else if (sexo === "Femenino") {
+      genero = 6.5;
+    }
+
+    areaMuscularBrazo = Math.pow(circunBrazo - pliegueTricipital * Math.PI, 2) / (4 * Math.PI) - genero;
+    return areaMuscularBrazo;
+  }
 }

@@ -3,6 +3,9 @@ import { useState } from "react";
 import axiosInstance from "@/app/utils/axiosConfig";
 import { Utils } from "../utils/utils";
 import { Image } from "react-bootstrap";
+import { ArticuloController } from "../articulo/[id]/articuloController";
+import { AgregarArticuloController } from "../nutriologo/agregar-articulo/agregarArticuloController";
+import { RegistroController } from "./registroController";
 
 export default function Registro() {
   const [nombre, setNombre] = useState("");
@@ -45,14 +48,9 @@ export default function Registro() {
     const formData = new FormData();
     formData.append("image", selectedFile);
     try {
-      const response = await axiosInstance.post("/upload/image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+      const response = await AgregarArticuloController.uploadImage(formData);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("No se subio ninguna imagen", error.message);
       return null;
     }
   };
@@ -101,18 +99,7 @@ export default function Registro() {
           break;
       }
 
-      const response = await axiosInstance
-        .post("/auth/register", JSON.stringify({ ...userData, ...tipoUsuarioData }), {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          Utils.swalSuccess("Usuario registrado correctamente");
-        })
-        .catch((error) => {
-          Utils.swalFailure("Error al registrar el usuario", error.message);
-        });
+      await RegistroController.addUser({ ...userData, ...tipoUsuarioData });
 
       setTrolId(null);
       setNombre("");
@@ -141,7 +128,7 @@ export default function Registro() {
         setAlergias("");
       }
     } catch (error) {
-      Utils.swalFailure("Error al registrar el usuario", error.message);
+      return error;
     }
   };
 

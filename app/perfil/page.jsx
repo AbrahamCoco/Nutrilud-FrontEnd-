@@ -1,34 +1,25 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Container, Image, Row, Col } from "react-bootstrap";
-import axiosInstance from "@/app/utils/axiosConfig";
-import { Utils } from "@/app/utils/utils";
 import "boxicons/css/boxicons.min.css";
+import { PacienteController } from "../paciente/pacienteController";
+import { PerfilController } from "./perfilController";
 
 export default function Perfil() {
   const [rol, setRol] = useState(null);
+  const [edad, setEdad] = useState(0);
   const [perfilData, setPerfilData] = useState([]);
 
   const handleDatosPerfil = async () => {
     try {
-      const response = await axiosInstance.get(`auth/user/${sessionStorage.getItem("id_user")}`);
+      const response = await PacienteController.getUser(sessionStorage.getItem("id_user"));
       setPerfilData(response.data);
-      Utils.swalSuccess("Datos cargados correctamente");
     } catch (error) {
-      Utils.swalError("Error al cargar datos del perfil", error.message);
+      setPerfilData(null);
     }
   };
 
-  function calcularEdad(fechaNacimiento) {
-    const hoy = new Date();
-    const cumpleanos = new Date(fechaNacimiento);
-    let edad = hoy.getFullYear() - cumpleanos.getFullYear();
-    const mes = hoy.getMonth() - cumpleanos.getMonth();
-    if (mes < 0 || (mes === 0 && hoy.getDate() < cumpleanos.getDate())) {
-      edad--;
-    }
-    return edad;
-  }
+  setEdad(PerfilController.calcularEdad(perfilData.data?.paciente?.fecha_nacimiento));
 
   useEffect(() => {
     const storedRol = parseInt(sessionStorage.getItem("trol_id"), 10);
@@ -131,7 +122,7 @@ export default function Perfil() {
                 })}
               </h5>
               <h4>Edad</h4>
-              <h5> {calcularEdad(perfilData.data?.paciente?.fecha_nacimiento)} años</h5>
+              <h5> {edad} años</h5>
             </Col>
             <Col md={4}>
               <h4>Estatura</h4>

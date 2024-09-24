@@ -1,5 +1,4 @@
 "use client";
-import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import { useParams } from "next/navigation";
@@ -84,28 +83,13 @@ export default function Consulta() {
     const estatura = parseFloat(datosFormulario.estatura);
     const sexo = paciente.sexo;
     const edad = calcularEdad(paciente.fecha_nacimiento);
+    const circunBrazo = parseFloat(datosFormulario.circunferencia_brazo);
+    const pliegueTricipital = parseFloat(datosFormulario.pliegue_tricipital);
 
     if (!isNaN(peso) && !isNaN(estatura && estatura !== 0)) {
-      const imc = peso / (estatura * estatura);
-
-      let porcentajeGrasa = 0;
-      if (sexo === "Masculino") {
-        porcentajeGrasa = 1.2 * imc + 0.23 * edad - 16.2;
-      } else if (sexo === "Femenino") {
-        porcentajeGrasa = 1.2 * imc + 0.23 * edad - 5.4;
-      }
-
-      let genero = 0;
-      let areaMuscularBrazo = 0;
-      if (!isNaN(datosFormulario.circunferencia_brazo) && !isNaN(datosFormulario.pliegue_tricipital)) {
-        if (datosFormulario.sexo === "Masculino") {
-          genero = 10;
-        } else if (datosFormulario.sexo === "Femenino") {
-          genero = 6.5;
-        }
-
-        areaMuscularBrazo = Math.pow(datosFormulario.circunferencia_brazo - datosFormulario.pliegue_tricipital * Math.PI, 2) / (4 * Math.PI) - genero;
-      }
+      let imc = peso / (estatura * estatura);
+      let porcentajeGrasa = await ConsultaController.porcentajeGrasa(sexo, imc, edad);
+      let areaMuscularBrazo = await ConsultaController.areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo);
 
       let porcentajeMusculo = 0;
       if (!isNaN(areaMuscularBrazo)) {
