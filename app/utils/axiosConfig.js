@@ -32,7 +32,7 @@ export const Tarjet = {
     logout: () => axiosInstance.post("/auth/logout"),
     register: (data) => axiosInstance.post("/auth/register", data),
     upluoadImage: (data) => axiosInstance.post("/upload/image", data),
-    getUser: () => axiosInstance.get(`/auth/user/${id}`),
+    getUser: (id) => axiosInstance.get(`/auth/user/${id}`),
   },
   adminApi: {},
   nutriologoApi: {

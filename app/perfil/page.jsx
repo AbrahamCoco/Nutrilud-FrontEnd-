@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Container, Image, Row, Col } from "react-bootstrap";
 import "boxicons/css/boxicons.min.css";
-import { PacienteController } from "../paciente/pacienteController";
 import { PerfilController } from "./perfilController";
 
 export default function Perfil() {
@@ -12,14 +11,12 @@ export default function Perfil() {
 
   const handleDatosPerfil = async () => {
     try {
-      const response = await PacienteController.getUser(sessionStorage.getItem("id_user"));
+      const response = await PerfilController.getUser(sessionStorage.getItem("id_user"));
       setPerfilData(response.data);
     } catch (error) {
       setPerfilData(null);
     }
   };
-
-  setEdad(PerfilController.calcularEdad(perfilData.data?.paciente?.fecha_nacimiento));
 
   useEffect(() => {
     const storedRol = parseInt(sessionStorage.getItem("trol_id"), 10);
@@ -27,7 +24,8 @@ export default function Perfil() {
       setRol(storedRol);
       handleDatosPerfil();
     }
-  }, []);
+    setEdad(PerfilController.calcularEdad(perfilData.data?.paciente?.fecha_nacimiento));
+  }, [perfilData.data?.paciente?.fecha_nacimiento]);
 
   return (
     <Container>

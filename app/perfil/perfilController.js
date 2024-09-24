@@ -1,3 +1,6 @@
+import { Tarjet } from "../utils/axiosConfig";
+import { Utils } from "../utils/utils";
+
 export class PerfilController {
   static async calcularEdad(fechaNacimiento) {
     const hoy = new Date();
@@ -8,5 +11,16 @@ export class PerfilController {
       edad--;
     }
     return edad;
+  }
+
+  static async getUser(idUser) {
+    try {
+      const response = await Tarjet.userApi.getUser(idUser);
+      Utils.swalSuccess("Datos cargados correctamente");
+      return response;
+    } catch (error) {
+      Utils.swalError("Error al cargar los datos");
+      return null;
+    }
   }
 }
