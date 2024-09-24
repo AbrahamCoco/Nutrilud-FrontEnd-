@@ -6,7 +6,7 @@ export class PacientesController {
     try {
       const response = await Tarjet.nutriologoApi.getAllPacientes();
       Utils.swalSuccess("Pacientes cargados correctamente");
-      return response;
+      return response.data;
     } catch (error) {
       Utils.swalError("Error al cargar pacientes", error.message);
       return [];

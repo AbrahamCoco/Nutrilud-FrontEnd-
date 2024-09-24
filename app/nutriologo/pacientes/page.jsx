@@ -31,8 +31,8 @@ export default function Pacientes() {
 
   const loadPacientes = async () => {
     try {
-      const response = PacientesController.getAllPacientes();
-      setPacientes(response.data.pacientes);
+      const response = await PacientesController.getAllPacientes();
+      setPacientes(response.pacientes);
     } catch (error) {
       setPacientes([]);
     }
