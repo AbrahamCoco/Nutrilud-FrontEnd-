@@ -29,7 +29,7 @@ axiosInstance.interceptors.request.use(
 export const Tarjet = {
   userApi: {
     login: (data) => axiosInstance.post("/auth/login", data),
-    logout: () => axiosInstance.post("/auth/logout"),
+    logout: (config) => axiosInstance.post("/auth/logout", {}, config),
     register: (data) => axiosInstance.post("/auth/register", data),
     upluoadImage: (data) => axiosInstance.post("/upload/image", data),
     getUser: (id) => axiosInstance.get(`/auth/user/${id}`),
@@ -47,5 +47,3 @@ export const Tarjet = {
   },
   pacienteApi: {},
 };
-
-export default axiosInstance;

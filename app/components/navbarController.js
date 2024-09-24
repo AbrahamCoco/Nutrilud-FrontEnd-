@@ -24,9 +24,9 @@ export class NavbarController {
     }
   }
 
-  static async logout() {
+  static async logout(token) {
     try {
-      await Tarjet.userApi.logout({}, { headers: { Authorization: `Bearer ${token}` } });
+      await Tarjet.userApi.logout({ headers: { Authorization: `Bearer ${token}` } });
       sessionStorage.clear();
       Utils.swalSuccess("Cerró sesión correctamente");
     } catch (error) {

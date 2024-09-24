@@ -47,7 +47,8 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    await NavbarController.logout();
+    const token = sessionStorage.getItem("token");
+    await NavbarController.logout(token);
     setRol(null);
   };
 
