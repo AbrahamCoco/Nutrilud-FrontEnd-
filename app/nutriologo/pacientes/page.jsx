@@ -236,18 +236,19 @@ export default function Pacientes() {
                   Telefono
                 </label>
                 <input type="text" className="form-control" id="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-                <label htmlFor="" className="form-label">
+                <label htmlFor="sexo" className="form-label">
                   Sexo
                 </label>
                 <div className="mb-2">
                   <div className="form-check-inline">
-                    <label htmlFor="" className="form-check-label">
-                      <input type="radio" className="form-check-input" name="sexo" id="masculino" value="Masculino" checked={sexo === "Masculino"} onChange={() => setSexo("Masculino")} /> Masculino
+                    <label htmlFor="masculino" className="form-check-label">
+                      <input type="radio" className="form-check-input" name="sexo" id="masculino" value="Masculino" checked={sexo === "Masculino"} onChange={(e) => setSexo(e.target.value)} />{" "}
+                      Masculino
                     </label>
                   </div>
                   <div className="form-check-inline">
-                    <label htmlFor="" className="form-check-label">
-                      <input type="radio" className="form-check-input" name="sexo" id="femenino" value="Femenino" checked={sexo === "Femenino"} onChange={() => setSexo("Femenino")} /> Femenino
+                    <label htmlFor="femenino" className="form-check-label">
+                      <input type="radio" className="form-check-input" name="sexo" id="femenino" value="Femenino" checked={sexo === "Femenino"} onChange={(e) => setSexo(e.target.value)} /> Femenino
                     </label>
                   </div>
                 </div>

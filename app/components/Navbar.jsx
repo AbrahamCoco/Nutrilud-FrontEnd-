@@ -105,11 +105,6 @@ export default function Navbar() {
               ) : (
                 <>
                   <li className="nav-item ms-2">
-                    <Link href="/registro" className="text-white text-decoration-none">
-                      <button className="btn btn-primary">Registrarse</button>
-                    </Link>
-                  </li>
-                  <li className="nav-item ms-2">
                     <button className="btn btn-primary" onClick={openModal}>
                       Iniciar Sesión
                     </button>
