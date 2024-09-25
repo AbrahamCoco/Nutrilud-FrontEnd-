@@ -1,15 +1,19 @@
 "use client";
-import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { useParams } from "next/navigation";
 import { Utils } from "@/app/utils/utils";
+import { BsWhatsapp } from "react-icons/bs";
+import { BsFileEarmarkMedicalFill } from "react-icons/bs";
+import Link from "next/link";
+import { ConsultaController } from "./consultaController";
 
 export default function Consulta() {
   const { id } = useParams();
   const [paciente, setPaciente] = useState(null);
   const [consulta, setConsulta] = useState([]);
   const [datosFormulario, setDatosFormulario] = useState({
+    nutriologo_id: "",
     peso: "",
     estatura: "",
     imc: "",
@@ -24,20 +28,41 @@ export default function Consulta() {
     siguiente_consulta: "",
   });
 
-  useEffect(() => {
-    loadPaciente();
-    loadDatosConsulta();
-  }, [id]);
+  const loadDatosConsulta = async () => {
+    try {
+      const response = await ConsultaController.getAllConsultas(id);
+      const consulta = response.data.consulta;
+
+      if (!consulta || consulta.length === 0) {
+        setConsulta(null);
+        Utils.swalWarning("No hay datos de consulta previos");
+      } else {
+        setConsulta(consulta);
+        Utils.swalSuccess("Datos de consulta cargados correctamente");
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        Utils.swalWarning(error.response.data.message || "No se encontraron datos de consulta.");
+      } else {
+        Utils.swalFailure("Error al cargar los datos de consulta", error.message);
+      }
+      setConsulta(null);
+    }
+  };
 
   const loadPaciente = async () => {
     try {
-      const response = await axiosInstance.get(`/paciente/${id}`);
+      const response = await ConsultaController.getPacienteId(id);
       setPaciente(response.data.paciente);
-      Utils.swalSuccess("Paciente cargado correctamente");
     } catch (error) {
-      Utils.swalFailure("Error al cargar el paciente", error.message);
+      setPaciente(null);
     }
   };
+
+  useEffect(() => {
+    loadPaciente();
+    loadDatosConsulta();
+  }, []);
 
   const calcularEdad = (fechaNacimiento) => {
     const fechaNac = new Date(fechaNacimiento);
@@ -51,16 +76,6 @@ export default function Consulta() {
     return edad;
   };
 
-  const loadDatosConsulta = async () => {
-    try {
-      const response = await axiosInstance.get(`/consultadatos/${id}`);
-      setConsulta(response.data.consulta || []);
-      Utils.swalSuccess("Datos de consulta cargados correctamente");
-    } catch (error) {
-      Utils.swalFailure("Error al cargar los datos de consulta", error.message);
-    }
-  };
-
   const handleGuardarDatos = async (event) => {
     event.preventDefault();
 
@@ -68,43 +83,22 @@ export default function Consulta() {
     const estatura = parseFloat(datosFormulario.estatura);
     const sexo = paciente.sexo;
     const edad = calcularEdad(paciente.fecha_nacimiento);
+    const circunBrazo = parseFloat(datosFormulario.circunferencia_brazo);
+    const pliegueTricipital = parseFloat(datosFormulario.pliegue_tricipital);
 
     if (!isNaN(peso) && !isNaN(estatura && estatura !== 0)) {
-      //Logica para calcular el IMC
-      const imc = peso / (estatura * estatura);
+      let imc = peso / (estatura * estatura);
+      let porcentajeGrasa = await ConsultaController.porcentajeGrasa(sexo, imc, edad);
+      let areaMuscularBrazo = await ConsultaController.areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo);
 
-      //Logica para calcular el porcentaje de grasa
-      let porcentajeGrasa = 0;
-      if (sexo === "Masculino") {
-        porcentajeGrasa = 1.2 * imc + 0.23 * edad - 16.2;
-      } else if (sexo === "Femenino") {
-        porcentajeGrasa = 1.2 * imc + 0.23 * edad - 5.4;
-      }
-
-      //Para sacar el porcentaje de musculo se necesita sacar el area muscular del brazo
-      //Logica para calcular el area muscular del brazo
-      let areaMuscularBrazo = 0;
-      if (!isNaN(datosFormulario.circunferencia_brazo) && !isNaN(datosFormulario.pliegue_tricipital)) {
-        // Define el valor del área del brazo según el género
-        let genero = 0;
-        if (datosFormulario.sexo === "Masculino") {
-          genero = 10;
-        } else if (datosFormulario.sexo === "Femenino") {
-          genero = 6.5;
-        }
-        // Calcula el área muscular del brazo
-        areaMuscularBrazo = Math.pow(datosFormulario.circunferencia_brazo - datosFormulario.pliegue_tricipital * Math.PI, 2) / (4 * Math.PI) - genero;
-      }
-
-      //Logica para calcular el porcentaje de musculo
       let porcentajeMusculo = 0;
       if (!isNaN(areaMuscularBrazo)) {
         porcentajeMusculo = datosFormulario.estatura * (0.0264 + 0.0029 * areaMuscularBrazo);
       }
 
-      //Logica para mandar los datos faltantes al formulario
       setDatosFormulario((prevDatosFormulario) => ({
         ...prevDatosFormulario,
+        nutriologo_id: sessionStorage.getItem("id_user"),
         imc: imc.toFixed(3),
         porcentaje_grasa: porcentajeGrasa.toFixed(3),
         porcentaje_musculo: porcentajeMusculo.toFixed(3),
@@ -112,11 +106,7 @@ export default function Consulta() {
     }
 
     try {
-      const response = await axiosInstance.post(`/insertardatos/${id}`, datosFormulario, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await ConsultaController.addConsulta(id, datosFormulario);
 
       setDatosFormulario({
         peso: "",
@@ -132,8 +122,8 @@ export default function Consulta() {
         fecha_medicion: "",
         siguiente_consulta: "",
       });
+
       loadDatosConsulta();
-      Utils.swalSuccess("Datos de consulta guardados correctamente");
     } catch (error) {
       Utils.swalFailure("Error al guardar los datos de consulta", error.message);
     }
@@ -163,6 +153,7 @@ export default function Consulta() {
                   <th>Edad</th>
                   <th>Correo</th>
                   <th>Telefono</th>
+                  <th>Recordatorios</th>
                 </tr>
               </thead>
               <tbody className="text-center">
@@ -176,7 +167,19 @@ export default function Consulta() {
                   <td>{paciente.sexo}</td>
                   <td>{calcularEdad(paciente.fecha_nacimiento)} años</td>
                   <td>{paciente.user.correo}</td>
-                  <td>{paciente.telefono}</td>
+                  <td>
+                    {paciente.telefono}{" "}
+                    <Link href={`https://wa.me/${paciente.telefono}`} target="_blank" rel="noopener noreferrer">
+                      <BsWhatsapp />
+                    </Link>
+                  </td>
+                  <td>
+                    <Link href={`/nutriologo/pacientes/consulta/${id}/recordatorios`}>
+                      <Button variant="info" className="mx-1">
+                        <BsFileEarmarkMedicalFill />
+                      </Button>
+                    </Link>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -186,53 +189,57 @@ export default function Consulta() {
       <h2>Datos de consultas previos</h2>
       <div className="row">
         <div className="col-sm-12">
-          <div className="table-responsive">
-            <table className="table table-striped table-bordered align-middle">
-              <thead className="text-center table-dark">
-                <tr className="align-middle">
-                  <th rowSpan={2}>Fecha de medicion</th>
-                  <th rowSpan={2}>Peso</th>
-                  <th rowSpan={2}>Estatura</th>
-                  <th rowSpan={2}>IMC</th>
-                  <th rowSpan={2}>Porcentaje Grasa Corporal</th>
-                  <th rowSpan={2}>Masa Muscular Total</th>
-                  <th colSpan={3}>Circunferencia</th>
-                  <th colSpan={2}>Pliegue</th>
-                </tr>
-                <tr>
-                  <th>Cintura</th>
-                  <th>Cadera</th>
-                  <th>Brazo</th>
-                  <th>Bicipital</th>
-                  <th>Tricipital</th>
-                </tr>
-              </thead>
-              <tbody className="text-center">
-                {Array.isArray(consulta) &&
-                  consulta.slice(-3).map((datos) => (
-                    <tr key={datos.id}>
-                      <td>
-                        {new Date(new Date(datos.fecha_medicion.split(" ")[0]).getTime() + 86400000).toLocaleDateString("es-ES", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })}
-                      </td>
-                      <td>{datos.peso.toFixed(3)} kg</td>
-                      <td>{datos.estatura.toFixed(2)} m</td>
-                      <td>{datos.imc.toFixed(3)} kg/m²</td>
-                      <td>{datos.porcentaje_grasa.toFixed(2)} %</td>
-                      <td>{datos.porcentaje_musculo.toFixed(3)} kg</td>
-                      <td>{datos.circunferencia_cintura.toFixed(2)} cm</td>
-                      <td>{datos.circunferencia_cadera.toFixed(2)} cm</td>
-                      <td>{datos.circunferencia_brazo.toFixed(2)} cm²</td>
-                      <td>{datos.pliegue_bicipital.toFixed(2)} mm</td>
-                      <td>{datos.pliegue_tricipital.toFixed(2)} mm</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+          {consulta ? (
+            <div className="table-responsive">
+              <table className="table table-striped table-bordered align-middle">
+                <thead className="text-center table-dark">
+                  <tr className="align-middle">
+                    <th rowSpan={2}>Fecha de medicion</th>
+                    <th rowSpan={2}>Peso</th>
+                    <th rowSpan={2}>Estatura</th>
+                    <th rowSpan={2}>IMC</th>
+                    <th rowSpan={2}>Porcentaje Grasa Corporal</th>
+                    <th rowSpan={2}>Masa Muscular Total</th>
+                    <th colSpan={3}>Circunferencia</th>
+                    <th colSpan={2}>Pliegue</th>
+                  </tr>
+                  <tr>
+                    <th>Cintura</th>
+                    <th>Cadera</th>
+                    <th>Brazo</th>
+                    <th>Bicipital</th>
+                    <th>Tricipital</th>
+                  </tr>
+                </thead>
+                <tbody className="text-center">
+                  {Array.isArray(consulta) &&
+                    consulta.slice(-3).map((datos) => (
+                      <tr key={datos.id}>
+                        <td>
+                          {new Date(new Date(datos.fecha_medicion.split(" ")[0]).getTime() + 86400000).toLocaleDateString("es-ES", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </td>
+                        <td>{datos.peso.toFixed(3)} kg</td>
+                        <td>{datos.estatura.toFixed(2)} m</td>
+                        <td>{datos.imc.toFixed(3)} kg/m²</td>
+                        <td>{datos.porcentaje_grasa.toFixed(2)} %</td>
+                        <td>{datos.porcentaje_musculo.toFixed(3)} kg</td>
+                        <td>{datos.circunferencia_cintura.toFixed(2)} cm</td>
+                        <td>{datos.circunferencia_cadera.toFixed(2)} cm</td>
+                        <td>{datos.circunferencia_brazo.toFixed(2)} cm²</td>
+                        <td>{datos.pliegue_bicipital.toFixed(2)} mm</td>
+                        <td>{datos.pliegue_tricipital.toFixed(2)} mm</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <h2>No hay datos de consulta previos</h2>
+          )}
         </div>
       </div>
       <h2>Agregar datos de consulta actual</h2>
@@ -376,7 +383,7 @@ export default function Consulta() {
               }
             />
             <div className="text-center my-4">
-              <button className="btn btn-primary" type="submit">
+              <button className="btn btn-primary mx-1" type="submit">
                 Guardar datos
               </button>
             </div>

@@ -1,80 +1,56 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Dropdown, Modal } from "react-bootstrap";
-import axiosInstance from "../utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
 import { useRouter } from "next/navigation";
+import MenuAdmin from "./users/administrador/MenuAdmin";
+import MenuNutri from "./users/nutriologo/MenuNutri";
+import MenuPaciente from "./users/paciente/MenuPaciente";
+import { NavbarController } from "./navbarController";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [rol, setRol] = useState(null);
+  const [usuario, setUsuario] = useState("");
+  const [contrasenia, setContrasenia] = useState("");
+  const [showModal, setShowModal] = useState(false);
   const router = useRouter();
 
-  const handleLogin = () => {
-    const usuario = document.getElementById("usuario").value;
-    const contrasenia = document.getElementById("contrasenia").value;
+  useEffect(() => {
+    const storedRol = sessionStorage.getItem("trol_id");
+    if (storedRol) {
+      setRol(Number(storedRol));
+    }
+  }, []);
 
-    axiosInstance
-      .post("/auth/login", {
-        usuario: usuario,
-        contrasenia: contrasenia,
-      })
-      .then((response) => {
-        sessionStorage.setItem("token", response.data.token);
-        sessionStorage.setItem("id_user", response.data.user);
-        sessionStorage.setItem("admin_id", response.data.admin_id ?? null);
-        sessionStorage.setItem("nutriologo_id", response.data.nutriologo_id ?? null);
-        sessionStorage.setItem("paciente_id", response.data.paciente_id ?? null);
-        sessionStorage.setItem("trol_id", response.data.trol_id);
-        setRol(response.data.trol_id);
-        closeModal();
-        setIsLoggedIn(true);
-        if (response.data.trol_id == 1) {
-          router.push("/administrador");
-        } else if (response.data.trol_id == 2) {
-          router.push("/nutriologo");
-        } else if (response.data.trol_id == 3) {
-          router.push("/paciente");
-        }
-      })
-      .then(() => {
-        Utils.swalSuccess("Inicio de sesión correcto");
-      })
-      .catch((error) => {
-        Utils.swalFailure("Error al iniciar sesión", error.message);
-      });
-  };
-
-  const handleLogout = async () => {
+  const handleLogin = async () => {
     try {
-      const response = await axiosInstance.post(
-        "/auth/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await NavbarController.login(usuario, contrasenia);
 
-      sessionStorage.removeItem("token");
-      sessionStorage.removeItem("nutriologo_id");
-      sessionStorage.removeItem("admin_id");
-      sessionStorage.removeItem("paciente_id");
-      setIsLoggedIn(false);
-      Utils.swalSuccess("Cerró sesión correctamente");
-    } catch (error) {
-      if (error.response && error.response.status === 401) {
-        Utils.swalError("El token es inválido. Necesita iniciar sesión nuevamente");
+      if (response.data.trol_id === 1) {
+        router.push("/administrador");
+      } else if (response.data.trol_id === 2) {
+        router.push("/nutriologo");
+      } else if (response.data.trol_id === 3) {
+        router.push("/paciente");
       } else {
-        Utils.swalError("Error al cerrar sesión", error.message);
+        Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesión nuevamente");
+        router.push("/");
       }
+
+      setRol(response.data.trol_id);
+      closeModal();
+    } catch (error) {
+      setRol(null);
     }
   };
 
-  const [showModal, setShowModal] = useState(false);
+  const handleLogout = async () => {
+    const token = sessionStorage.getItem("token");
+    await NavbarController.logout(token);
+    setRol(null);
+  };
 
   const openModal = () => {
     setShowModal(true);
@@ -105,7 +81,7 @@ export default function Navbar() {
           </div>
           <div className="row lg-6">
             <ul className="nav">
-              {isLoggedIn ? (
+              {rol ? (
                 <>
                   <li className="nav-item">
                     <Link href="/perfil" className="nav-link text-white">
@@ -118,38 +94,7 @@ export default function Navbar() {
                         Opciones
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        {rol === 1 ? (
-                          <>
-                            <Dropdown.Item as={Link} href="/administrador">
-                              Dashboard
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                          </>
-                        ) : rol === 2 ? (
-                          <>
-                            <Dropdown.Item as={Link} href="/nutriologo">
-                              Dashboard
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item as={Link} href="/nutriologo/agregar-articulo">
-                              Agregar articulo
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} href="/nutriologo/agenda">
-                              Agenda
-                            </Dropdown.Item>
-                            <Dropdown.Item as={Link} href="/nutriologo/pacientes">
-                              Pacientes
-                            </Dropdown.Item>
-                          </>
-                        ) : rol === 3 ? (
-                          <>
-                            <Dropdown.Item as={Link} href="/paciente">
-                              Dashboard
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                          </>
-                        ) : null}
-                        <Dropdown.Divider />
+                        {rol === 1 ? <MenuAdmin /> : rol === 2 ? <MenuNutri /> : rol === 3 ? <MenuPaciente /> : null}
                         <Dropdown.Item as={Link} href="/" onClick={handleLogout}>
                           Cerrar Sesión
                         </Dropdown.Item>
@@ -178,13 +123,13 @@ export default function Navbar() {
 
       <Modal show={showModal} onHide={closeModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Iniciar Sesion</Modal.Title>
+          <Modal.Title>Iniciar Sesión</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <label htmlFor="usuario">Usuario</label>
-          <input type="text" name="usuario" id="usuario" className="form-control" />
+          <input type="text" name="usuario" id="usuario" className="form-control" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
           <label htmlFor="contrasenia">Contraseña</label>
-          <input type="password" name="contrasenia" id="contrasenia" className="form-control" />
+          <input type="password" name="contrasenia" id="contrasenia" className="form-control" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)} />
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-secondary" onClick={closeModal}>

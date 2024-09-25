@@ -1,14 +1,11 @@
 "use client";
 import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import esLocale from "@fullcalendar/core/locales/es";
-import axiosInstance from "@/app/utils/axiosConfig";
 import { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
-import { Utils } from "../utils/utils";
 import Clock from "../components/Clock";
+import { NutriologoController } from "./nutriologoController";
 
 export default function Nutriologo() {
   const [agenda, setAgenda] = useState(null);
@@ -19,26 +16,10 @@ export default function Nutriologo() {
 
   const loadAgenda = async () => {
     try {
-      const response = await axiosInstance.get("/nutriologo/agenda");
-      if (response.data.agenda.length === 0) {
-        Utils.swalInfo("No hay eventos en la agenda");
-        return;
-      }
-      const eventos = response.data.agenda.map((evento) => {
-        const fechaInicio = new Date(evento.siguiente_consulta);
-        const fechaFin = new Date(fechaInicio);
-        fechaFin.setMinutes(fechaFin.getMinutes() + 29);
-
-        return {
-          title: `Cita con el paciente: ${evento.consulta.user.nombre} ${evento.consulta.user.primer_apellido} ${evento.consulta.user.segundo_apellido}`,
-          start: fechaInicio,
-          end: fechaFin,
-        };
-      });
-      setAgenda(eventos);
-      Utils.swalSuccess("Agenda cargada correctamente");
+      const response = await NutriologoController.getAgenda();
+      setAgenda(response);
     } catch (error) {
-      Utils.swalFailure("Error al cargar la agenda", error.response.data.message);
+      setAgenda(null);
     }
   };
 
@@ -81,7 +62,23 @@ export default function Nutriologo() {
           </Row>
         </Col>
         <Col md={4}>
-          <FullCalendar locale={esLocale} plugins={[dayGridPlugin, timeGridPlugin, listPlugin]} headerToolbar={{ left: "", center: "title", right: "" }} initialView="listWeek" events={agenda} slotMinTime={"08:00:00"} slotMaxTime={"18:00:00"} themeSystem="bootstrap4" />
+          <FullCalendar
+            locale={esLocale}
+            plugins={[listPlugin]}
+            headerToolbar={{ left: "prev", center: "title", right: "next" }}
+            initialView="listWeek"
+            events={agenda}
+            slotMinTime={"08:00:00"}
+            slotMaxTime={"18:00:00"}
+            themeSystem="bootstrap4"
+            eventDidMount={(info) => {
+              if (info.event.extendedProps.status === "done") {
+                info.el.style.backgroundColor = "green";
+              } else if (info.event.extendedProps.status === "pending") {
+                info.el.style.backgroundColor = "red";
+              }
+            }}
+          />
         </Col>
       </Row>
       <Row>Hola Nutriologo</Row>

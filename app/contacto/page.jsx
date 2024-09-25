@@ -3,14 +3,12 @@ import { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 
 export default function Contacto() {
-  // Estado para almacenar los valores del formulario
   const [formData, setFormData] = useState({
     nombre: "",
     email: "",
     mensaje: "",
   });
 
-  // Función para manejar cambios en los campos del formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -19,10 +17,8 @@ export default function Contacto() {
     });
   };
 
-  // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes agregar la lógica para enviar el formulario (por ejemplo, a través de una solicitud HTTP)
     console.log("Formulario enviado:", formData);
   };
 

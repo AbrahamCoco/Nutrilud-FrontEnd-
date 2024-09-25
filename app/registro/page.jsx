@@ -1,7 +1,11 @@
 "use client";
 import { useState } from "react";
 import axiosInstance from "@/app/utils/axiosConfig";
-import { Utils } from "@app/utils/utils";
+import { Utils } from "../utils/utils";
+import { Image } from "react-bootstrap";
+import { ArticuloController } from "../articulo/[id]/articuloController";
+import { AgregarArticuloController } from "../nutriologo/agregar-articulo/agregarArticuloController";
+import { RegistroController } from "./registroController";
 
 export default function Registro() {
   const [nombre, setNombre] = useState("");
@@ -44,16 +48,10 @@ export default function Registro() {
     const formData = new FormData();
     formData.append("image", selectedFile);
     try {
-      const response = await axiosInstance.post("/upload/image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      console.log("URL de la Imagen: ", response.data.url);
+      const response = await AgregarArticuloController.uploadImage(formData);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("Error al subir la imagen", error.message);
-      return "image.jpg";
+      return null;
     }
   };
 
@@ -101,18 +99,7 @@ export default function Registro() {
           break;
       }
 
-      const response = await axiosInstance
-        .post("/auth/register", JSON.stringify({ ...userData, ...tipoUsuarioData }), {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          Utils.swalSuccess("Usuario registrado correctamente");
-        })
-        .catch((error) => {
-          Utils.swalFailure("Error al registrar el usuario", error.message);
-        });
+      await RegistroController.addUser({ ...userData, ...tipoUsuarioData });
 
       setTrolId(null);
       setNombre("");
@@ -141,7 +128,7 @@ export default function Registro() {
         setAlergias("");
       }
     } catch (error) {
-      Utils.swalFailure("Error al registrar el usuario", error.message);
+      return error;
     }
   };
 
@@ -149,7 +136,7 @@ export default function Registro() {
     <div className="container my-4">
       <form>
         <div className="row">
-          <div className="col-sm-3">{selectedImage && <img src={selectedImage} className="img-fluid imagen" alt="Previsualización" />}</div>
+          <div className="col-sm-3">{selectedImage && <Image src={selectedImage} className="img-fluid imagen" alt="Previsualización" />}</div>
           <div className="col-sm-9">
             <div className="mb-2">
               <label htmlFor="imagen" className="form-label">

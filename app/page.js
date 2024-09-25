@@ -1,9 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import axiosInstance from "@/app/utils/axiosConfig";
 import { Carousel, Image } from "react-bootstrap";
-import { Utils } from "@/app/utils/utils";
+import { IndexController } from "./indexController";
 
 export default function Home() {
   const [articulos, setArticulos] = useState([]);
@@ -15,28 +14,14 @@ export default function Home() {
 
   const loadArticulos = async () => {
     try {
-      const response = await axiosInstance.get("/");
+      const { response, encabezados } = await IndexController.getArticulos();
+
       setArticulos(response.data.articulos);
-
-      const encabezados = response.data.articulos.reduce((acc, articulo) => {
-        const encabezado = extraerPrimerEncabezado(articulo.contenido);
-        acc[articulo.id] = encabezado;
-        return acc;
-      }, {});
-
       setPrimerEncabezado(encabezados);
-      Utils.swalSuccess("Artículos cargados correctamente");
     } catch (error) {
-      Utils.swalFailure("Error al cargar los artículos", error.message);
+      setArticulos([]);
+      setPrimerEncabezado({});
     }
-  };
-
-  const extraerPrimerEncabezado = (htmlContent) => {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, "text/html");
-
-    const heading = doc.querySelector("h1, h2, h3, h4, h5, h6");
-    return heading ? heading.outerHTML : "No hay encabezado";
   };
 
   return (
