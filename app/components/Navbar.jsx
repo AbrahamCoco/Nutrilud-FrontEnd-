@@ -45,7 +45,7 @@ export default function Navbar() {
       }
 
       setRol(response.data.user.trol_id);
-      setNombre(response.data.user.nombre);
+      setNombre(response.data.user.nombre + " " + response.data.user.primer_apellido);
       closeModal();
     } catch (error) {
       setRol(null);

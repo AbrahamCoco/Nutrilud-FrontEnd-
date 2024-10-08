@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Col, Container, Row } from "react-bootstrap";
 import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { BsWhatsapp } from "react-icons/bs";
 
 export default function Footer() {
   return (
@@ -11,7 +12,12 @@ export default function Footer() {
             <h5>Información de contacto:</h5>
             <ul className="list-unstyled">
               <li>
-                Teléfono: <strong>246 265 3921</strong>
+                Teléfono:{" "}
+                <strong>
+                  <Link href={`https://wa.me/2462653921`} target="_blank" rel="noopener noreferrer" className="text-light">
+                    246 265 3921 <BsWhatsapp />
+                  </Link>
+                </strong>
               </li>
               <li>
                 Email: <strong>info@nutrilud.com o karinetza09@gmail.com</strong>
@@ -25,21 +31,18 @@ export default function Footer() {
             <h5>Redes sociales:</h5>
             <ul className="list-unstyled">
               <li>
-                <FaFacebook />{" "}
                 <a href="https://www.facebook.com/NutriLud" className="text-light">
-                  Facebook
+                  <FaFacebook /> Facebook
                 </a>
               </li>
               <li>
-                <FaInstagram />{" "}
                 <a href="https://www.instagram.com/nutrilud/" className="text-light">
-                  Instagram
+                  <FaInstagram /> Instagram
                 </a>
               </li>
               <li>
-                <FaTwitter />{" "}
                 <a href="#" className="text-light">
-                  Twitter
+                  <FaTwitter /> Twitter
                 </a>
               </li>
             </ul>

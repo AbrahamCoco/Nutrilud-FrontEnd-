@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Image } from "react-bootstrap";
-import { Utils } from "@/app/utils/utils";
 import { ArticuloController } from "./articuloController";
 
 export default function Articulo() {
@@ -40,7 +39,7 @@ export default function Articulo() {
   return (
     <div className="container my-4">
       <div className="row">
-        <div className="col-sm-8 texto-justificado">
+        <div className="col-sm-8 text-justify">
           <div dangerouslySetInnerHTML={{ __html: encabezado }} />
           <div dangerouslySetInnerHTML={{ __html: contenidoSinEncabezado }} />
           <p>

@@ -10,10 +10,10 @@ export class NavbarController {
       });
 
       sessionStorage.setItem("token", response.data.token);
-      sessionStorage.setItem("id_user", response.data.user.user);
-      sessionStorage.setItem("admin_id", response.data.user.tusuario_admin_id ?? null);
-      sessionStorage.setItem("nutriologo_id", response.data.user.tusuario_nutriologo_id ?? null);
-      sessionStorage.setItem("paciente_id", response.data.user.tusuario_paciente_id ?? null);
+      sessionStorage.setItem("id_user", response.data.user.id);
+      sessionStorage.setItem("admin_id", response.data.user.tusuario_admin_id);
+      sessionStorage.setItem("nutriologo_id", response.data.user.tusuario_nutriologo_id);
+      sessionStorage.setItem("paciente_id", response.data.user.tusuario_paciente_id);
       sessionStorage.setItem("trol_id", response.data.user.trol_id);
 
       Utils.swalSuccess("Inicio de sesión correcto");
