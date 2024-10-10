@@ -15,6 +15,7 @@ export class NavbarController {
       sessionStorage.setItem("nutriologo_id", response.data.user.tusuario_nutriologo_id);
       sessionStorage.setItem("paciente_id", response.data.user.tusuario_paciente_id);
       sessionStorage.setItem("trol_id", response.data.user.trol_id);
+      sessionStorage.setItem("nombre", response.data.user.nombre + " " + response.data.user.primer_apellido);
 
       Utils.swalSuccess("Inicio de sesión correcto");
       return response;

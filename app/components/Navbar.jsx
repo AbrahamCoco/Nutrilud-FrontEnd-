@@ -8,6 +8,7 @@ import MenuAdmin from "./users/administrador/MenuAdmin";
 import MenuNutri from "./users/nutriologo/MenuNutri";
 import MenuPaciente from "./users/paciente/MenuPaciente";
 import { NavbarController } from "./navbarController";
+import { FaUserCircle } from "react-icons/fa";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
@@ -21,6 +22,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const storedRol = sessionStorage.getItem("trol_id");
+    setNombre(sessionStorage.getItem("nombre"));
     if (storedRol) {
       setRol(Number(storedRol));
     }
@@ -45,7 +47,6 @@ export default function Navbar() {
       }
 
       setRol(response.data.user.trol_id);
-      setNombre(response.data.user.nombre + " " + response.data.user.primer_apellido);
       closeModal();
     } catch (error) {
       setRol(null);
@@ -97,11 +98,7 @@ export default function Navbar() {
                   <li className="nav-item">
                     <Dropdown>
                       <Dropdown.Toggle variant="primary" id="dropdown-basic" style={{ display: "flex", alignItems: "center" }}>
-                        {fotoPerfil ? (
-                          <Image src={fotoPerfil} alt="Foto de perfil" className="rounded-circle" width={42} height={42} />
-                        ) : (
-                          <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "2rem", display: "inline-block", marginRight: "2px" }}></i>
-                        )}
+                        {fotoPerfil ? <Image src={fotoPerfil} alt="Foto de perfil" className="rounded-circle" width={42} height={42} /> : <FaUserCircle />}
                         <span style={{ marginLeft: "2px" }}>{nombre}</span>{" "}
                       </Dropdown.Toggle>
                       <Dropdown.Menu>

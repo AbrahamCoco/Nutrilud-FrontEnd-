@@ -53,7 +53,7 @@ export default function Consulta() {
   const loadPaciente = async () => {
     try {
       const response = await ConsultaController.getPacienteId(id);
-      setPaciente(response.data.paciente);
+      setPaciente(response.paciente);
     } catch (error) {
       setPaciente(null);
     }
