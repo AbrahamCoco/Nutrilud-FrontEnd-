@@ -54,7 +54,67 @@ export default function Recordatorios() {
           <Editor
             apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
             onInit={(evt, editor) => (editorRef.current = editor)}
-            initialValue="<p>Contenido del Artículo</p>"
+            initialValue="<h2>Recordatorio de 24 horas</h2>
+            <Table>
+              <tr>
+                <th></th>
+                <th>Hora</th>
+                <th>Lugar</th>
+                <th>Alimentos</th> 
+                <th>Porciones</th> 
+                <th>Marca</th> 
+                <th>Formas de preparacion</th>
+              </tr>
+              <tr>
+                <td>Desayuno</td>
+                <td></td>
+                <td></td> 
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Almuerzo</td>
+                <td></td>
+                <td></td> 
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Media tarde</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Cena</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Colacion</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Otros</td>
+                <td></td>
+              </tr>
+            </Table>"
             onEditorChange={(content) => setContent(content)}
             init={{
               height: 500,
