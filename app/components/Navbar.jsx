@@ -46,6 +46,7 @@ export default function Navbar() {
         router.push("/");
       }
 
+      setNombre(sessionStorage.getItem("nombre"));
       setRol(response.data.user.trol_id);
       closeModal();
     } catch (error) {
