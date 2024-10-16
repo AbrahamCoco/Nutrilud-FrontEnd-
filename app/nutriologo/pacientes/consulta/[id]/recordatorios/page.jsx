@@ -2,8 +2,8 @@
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { useRef, useState } from "react";
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
 import { FaEye, FaFileDownload } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
@@ -13,6 +13,9 @@ export default function Recordatorios() {
   const searchParams = useSearchParams();
   const editorRef = useRef(null);
   const [content, setContent] = useState("");
+  const [recordatorios, setRecordatorios] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState("");
 
   const id_nutriologo = sessionStorage.getItem("nutriologo_id");
   const id_paciente = searchParams.get("id_paciente");
@@ -40,7 +43,8 @@ export default function Recordatorios() {
       const nombrePaciente = `${nombre} ${primer_apellido} ${segundo_apellido}`;
       doc.text(`Nombre del paciente: ${nombrePaciente}`, 40, 70);
       const fecha = new Date();
-      doc.text(`Fecha: ${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}           Edad: ${fecha_nacimiento}`, 40, 90);
+      const edad = fecha.getFullYear() - new Date(fecha_nacimiento).getFullYear();
+      doc.text(`Fecha del recordatorio: ${fecha.getDate()}/${fecha.getMonth() + 1}/${fecha.getFullYear()}       Edad: ${edad} años`, 40, 90);
 
       const table = tempDiv.querySelector("table");
       if (table) {
@@ -80,26 +84,40 @@ export default function Recordatorios() {
       formData.append("paciente_id", id_paciente);
       formData.append("recordatorioPdf", pdfFile);
 
-      console.log(formData);
       const response = await RecordatorioController.postRecordatorio(formData);
+      getRecordatorios();
     }
   };
 
+  const getRecordatorios = useCallback(async () => {
+    try {
+      const response = await RecordatorioController.getRecordatorios(id_paciente);
+      setRecordatorios(response.data.recordatorio);
+    } catch (error) {
+      setRecordatorios([]);
+    }
+  }, [id_paciente]);
+
+  useEffect(() => {
+    getRecordatorios();
+  }, [getRecordatorios]);
+
   const columns = [
     {
-      name: "Nombre",
-      selector: "nombre",
+      name: "No.",
+      selector: (row, index) => index + 1,
       sortable: true,
     },
     {
-      name: "Fecha",
-      selector: "fecha",
+      name: "Nombre/Fecha",
+      selector: (row, index) =>
+        row.created_at ? `Recordatorio de la fecha: ${new Date(row.created_at).toLocaleDateString()} ${new Date(row.created_at).toLocaleTimeString()}` : "Fecha no disponible",
       sortable: true,
     },
     {
       name: "Ver",
       cell: (row) => (
-        <Button variant="primary">
+        <Button variant="primary" onClick={() => handleView(row.recordatorioPdf)}>
           <FaEye />
         </Button>
       ),
@@ -107,24 +125,40 @@ export default function Recordatorios() {
     {
       name: "Descargar",
       cell: (row) => (
-        <Button variant="danger">
+        <Button variant="warning" onClick={() => handleDownload(row.recordatorioPdf)}>
           <FaFileDownload />
         </Button>
       ),
     },
   ];
 
+  const handleView = (row) => {
+    const url = `http://127.0.0.1:8000${row}`;
+    setPdfUrl(url);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setPdfUrl("");
+  };
+
+  const handleDownload = (row) => {
+    console.log(row);
+  };
+
   return (
-    <Container>
-      <Row>
-        <Col md={12}>
-          <h1>Recordatorio de 24 hrs</h1>
-        </Col>
-        <Col md={12} className="py-4">
-          <Editor
-            apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
-            onInit={(evt, editor) => (editorRef.current = editor)}
-            initialValue="
+    <>
+      <Container>
+        <Row>
+          <Col md={12}>
+            <h1>Recordatorio de 24 hrs</h1>
+          </Col>
+          <Col md={12} className="py-4">
+            <Editor
+              apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
+              onInit={(evt, editor) => (editorRef.current = editor)}
+              initialValue="
             <table border='1'>
               <tr>
                 <th></th>
@@ -185,42 +219,57 @@ export default function Recordatorios() {
                 <td></td>
               </tr>
             </table>"
-            onEditorChange={(content) => setContent(content)}
-            init={{
-              height: 500,
-              menubar: true,
-              plugins: [
-                "advlist",
-                "autolink",
-                "lists",
-                "link",
-                "image",
-                "charmap",
-                "preview",
-                "anchor",
-                "searchreplace",
-                "visualblocks",
-                "code",
-                "fullscreen",
-                "insertdatetime",
-                "media",
-                "table",
-                "help",
-                "wordcount",
-              ],
-              toolbar: "undo redo | blocks | bold italic backcolor | " + "alignleft aligncenter alignright alignjustify | " + "bullist numlist outdent indent | removeformat | help | fontsizeselect",
-              content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
-            }}></Editor>
-        </Col>
-        <Col md={12}>
-          <Button variant="primary" onClick={handleSavePDF}>
-            Guardar recordatorio
+              onEditorChange={(content) => setContent(content)}
+              init={{
+                height: 500,
+                menubar: true,
+                plugins: [
+                  "advlist",
+                  "autolink",
+                  "lists",
+                  "link",
+                  "image",
+                  "charmap",
+                  "preview",
+                  "anchor",
+                  "searchreplace",
+                  "visualblocks",
+                  "code",
+                  "fullscreen",
+                  "insertdatetime",
+                  "media",
+                  "table",
+                  "help",
+                  "wordcount",
+                ],
+                toolbar: "undo redo | blocks | bold italic backcolor | " + "alignleft aligncenter alignright alignjustify | " + "bullist numlist outdent indent | removeformat | help | fontsizeselect",
+                content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
+              }}></Editor>
+          </Col>
+          <Col md={12}>
+            <Button variant="primary" onClick={handleSavePDF}>
+              Guardar recordatorio
+            </Button>
+          </Col>
+          <Col md={12} className="py-4">
+            <DataTable columns={columns} data={recordatorios} pagination striped highlightOnHover theme="dark" />
+          </Col>
+        </Row>
+      </Container>
+
+      <Modal show={showModal} onHide={handleCloseModal} size="xl">
+        <Modal.Header closeButton>
+          <Modal.Title>Visualizar PDF</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <iframe src={pdfUrl} width="100%" height="700px" style={{ border: "none" }} title="Visualizar PDF" />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseModal}>
+            Cerrar
           </Button>
-        </Col>
-        <Col md={12} className="py-4">
-          <DataTable columns={columns} pagination striped highlightOnHover theme="dark" />
-        </Col>
-      </Row>
-    </Container>
+        </Modal.Footer>
+      </Modal>
+    </>
   );
 }

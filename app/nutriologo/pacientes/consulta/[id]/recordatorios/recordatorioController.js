@@ -16,4 +16,15 @@ export class RecordatorioController {
       return null;
     }
   }
+
+  static async getRecordatorios(id_paciente) {
+    try {
+      const response = await Tarjet.nutriologoApi.getRecordatorios(id_paciente);
+      Utils.swalSuccess("Recordatorios cargados correctamente");
+      return response;
+    } catch (error) {
+      Utils.swalError("Error al obtener los recordatorios");
+      return null;
+    }
+  }
 }
