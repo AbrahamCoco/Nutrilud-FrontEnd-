@@ -177,6 +177,7 @@ export default function Consulta() {
                     href={{
                       pathname: `/nutriologo/pacientes/consulta/${id}/recordatorios`,
                       query: {
+                        id_paciente: paciente.id,
                         nombre: paciente.user.nombre,
                         primer_apellido: paciente.user.primer_apellido,
                         segundo_apellido: paciente.user.segundo_apellido,

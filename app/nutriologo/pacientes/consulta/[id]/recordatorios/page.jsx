@@ -5,22 +5,23 @@ import "jspdf-autotable";
 import { useRef, useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import { useSearchParams } from "next/navigation"; // Cambiar useRouter por useSearchParams
+import { FaEye, FaFileDownload } from "react-icons/fa";
+import { useSearchParams } from "next/navigation";
+import { RecordatorioController } from "./recordatorioController";
 
 export default function Recordatorios() {
   const searchParams = useSearchParams();
   const editorRef = useRef(null);
   const [content, setContent] = useState("");
 
-  // Obtén los datos del paciente desde los parámetros de la URL
+  const id_nutriologo = sessionStorage.getItem("nutriologo_id");
+  const id_paciente = searchParams.get("id_paciente");
   const nombre = searchParams.get("nombre");
   const primer_apellido = searchParams.get("primer_apellido");
   const segundo_apellido = searchParams.get("segundo_apellido");
   const fecha_nacimiento = searchParams.get("fecha_nacimiento");
 
-  // Función para generar el PDF
-  const handleSavePDF = () => {
+  const handleSavePDF = async () => {
     if (editorRef.current) {
       const doc = new jsPDF({
         orientation: "portrait",
@@ -65,7 +66,22 @@ export default function Recordatorios() {
         });
       }
 
-      doc.save("recordatorio.pdf");
+      const pdfBlob = doc.output("blob");
+
+      const fileName = `Recordatorio_${nombre}${primer_apellido}${segundo_apellido}_${fecha.getDate()}_${fecha.getMonth() + 1}_${fecha.getFullYear()}_${fecha
+        .getHours()
+        .toString()
+        .padStart(2, "0")}_${fecha.getMinutes().toString().padStart(2, "0")}_${fecha.getSeconds().toString().padStart(2, "0")}.pdf`;
+
+      const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
+
+      const formData = new FormData();
+      formData.append("nutriologo_id", id_nutriologo);
+      formData.append("paciente_id", id_paciente);
+      formData.append("recordatorioPdf", pdfFile);
+
+      console.log(formData);
+      const response = await RecordatorioController.postRecordatorio(formData);
     }
   };
 
@@ -81,16 +97,19 @@ export default function Recordatorios() {
       sortable: true,
     },
     {
-      name: "Acciones",
+      name: "Ver",
       cell: (row) => (
-        <>
-          <Button variant="primary">
-            <FaEdit />
-          </Button>
-          <Button variant="danger">
-            <FaTrash />
-          </Button>
-        </>
+        <Button variant="primary">
+          <FaEye />
+        </Button>
+      ),
+    },
+    {
+      name: "Descargar",
+      cell: (row) => (
+        <Button variant="danger">
+          <FaFileDownload />
+        </Button>
       ),
     },
   ];
@@ -98,15 +117,14 @@ export default function Recordatorios() {
   return (
     <Container>
       <Row>
+        <Col md={12}>
+          <h1>Recordatorio de 24 hrs</h1>
+        </Col>
         <Col md={12} className="py-4">
           <Editor
             apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
             onInit={(evt, editor) => (editorRef.current = editor)}
-            initialValue="<h2>Recordatorio de 24 horas</h2>
-            <p>Nombre del paciente: </p>
-            <p>Fecha: </p>
-            <p>Edad: </p>
-            <p>
+            initialValue="
             <table border='1'>
               <tr>
                 <th></th>
@@ -166,8 +184,7 @@ export default function Recordatorios() {
                 <td>Otros</td>
                 <td></td>
               </tr>
-            </table>
-            </p>"
+            </table>"
             onEditorChange={(content) => setContent(content)}
             init={{
               height: 500,
