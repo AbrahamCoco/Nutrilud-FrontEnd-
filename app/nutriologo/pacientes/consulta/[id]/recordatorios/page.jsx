@@ -5,7 +5,7 @@ import "jspdf-autotable";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
-import { FaEye, FaFileDownload } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 import { RecordatorioController } from "./recordatorioController";
 
@@ -16,8 +16,7 @@ export default function Recordatorios() {
   const [recordatorios, setRecordatorios] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [pdfUrl, setPdfUrl] = useState("");
-
-  const id_nutriologo = sessionStorage.getItem("nutriologo_id");
+  const [id_nutriologo, setIdNutriologo] = useState("");
   const id_paciente = searchParams.get("id_paciente");
   const nombre = searchParams.get("nombre");
   const primer_apellido = searchParams.get("primer_apellido");
@@ -99,6 +98,8 @@ export default function Recordatorios() {
   }, [id_paciente]);
 
   useEffect(() => {
+    const storedId = sessionStorage.getItem("nutriologo_id");
+    setIdNutriologo(storedId);
     getRecordatorios();
   }, [getRecordatorios]);
 
@@ -122,14 +123,6 @@ export default function Recordatorios() {
         </Button>
       ),
     },
-    {
-      name: "Descargar",
-      cell: (row) => (
-        <Button variant="warning" onClick={() => handleDownload(row.recordatorioPdf)}>
-          <FaFileDownload />
-        </Button>
-      ),
-    },
   ];
 
   const handleView = (row) => {
@@ -141,10 +134,6 @@ export default function Recordatorios() {
   const handleCloseModal = () => {
     setShowModal(false);
     setPdfUrl("");
-  };
-
-  const handleDownload = (row) => {
-    console.log(row);
   };
 
   return (
@@ -252,7 +241,7 @@ export default function Recordatorios() {
             </Button>
           </Col>
           <Col md={12} className="py-4">
-            <DataTable columns={columns} data={recordatorios} pagination striped highlightOnHover theme="dark" />
+            <DataTable columns={columns} data={recordatorios} pagination striped highlightOnHover theme="dark" responsive />
           </Col>
         </Row>
       </Container>

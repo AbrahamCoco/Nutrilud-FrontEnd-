@@ -90,6 +90,11 @@ export default function Pacientes() {
 
   const columns = [
     {
+      name: "No.",
+      selector: (row, index) => index + 1,
+      sortable: true,
+    },
+    {
       name: "Nombre",
       selector: (row) => `${row.user.nombre} ${row.user.primer_apellido} ${row.user.segundo_apellido}`,
       sortable: true,
@@ -178,6 +183,7 @@ export default function Pacientes() {
             striped
             highlightOnHover
             theme="dark"
+            responsive
           />
         </Row>
       </Container>
