@@ -25,4 +25,27 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-export default axiosInstance;
+// Exporta los métodos de la API
+export const Tarjet = {
+  userApi: {
+    login: (data) => axiosInstance.post("/auth/login", data),
+    logout: (config) => axiosInstance.post("/auth/logout", {}, config),
+    register: (data) => axiosInstance.post("/auth/register", data),
+    upluoadImage: (data) => axiosInstance.post("/upload/image", data),
+    getUser: (id) => axiosInstance.get(`/auth/user/${id}`),
+  },
+  adminApi: {},
+  nutriologoApi: {
+    getAllArticulos: () => axiosInstance.get("/nutriologo/"),
+    getArticuloId: (id) => axiosInstance.get(`/nutriologo/articulo/${id}`),
+    getAgenda: () => axiosInstance.get("/nutriologo/agenda"),
+    addArticulo: (data) => axiosInstance.post("/nutriologo/articulos", data),
+    getAllPacientes: () => axiosInstance.get("/nutriologo/pacientes"),
+    getPacienteId: (id) => axiosInstance.get(`/nutriologo/paciente/${id}`),
+    getAllConsultas: (id) => axiosInstance.get(`/nutriologo/consultadatos/${id}`),
+    addConsulta: (id, data) => axiosInstance.post(`/nutriologo/insertardatos/${id}`, data),
+    addRecordatorio: (data) => axiosInstance.post("/nutriologo/insertarRecordatorio", data),
+    getRecordatorios: (id) => axiosInstance.get(`/nutriologo/recordatorios/${id}`),
+  },
+  pacienteApi: {},
+};

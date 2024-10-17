@@ -1,79 +1,80 @@
+import Link from "next/link";
+import { Col, Container, Row } from "react-bootstrap";
 import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { BsWhatsapp } from "react-icons/bs";
 
 export default function Footer() {
   return (
-    <footer className="footer mt-auto py-4 bg-success bg-gradient text-light">
-      <div className="container">
-        <div className="row">
-          <div className="col-md-4">
-            <h5 className="">Información de contacto:</h5>
+    <footer className="footer py-4 bg-success bg-gradient text-light mt-auto">
+      <Container>
+        <Row className="justify-content-center">
+          <Col md={4} sm={12} className="text-center text-md-start">
+            <h5>Información de contacto:</h5>
             <ul className="list-unstyled">
               <li>
-                <strong>Teléfono:</strong> 246 265 3921
+                Teléfono:{" "}
+                <strong>
+                  <Link href={`https://wa.me/2462653921`} target="_blank" rel="noopener noreferrer" className="text-light">
+                    246 265 3921 <BsWhatsapp />
+                  </Link>
+                </strong>
               </li>
               <li>
-                <strong>Email:</strong> info@nutrilud.com o karinetza09@gmail.com
+                Email: <strong>info@nutrilud.com o karinetza09@gmail.com</strong>
               </li>
               <li>
-                <strong>Horario de consultas:</strong> Lunes a Viernes de 9:00 A.M. a 5:00 P.M.
+                Horario de consultas: <strong>Lunes a Viernes de 9:00 A.M. a 5:00 P.M.</strong>
               </li>
             </ul>
-          </div>
-          <div className="col-md-4 text-center">
-            <h5 className="">Redes sociales:</h5>
+          </Col>
+          <Col md={4} sm={12} className="text-center">
+            <h5>Redes sociales:</h5>
             <ul className="list-unstyled">
               <li>
-                {" "}
-                <FaFacebook />{" "}
                 <a href="https://www.facebook.com/NutriLud" className="text-light">
-                  {" "}
-                  Facebook
+                  <FaFacebook /> Facebook
                 </a>
               </li>
               <li>
-                {" "}
-                <FaInstagram />{" "}
                 <a href="https://www.instagram.com/nutrilud/" className="text-light">
-                  {" "}
-                  Instagram
+                  <FaInstagram /> Instagram
                 </a>
               </li>
               <li>
-                {" "}
-                <FaTwitter />{" "}
                 <a href="#" className="text-light">
-                  Twitter
+                  <FaTwitter /> Twitter
                 </a>
               </li>
             </ul>
-          </div>
-          <div className="col-md-4 text-end">
-            <h5 className="">Recursos útiles:</h5>
+          </Col>
+          <Col md={4} sm={12} className="text-center text-md-end">
+            <h5>Recursos útiles:</h5>
             <ul className="list-unstyled">
               <li>
-                <a href="[Enlace a recursos de nutrición]" className="text-light">
+                <Link href="/nutriologo/recursos" className="text-light">
                   Recursos de nutrición
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="[Enlace a guías de alimentación saludable]" className="text-light">
+                <Link href="/nutriologo/guias" className="text-light">
                   Guías de alimentación saludable
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="[Enlace a información sobre estilos de vida activos]" className="text-light">
+                <Link href="/nutriologo/estilos" className="text-light">
                   Información sobre estilos de vida activos
-                </a>
+                </Link>
               </li>
             </ul>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-12 text-center">
-            <p className="text-light">© {new Date().getFullYear()} NutriLud. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </div>
+          </Col>
+          <Col md={12} className="text-center">
+            NutriLud {new Date().getFullYear()} &copy; Todos los derechos reservados | Desarrollado por{" "}
+            <a href="https://github.com/DevConMx" className="text-light" target="_blank">
+              DevConMx
+            </a>
+          </Col>
+        </Row>
+      </Container>
     </footer>
   );
 }

@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Col, Container, Modal, Row, Table } from "react-bootstrap";
+import { Col, Container, Modal, Row } from "react-bootstrap";
 import Link from "next/link";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
-import axiosInstance from "@/app/utils/axiosConfig";
-import { Utils } from "@/app/utils/utils";
+import { BsWhatsapp } from "react-icons/bs";
+import { ImStatsDots } from "react-icons/im";
+import DataTable from "react-data-table-component";
+import { PacientesController } from "./pacientesController";
+import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -20,6 +23,7 @@ export default function Pacientes() {
   const [telefono, setTelefono] = useState("");
   const [sexo, setSexo] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     loadPacientes();
@@ -27,24 +31,15 @@ export default function Pacientes() {
 
   const loadPacientes = async () => {
     try {
-      const response = await axiosInstance.get("/pacientes");
-      setPacientes(response.data.pacientes);
-      console.log(response.data.pacientes);
-      Utils.swalSuccess("Pacientes cargados correctamente");
+      const response = await PacientesController.getAllPacientes();
+      setPacientes(response.pacientes);
     } catch (error) {
-      Utils.swalFailure("Error al cargar los pacientes", error.message);
+      setPacientes([]);
     }
   };
 
-  const [showModal, setShowModal] = useState(false);
-
-  const openModal = () => {
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   const uploadImage = async () => {
     if (!selectedFile) {
@@ -56,16 +51,9 @@ export default function Pacientes() {
     formData.append("image", selectedFile);
 
     try {
-      const response = await axiosInstance.post("/upload/image", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      console.log("URL de la Imagen:", response.data.url);
+      const response = await AgregarArticuloController.uploadImage(formData);
       return response.data.url;
     } catch (error) {
-      Utils.swalError("Error al subir la imagen", error.message);
       return null;
     }
   };
@@ -90,20 +78,89 @@ export default function Pacientes() {
         sexo,
       };
 
-      const response = await axiosInstance.post("/auth/register", userData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await PacientesController.addPaciente(userData);
 
       loadPacientes();
       closeModal();
-      Utils.swalSuccess("Paciente guardado correctamente");
       return response;
     } catch (error) {
-      Utils.swalFailure("Error al guardar el paciente", error.message);
+      return null;
     }
   };
+
+  const columns = [
+    {
+      name: "No.",
+      selector: (row, index) => index + 1,
+      sortable: true,
+    },
+    {
+      name: "Nombre",
+      selector: (row) => `${row.user.nombre} ${row.user.primer_apellido} ${row.user.segundo_apellido}`,
+      sortable: true,
+    },
+    {
+      name: "Sexo",
+      selector: (row) => row.sexo,
+      sortable: true,
+    },
+    {
+      name: "Correo",
+      selector: (row) => row.user.correo,
+      sortable: true,
+    },
+    {
+      name: "Telefono",
+      cell: (row) => (
+        <>
+          {row.telefono}{" "}
+          <Link href={`https://wa.me/${row.telefono}`} target="_blank" rel="noopener noreferrer">
+            <BsWhatsapp />
+          </Link>
+        </>
+      ),
+    },
+    {
+      name: "Estadisticas",
+      cell: (row) => (
+        <Link href={`/nutriologo/pacientes/estadisticas/${row.user.id}`}>
+          <button className="btn btn-info pb-2">
+            <ImStatsDots />
+          </button>
+        </Link>
+      ),
+    },
+    {
+      name: "Dar consulta",
+      cell: (row) => (
+        <Link href={`/nutriologo/pacientes/consulta/${row.id}`}>
+          <button className="btn btn-info pb-2">
+            <FaFolderOpen />
+          </button>
+        </Link>
+      ),
+    },
+    {
+      name: "Modificar",
+      cell: (row) => (
+        <Link href={`/modificar-paciente/${row.id}`}>
+          <button className="btn btn-warning pb-2">
+            <FaEdit />
+          </button>
+        </Link>
+      ),
+    },
+    {
+      name: "Eliminar",
+      cell: (row) => (
+        <Link href={`/eliminar-paciente/paciente=${row.id}`}>
+          <button className="btn btn-danger pb-2">
+            <FaTrash />
+          </button>
+        </Link>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -119,58 +176,15 @@ export default function Pacientes() {
               </button>
             </div>
           </Col>
-          <Table striped bordered hover>
-            <thead className="text-center">
-              <tr>
-                <th>Nombre</th>
-                <th>Sexo</th>
-                <th>Correo</th>
-                <th>Telefono</th>
-                <th>Dar consulta</th>
-                <th>Modificar</th>
-                <th>Eliminar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pacientes.map((paciente) => (
-                <tr key={paciente.id}>
-                  <td>
-                    {paciente.user.nombre} {paciente.user.primer_apellido} {paciente.user.segundo_apellido}
-                  </td>
-                  <td>{paciente.sexo}</td>
-                  <td>{paciente.user.correo}</td>
-                  <td>{paciente.telefono}</td>
-                  <td className="text-center">
-                    <Link href={`/nutriologo/pacientes/consulta/${paciente.id}`}>
-                      <div>
-                        <button className="btn btn-success pb-2">
-                          <FaFolderOpen />
-                        </button>
-                      </div>
-                    </Link>
-                  </td>
-                  <td className="text-center">
-                    <Link href={`/modificar-paciente/${paciente.id}`}>
-                      <div>
-                        <button className="btn btn-primary pb-2">
-                          <FaEdit />
-                        </button>
-                      </div>
-                    </Link>
-                  </td>
-                  <td className="text-center">
-                    <Link href={`/eliminar-paciente/paciente=${paciente.id}`}>
-                      <div>
-                        <button className="btn btn-danger pb-2">
-                          <FaTrash />
-                        </button>
-                      </div>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
+          <DataTable
+            columns={columns}
+            data={pacientes} // Mostrar solo los pacientes filtrados
+            pagination
+            striped
+            highlightOnHover
+            theme="dark"
+            responsive
+          />
         </Row>
       </Container>
 
@@ -228,18 +242,19 @@ export default function Pacientes() {
                   Telefono
                 </label>
                 <input type="text" className="form-control" id="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-                <label htmlFor="" className="form-label">
+                <label htmlFor="sexo" className="form-label">
                   Sexo
                 </label>
                 <div className="mb-2">
                   <div className="form-check-inline">
-                    <label htmlFor="" className="form-check-label">
-                      <input type="radio" className="form-check-input" name="sexo" id="masculino" value="Masculino" checked={sexo === "Masculino"} onChange={() => setSexo("Masculino")} /> Masculino
+                    <label htmlFor="masculino" className="form-check-label">
+                      <input type="radio" className="form-check-input" name="sexo" id="masculino" value="Masculino" checked={sexo === "Masculino"} onChange={(e) => setSexo(e.target.value)} />{" "}
+                      Masculino
                     </label>
                   </div>
                   <div className="form-check-inline">
-                    <label htmlFor="" className="form-check-label">
-                      <input type="radio" className="form-check-input" name="sexo" id="femenino" value="Femenino" checked={sexo === "Femenino"} onChange={() => setSexo("Femenino")} /> Femenino
+                    <label htmlFor="femenino" className="form-check-label">
+                      <input type="radio" className="form-check-input" name="sexo" id="femenino" value="Femenino" checked={sexo === "Femenino"} onChange={(e) => setSexo(e.target.value)} /> Femenino
                     </label>
                   </div>
                 </div>
@@ -249,10 +264,10 @@ export default function Pacientes() {
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-secondary" onClick={closeModal}>
-            Cerrar
+            Cancelar
           </button>
           <button className="btn btn-primary" onClick={handleRegisterPaciente}>
-            Guardar
+            Guardar paciente
           </button>
         </Modal.Footer>
       </Modal>
