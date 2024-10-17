@@ -1,13 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Dropdown, Modal } from "react-bootstrap";
+import { Dropdown, Image, Modal } from "react-bootstrap";
 import { Utils } from "@/app/utils/utils";
 import { useRouter } from "next/navigation";
 import MenuAdmin from "./users/administrador/MenuAdmin";
 import MenuNutri from "./users/nutriologo/MenuNutri";
 import MenuPaciente from "./users/paciente/MenuPaciente";
 import { NavbarController } from "./navbarController";
+import { FaUserCircle } from "react-icons/fa";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
@@ -15,10 +16,13 @@ export default function Navbar() {
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [fotoPerfil, setFotoPerfil] = useState("");
+  const [nombre, setNombre] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     const storedRol = sessionStorage.getItem("trol_id");
+    setNombre(sessionStorage.getItem("nombre"));
     if (storedRol) {
       setRol(Number(storedRol));
     }
@@ -28,18 +32,22 @@ export default function Navbar() {
     try {
       const response = await NavbarController.login(usuario, contrasenia);
 
-      if (response.data.trol_id === 1) {
+      if (response.data.user.trol_id === 1) {
+        setFotoPerfil(response.data.user.admin.foto);
         router.push("/administrador");
-      } else if (response.data.trol_id === 2) {
+      } else if (response.data.user.trol_id === 2) {
+        setFotoPerfil(response.data.user.nutriologo.foto);
         router.push("/nutriologo");
-      } else if (response.data.trol_id === 3) {
+      } else if (response.data.user.trol_id === 3) {
+        setFotoPerfil(response.data.user.paciente.foto);
         router.push("/paciente");
       } else {
         Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesión nuevamente");
         router.push("/");
       }
 
-      setRol(response.data.trol_id);
+      setNombre(sessionStorage.getItem("nombre"));
+      setRol(response.data.user.trol_id);
       closeModal();
     } catch (error) {
       setRol(null);
@@ -90,8 +98,9 @@ export default function Navbar() {
                   </li>
                   <li className="nav-item">
                     <Dropdown>
-                      <Dropdown.Toggle variant="primary" id="dropdown-basic">
-                        Opciones
+                      <Dropdown.Toggle variant="primary" id="dropdown-basic" style={{ display: "flex", alignItems: "center" }}>
+                        {fotoPerfil ? <Image src={fotoPerfil} alt="Foto de perfil" className="rounded-circle" width={42} height={42} /> : <FaUserCircle />}
+                        <span style={{ marginLeft: "2px" }}>{nombre}</span>{" "}
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
                         {rol === 1 ? <MenuAdmin /> : rol === 2 ? <MenuNutri /> : rol === 3 ? <MenuPaciente /> : null}
@@ -104,11 +113,6 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <li className="nav-item ms-2">
-                    <Link href="/registro" className="text-white text-decoration-none">
-                      <button className="btn btn-primary">Registrarse</button>
-                    </Link>
-                  </li>
                   <li className="nav-item ms-2">
                     <button className="btn btn-primary" onClick={openModal}>
                       Iniciar Sesión

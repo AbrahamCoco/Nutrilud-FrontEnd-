@@ -53,7 +53,7 @@ export default function Consulta() {
   const loadPaciente = async () => {
     try {
       const response = await ConsultaController.getPacienteId(id);
-      setPaciente(response.data.paciente);
+      setPaciente(response.paciente);
     } catch (error) {
       setPaciente(null);
     }
@@ -173,13 +173,21 @@ export default function Consulta() {
                       <BsWhatsapp />
                     </Link>
                   </td>
-                  <td>
-                    <Link href={`/nutriologo/pacientes/consulta/${id}/recordatorios`}>
-                      <Button variant="info" className="mx-1">
-                        <BsFileEarmarkMedicalFill />
-                      </Button>
-                    </Link>
-                  </td>
+                  <Link
+                    href={{
+                      pathname: `/nutriologo/pacientes/consulta/${id}/recordatorios`,
+                      query: {
+                        id_paciente: paciente.id,
+                        nombre: paciente.user.nombre,
+                        primer_apellido: paciente.user.primer_apellido,
+                        segundo_apellido: paciente.user.segundo_apellido,
+                        fecha_nacimiento: paciente.fecha_nacimiento,
+                      },
+                    }}>
+                    <Button variant="info" className="mx-1">
+                      <BsFileEarmarkMedicalFill />
+                    </Button>
+                  </Link>
                 </tr>
               </tbody>
             </table>

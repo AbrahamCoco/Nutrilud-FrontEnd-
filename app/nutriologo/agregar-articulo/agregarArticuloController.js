@@ -16,7 +16,7 @@ export class AgregarArticuloController {
     try {
       const response = await Tarjet.nutriologoApi.addArticulo(data, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
           "Content-Type": "application/json",
         },
       });
