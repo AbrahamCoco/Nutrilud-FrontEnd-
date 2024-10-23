@@ -36,7 +36,7 @@ export default function PerfilNutriologo() {
           {perfilData?.data?.nutriologo?.foto ? (
             <Image src={perfilData?.data.nutriologo?.foto} alt={perfilData?.data?.nombre} fluid roundedCircle />
           ) : (
-            <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "6rem", width: "100%", display: "block", textAlign: "center" }}></i>
+            <i className="bx bxs-user-circle" style={{ color: "black", fontSize: "15rem", width: "100%", display: "block", textAlign: "center" }}></i>
           )}
         </Col>
         <Col md={9}>
