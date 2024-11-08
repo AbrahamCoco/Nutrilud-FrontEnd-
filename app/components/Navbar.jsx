@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Dropdown, Image, Modal } from "react-bootstrap";
+import { Dropdown, Form, Image, Modal } from "react-bootstrap";
 import { Utils } from "@/app/utils/utils";
 import { useRouter } from "next/navigation";
 import MenuAdmin from "./users/administrador/MenuAdmin";
@@ -31,15 +31,16 @@ export default function Navbar() {
   const handleLogin = async () => {
     try {
       const response = await NavbarController.login(usuario, contrasenia);
+      const { trol_id, admin, nutriologo, paciente } = response.data.user;
 
-      if (response.data.user.trol_id === 1) {
-        setFotoPerfil(response.data.user.admin.foto);
+      if (trol_id === 1) {
+        setFotoPerfil(admin.foto);
         router.push("/administrador");
-      } else if (response.data.user.trol_id === 2) {
-        setFotoPerfil(response.data.user.nutriologo.foto);
+      } else if (trol_id === 2) {
+        setFotoPerfil(nutriologo.foto);
         router.push("/nutriologo");
-      } else if (response.data.user.trol_id === 3) {
-        setFotoPerfil(response.data.user.paciente.foto);
+      } else if (trol_id === 3) {
+        setFotoPerfil(paciente.foto);
         router.push("/paciente");
       } else {
         Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesión nuevamente");
@@ -47,7 +48,7 @@ export default function Navbar() {
       }
 
       setNombre(sessionStorage.getItem("nombre"));
-      setRol(response.data.user.trol_id);
+      setRol(trol_id);
       closeModal();
     } catch (error) {
       setRol(null);
@@ -60,13 +61,8 @@ export default function Navbar() {
     setRol(null);
   };
 
-  const openModal = () => {
-    setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   return (
     <>
@@ -89,6 +85,11 @@ export default function Navbar() {
           </div>
           <div className="row lg-6">
             <ul className="nav">
+              <li className="nav-item">
+                <Form>
+                  <Form.Check type="switch" id="custom-switch" label="Blanco" />
+                </Form>
+              </li>
               {rol ? (
                 <>
                   <li className="nav-item">
@@ -112,13 +113,11 @@ export default function Navbar() {
                   </li>
                 </>
               ) : (
-                <>
-                  <li className="nav-item ms-2">
-                    <button className="btn btn-primary" onClick={openModal}>
-                      Iniciar Sesión
-                    </button>
-                  </li>
-                </>
+                <li className="nav-item ms-2">
+                  <button className="btn btn-primary" onClick={openModal}>
+                    Iniciar Sesión
+                  </button>
+                </li>
               )}
             </ul>
           </div>
