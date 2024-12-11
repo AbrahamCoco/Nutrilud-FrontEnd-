@@ -58,6 +58,7 @@ export default function Navbar() {
   const handleLogout = async () => {
     const token = sessionStorage.getItem("token");
     await NavbarController.logout(token);
+    router.push("/");
     setRol(null);
   };
 

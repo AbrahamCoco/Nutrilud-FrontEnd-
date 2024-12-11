@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import { useParams } from "next/navigation";
 import { Utils } from "@/app/utils/utils";
-import { BsWhatsapp } from "react-icons/bs";
-import { BsFileEarmarkMedicalFill } from "react-icons/bs";
+import { BsWhatsapp, BsFileEarmarkMedicalFill } from "react-icons/bs";
 import Link from "next/link";
 import { ConsultaController } from "./consultaController";
 
@@ -31,21 +30,18 @@ export default function Consulta() {
   const loadDatosConsulta = async () => {
     try {
       const response = await ConsultaController.getAllConsultas(id);
-      const consulta = response.data.consulta;
+      const consultas = response.consulta;
 
-      if (!consulta || consulta.length === 0) {
+      if (!consultas || consultas.length === 0) {
         setConsulta(null);
         Utils.swalWarning("No hay datos de consulta previos");
       } else {
-        setConsulta(consulta);
+        setConsulta(consultas);
         Utils.swalSuccess("Datos de consulta cargados correctamente");
       }
     } catch (error) {
-      if (error.response && error.response.status === 400) {
-        Utils.swalWarning(error.response.data.message || "No se encontraron datos de consulta.");
-      } else {
-        Utils.swalFailure("Error al cargar los datos de consulta", error.message);
-      }
+      const message = error.response?.data?.message || "No se encontraron datos de consulta.";
+      Utils.swalWarning(message);
       setConsulta(null);
     }
   };
@@ -54,7 +50,7 @@ export default function Consulta() {
     try {
       const response = await ConsultaController.getPacienteId(id);
       setPaciente(response.paciente);
-    } catch (error) {
+    } catch {
       setPaciente(null);
     }
   };
@@ -67,18 +63,14 @@ export default function Consulta() {
   const calcularEdad = (fechaNacimiento) => {
     const fechaNac = new Date(fechaNacimiento);
     const hoy = new Date();
-    const edad = hoy.getFullYear() - fechaNac.getFullYear();
-
+    let edad = hoy.getFullYear() - fechaNac.getFullYear();
     if (hoy.getMonth() < fechaNac.getMonth() || (hoy.getMonth() === fechaNac.getMonth() && hoy.getDate() < fechaNac.getDate())) {
-      return edad - 1;
+      edad--;
     }
-
     return edad;
   };
 
-  const handleGuardarDatos = async (event) => {
-    event.preventDefault();
-
+  const handleGuardarDatos = async () => {
     const peso = parseFloat(datosFormulario.peso);
     const estatura = parseFloat(datosFormulario.estatura);
     const sexo = paciente.sexo;
@@ -86,28 +78,33 @@ export default function Consulta() {
     const circunBrazo = parseFloat(datosFormulario.circunferencia_brazo);
     const pliegueTricipital = parseFloat(datosFormulario.pliegue_tricipital);
 
-    if (!isNaN(peso) && !isNaN(estatura && estatura !== 0)) {
-      let imc = peso / (estatura * estatura);
-      let porcentajeGrasa = await ConsultaController.porcentajeGrasa(sexo, imc, edad);
-      let areaMuscularBrazo = await ConsultaController.areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo);
+    let imc = 0;
+    let porcentajeGrasa = 0;
+    let porcentajeMusculo = 0;
 
-      let porcentajeMusculo = 0;
-      if (!isNaN(areaMuscularBrazo)) {
-        porcentajeMusculo = datosFormulario.estatura * (0.0264 + 0.0029 * areaMuscularBrazo);
-      }
+    if (!isNaN(peso) && !isNaN(estatura) && estatura !== 0) {
+      imc = peso / (estatura * estatura);
+      porcentajeGrasa = ConsultaController.porcentajeGrasa(sexo, imc, edad);
+      const areaMuscularBrazo = ConsultaController.areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo);
+      porcentajeMusculo = !isNaN(areaMuscularBrazo) ? estatura * (0.0264 + 0.0029 * areaMuscularBrazo) : 0;
+    }
 
-      setDatosFormulario((prevDatosFormulario) => ({
-        ...prevDatosFormulario,
+    setDatosFormulario((prev) => ({
+      ...prev,
+      nutriologo_id: sessionStorage.getItem("id_user"),
+      imc: imc.toFixed(3),
+      porcentaje_grasa: porcentajeGrasa.toFixed(3),
+      porcentaje_musculo: porcentajeMusculo.toFixed(3),
+    }));
+
+    try {
+      await ConsultaController.addConsulta(id, {
+        ...datosFormulario,
         nutriologo_id: sessionStorage.getItem("id_user"),
         imc: imc.toFixed(3),
         porcentaje_grasa: porcentajeGrasa.toFixed(3),
         porcentaje_musculo: porcentajeMusculo.toFixed(3),
-      }));
-    }
-
-    try {
-      const response = await ConsultaController.addConsulta(id, datosFormulario);
-
+      });
       setDatosFormulario({
         peso: "",
         estatura: "",
@@ -122,7 +119,6 @@ export default function Consulta() {
         fecha_medicion: "",
         siguiente_consulta: "",
       });
-
       loadDatosConsulta();
     } catch (error) {
       Utils.swalFailure("Error al guardar los datos de consulta", error.message);
@@ -173,21 +169,23 @@ export default function Consulta() {
                       <BsWhatsapp />
                     </Link>
                   </td>
-                  <Link
-                    href={{
-                      pathname: `/nutriologo/pacientes/consulta/${id}/recordatorios`,
-                      query: {
-                        id_paciente: paciente.id,
-                        nombre: paciente.user.nombre,
-                        primer_apellido: paciente.user.primer_apellido,
-                        segundo_apellido: paciente.user.segundo_apellido,
-                        fecha_nacimiento: paciente.fecha_nacimiento,
-                      },
-                    }}>
-                    <Button variant="info" className="mx-1">
-                      <BsFileEarmarkMedicalFill />
-                    </Button>
-                  </Link>
+                  <td>
+                    <Link
+                      href={{
+                        pathname: `/nutriologo/pacientes/consulta/${id}/recordatorios`,
+                        query: {
+                          id_paciente: paciente.id,
+                          nombre: paciente.user.nombre,
+                          primer_apellido: paciente.user.primer_apellido,
+                          segundo_apellido: paciente.user.segundo_apellido,
+                          fecha_nacimiento: paciente.fecha_nacimiento,
+                        },
+                      }}>
+                      <Button variant="info" className="mx-1">
+                        <BsFileEarmarkMedicalFill />
+                      </Button>
+                    </Link>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -251,153 +249,151 @@ export default function Consulta() {
         </div>
       </div>
       <h2>Agregar datos de consulta actual</h2>
-      <form onSubmit={handleGuardarDatos}>
-        <div className="row">
-          <div className="col-sm-3">
-            <label htmlFor="peso" className="form-label">
-              Peso
-            </label>
-            <input type="number" step="0.001" className="form-control" name="peso" value={datosFormulario.peso} onChange={(e) => setDatosFormulario({ ...datosFormulario, peso: e.target.value })} />
-            <label htmlFor="estatura" className="form-label">
-              Estatura
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="estatura"
-              value={datosFormulario.estatura}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  estatura: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="col-sm-3">
-            <label htmlFor="circunferencia_cintura" className="form-label">
-              Circunferencia de cintura
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="circunferencia_cintura"
-              value={datosFormulario.circunferencia_cintura}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  circunferencia_cintura: e.target.value,
-                })
-              }
-            />
-            <label htmlFor="circunferencia_cadera" className="form-label">
-              Circunferencia de cadera
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="circunferencia_cadera"
-              value={datosFormulario.circunferencia_cadera}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  circunferencia_cadera: e.target.value,
-                })
-              }
-            />
-            <label htmlFor="circunferencia_brazo" className="form-label">
-              Circunferencia de brazo
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="circunferencia_brazo"
-              value={datosFormulario.circunferencia_brazo}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  circunferencia_brazo: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="col-sm-3">
-            <label htmlFor="pliegue_bicipital" className="form-label">
-              Pliegue bicipital
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="pliegue_bicipital"
-              value={datosFormulario.pliegue_bicipital}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  pliegue_bicipital: e.target.value,
-                })
-              }
-            />
-            <label htmlFor="pliegue_tricipital" className="form-label">
-              Pliegue tricipital
-            </label>
-            <input
-              type="number"
-              step="0.001"
-              className="form-control"
-              name="pliegue_tricipital"
-              value={datosFormulario.pliegue_tricipital}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  pliegue_tricipital: e.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="col-sm-3">
-            <label htmlFor="fecha_medicion" className="form-label">
-              Fecha de medicion
-            </label>
-            <input
-              type="date"
-              className="form-control"
-              name="fecha_medicion"
-              value={datosFormulario.fecha_medicion}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  fecha_medicion: e.target.value,
-                })
-              }
-            />
-            <label htmlFor="fecha_siguiente_consulta" className="form-label">
-              Fecha de siguiente consulta
-            </label>
-            <input
-              type="datetime-local"
-              className="form-control"
-              name="siguiente_consulta"
-              value={datosFormulario.siguiente_consulta}
-              onChange={(e) =>
-                setDatosFormulario({
-                  ...datosFormulario,
-                  siguiente_consulta: e.target.value,
-                })
-              }
-            />
-            <div className="text-center my-4">
-              <button className="btn btn-primary mx-1" type="submit">
-                Guardar datos
-              </button>
-            </div>
+      <div className="row">
+        <div className="col-sm-3">
+          <label htmlFor="peso" className="form-label">
+            Peso <span>(Kg)</span>
+          </label>
+          <input type="number" step="0.001" className="form-control" name="peso" value={datosFormulario.peso} onChange={(e) => setDatosFormulario({ ...datosFormulario, peso: e.target.value })} />
+          <label htmlFor="estatura" className="form-label">
+            Estatura <span>(m)</span>
+          </label>
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="estatura"
+            value={datosFormulario.estatura}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                estatura: e.target.value,
+              })
+            }
+          />
+        </div>
+        <div className="col-sm-3">
+          <label htmlFor="circunferencia_cintura" className="form-label">
+            Circunferencia de cintura <span>(cm)</span>
+          </label>
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="circunferencia_cintura"
+            value={datosFormulario.circunferencia_cintura}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                circunferencia_cintura: e.target.value,
+              })
+            }
+          />
+          <label htmlFor="circunferencia_cadera" className="form-label">
+            Circunferencia de cadera <span>(cm)</span>
+          </label>
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="circunferencia_cadera"
+            value={datosFormulario.circunferencia_cadera}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                circunferencia_cadera: e.target.value,
+              })
+            }
+          />
+          <label htmlFor="circunferencia_brazo" className="form-label">
+            Circunferencia de brazo <span>(cm²)</span>
+          </label>
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="circunferencia_brazo"
+            value={datosFormulario.circunferencia_brazo}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                circunferencia_brazo: e.target.value,
+              })
+            }
+          />
+        </div>
+        <div className="col-sm-3">
+          <label htmlFor="pliegue_bicipital" className="form-label">
+            Pliegue bicipital <span>(mm)</span>
+          </label>
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="pliegue_bicipital"
+            value={datosFormulario.pliegue_bicipital}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                pliegue_bicipital: e.target.value,
+              })
+            }
+          />
+          <label htmlFor="pliegue_tricipital" className="form-label">
+            Pliegue tricipital <span>(mm)</span>
+          </label>
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="pliegue_tricipital"
+            value={datosFormulario.pliegue_tricipital}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                pliegue_tricipital: e.target.value,
+              })
+            }
+          />
+        </div>
+        <div className="col-sm-3">
+          <label htmlFor="fecha_medicion" className="form-label">
+            Fecha de medicion
+          </label>
+          <input
+            type="date"
+            className="form-control"
+            name="fecha_medicion"
+            value={datosFormulario.fecha_medicion}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                fecha_medicion: e.target.value,
+              })
+            }
+          />
+          <label htmlFor="fecha_siguiente_consulta" className="form-label">
+            Fecha de siguiente consulta
+          </label>
+          <input
+            type="datetime-local"
+            className="form-control"
+            name="siguiente_consulta"
+            value={datosFormulario.siguiente_consulta}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                siguiente_consulta: e.target.value,
+              })
+            }
+          />
+          <div className="text-center my-4">
+            <button className="btn btn-primary mx-1" type="button" onClick={handleGuardarDatos}>
+              Guardar datos
+            </button>
           </div>
         </div>
-      </form>
+      </div>
     </Container>
   );
 }

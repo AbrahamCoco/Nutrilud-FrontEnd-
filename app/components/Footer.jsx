@@ -69,9 +69,9 @@ export default function Footer() {
         </Col>
         <Col md={12} className="text-center">
           NutriLud {currentYear} &copy; Todos los derechos reservados | Desarrollado por{" "}
-          <a href="https://github.com/DevConMx" className="text-light" target="_blank">
+          {/* <a href="https://github.com/DevConMx" className="text-light" target="_blank">
             DevConMx
-          </a>
+          </a> */}
         </Col>
       </Row>
     </footer>

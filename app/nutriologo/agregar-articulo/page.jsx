@@ -14,33 +14,28 @@ export default function AgregarArticulo() {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    }
+    if (file) setSelectedFile(file);
   };
 
   const subirImagen = async () => {
-    const formData = new FormData();
+    if (!selectedFile) return null;
 
+    const formData = new FormData();
     const img = document.createElement("img");
     img.src = URL.createObjectURL(selectedFile);
 
-    const generarBlob = (canvas) => {
-      return new Promise((resolve) => {
-        canvas.toBlob((blob) => {
-          resolve(blob);
-        }, "image/jpeg");
+    const generarBlob = (canvas) =>
+      new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg");
       });
-    };
 
-    const procesarImagen = () => {
-      return new Promise((resolve, reject) => {
+    const procesarImagen = () =>
+      new Promise((resolve, reject) => {
         img.onload = async () => {
           try {
             const canvas = document.createElement("canvas");
             const maxWidth = 800;
             const maxHeight = 400;
-
             canvas.width = maxWidth;
             canvas.height = maxHeight;
 
@@ -52,19 +47,16 @@ export default function AgregarArticulo() {
 
             const blob = await generarBlob(canvas);
             formData.append("image", blob, selectedFile.name);
-
             resolve();
           } catch (error) {
             reject(error);
           }
         };
       });
-    };
 
     try {
       await procesarImagen();
-      const response = await AgregarArticuloController.uploadImage(formData);
-      return response;
+      return await AgregarArticuloController.uploadImage(formData);
     } catch (error) {
       console.error("Error al procesar o subir la imagen", error);
       return null;
@@ -81,7 +73,7 @@ export default function AgregarArticulo() {
       }
 
       await AgregarArticuloController.AddArticulo({
-        contenido: contenido,
+        contenido,
         foto: imageUrl,
         nutriologo_id: sessionStorage.getItem("nutriologo_id"),
       });
