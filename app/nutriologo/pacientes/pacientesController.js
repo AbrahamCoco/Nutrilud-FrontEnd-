@@ -25,4 +25,15 @@ export class PacientesController {
       return null;
     }
   }
+
+  static async deletePaciente(id) {
+    try {
+      const response = await Tarjet.nutriologoApi.deletePaciente(id);
+      Utils.swalSuccess("Paciente eliminado correctamente");
+      return response;
+    } catch (error) {
+      Utils.swalError("Error al eliminar paciente", error.message);
+      return null;
+    }
+  }
 }

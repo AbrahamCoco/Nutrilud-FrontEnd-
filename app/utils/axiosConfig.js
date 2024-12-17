@@ -41,6 +41,7 @@ export const Tarjet = {
     getAgenda: () => axiosInstance.get("/nutriologo/agenda"),
     addArticulo: (data) => axiosInstance.post("/nutriologo/articulos", data),
     getAllPacientes: () => axiosInstance.get("/nutriologo/pacientes"),
+    deletePaciente: (id) => axiosInstance.get(`/nutriologo/pacienteDelete/${id}`),
     getPacienteId: (id) => axiosInstance.get(`/nutriologo/paciente/${id}`),
     getAllConsultas: (id) => axiosInstance.get(`/nutriologo/consultadatos/${id}`),
     addConsulta: (id, data) => axiosInstance.post(`/nutriologo/insertardatos/${id}`, data),

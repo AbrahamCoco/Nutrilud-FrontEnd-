@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Col, Container, Modal, Row } from "react-bootstrap";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import Link from "next/link";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
 import { BsWhatsapp } from "react-icons/bs";
@@ -28,6 +28,16 @@ export default function Pacientes() {
   useEffect(() => {
     loadPacientes();
   }, []);
+
+  const deleteAppClientCache = (id) => async () => {
+    try {
+      const response = await PacientesController.deletePaciente(id);
+      loadPacientes();
+      return response;
+    } catch (error) {
+      return null;
+    }
+  };
 
   const loadPacientes = async () => {
     try {
@@ -143,21 +153,17 @@ export default function Pacientes() {
     {
       name: "Modificar",
       cell: (row) => (
-        <Link href={`/modificar-paciente/${row.id}`}>
-          <button className="btn btn-warning pb-2">
-            <FaEdit />
-          </button>
-        </Link>
+        <Button variant="warning" onClick={() => console.log(row)}>
+          <FaEdit />
+        </Button>
       ),
     },
     {
       name: "Eliminar",
       cell: (row) => (
-        <Link href={`/eliminar-paciente/paciente=${row.id}`}>
-          <button className="btn btn-danger pb-2">
-            <FaTrash />
-          </button>
-        </Link>
+        <Button variant="danger" onClick={deleteAppClientCache(row.id)}>
+          <FaTrash />
+        </Button>
       ),
     },
   ];
