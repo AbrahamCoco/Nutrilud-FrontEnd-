@@ -5,7 +5,7 @@ export class ArticuloController {
   static async getArticulo(id) {
     try {
       const response = await Tarjet.nutriologoApi.getArticuloId(id);
-      const articuloData = response.data.articulo;
+      const articuloData = response.data.data[0];
 
       if (!articuloData || !articuloData.contenido) {
         throw new Error("Contenido del artículo no encontrado");
@@ -17,7 +17,7 @@ export class ArticuloController {
       Utils.swalSuccess("Artículo cargado correctamente");
       return { articuloData, titulo, contenidoModificado };
     } catch (error) {
-      Utils.swalFailure("Error al cargar el artículo: ", error.response.data.message);
+      Utils.swalFailure("Error al cargar el artículo: ", error);
       return { articuloData: null, titulo: null, contenidoModificado: null };
     }
   }

@@ -4,7 +4,9 @@ import { Utils } from "@/app/utils/utils";
 export class PacientesController {
   static async getAllPacientes() {
     try {
-      const response = await Tarjet.nutriologoApi.getAllPacientes();
+      const response = await Tarjet.nutriologoApi.getAllPacientes({
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      });
       Utils.swalSuccess("Pacientes cargados correctamente");
       return response.data;
     } catch (error) {

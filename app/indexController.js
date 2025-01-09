@@ -6,7 +6,7 @@ export class IndexController {
     try {
       const response = await Tarjet.nutriologoApi.getAllArticulos();
 
-      const encabezados = response.data.articulos.reduce((acc, articulo) => {
+      const encabezados = response.data.data.reduce((acc, articulo) => {
         const encabezado = extraerPrimerEncabezado(articulo.contenido);
         acc[articulo.id] = encabezado;
         return acc;

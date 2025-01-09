@@ -16,8 +16,13 @@ export default function Home() {
     try {
       const { response, encabezados } = await IndexController.getArticulos();
 
-      setArticulos(response.data.articulos);
-      setPrimerEncabezado(encabezados);
+      if (response && response.data && Array.isArray(response.data.data)) {
+        setArticulos(response.data.data);
+        setPrimerEncabezado(encabezados);
+      } else {
+        setArticulos([]);
+        setPrimerEncabezado({});
+      }
     } catch (error) {
       setArticulos([]);
       setPrimerEncabezado({});

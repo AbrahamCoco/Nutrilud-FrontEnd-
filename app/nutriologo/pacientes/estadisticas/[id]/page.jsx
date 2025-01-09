@@ -29,10 +29,7 @@ export default function EstadisticasPaciente() {
     return (
       <Container>
         <Row>
-          <Col md={12}>
-            <h1>Dashboard</h1>
-            <h2>Cargando datos...</h2>
-          </Col>
+          <h1>Estadisticas del paciente...</h1>
         </Row>
       </Container>
     );
@@ -41,7 +38,6 @@ export default function EstadisticasPaciente() {
   const generateChartData = (label, key, borderColor, backgroundColor) => {
     const consulta = data.data.paciente.consulta || [];
 
-    // Si el array está vacío, devuelve datos por defecto o evita el error
     if (consulta.length === 0) {
       const defaultDate = new Date();
       return {
@@ -58,7 +54,7 @@ export default function EstadisticasPaciente() {
     }
 
     const labels = consulta.map((c) => {
-      const date = new Date(c.fecha_medicion || new Date()); // Maneja la posibilidad de fecha_medicion indefinida
+      const date = new Date(c.fecha_medicion || new Date());
       return date.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
     });
 

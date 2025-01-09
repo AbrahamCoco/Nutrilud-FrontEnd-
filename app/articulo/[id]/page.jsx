@@ -45,7 +45,7 @@ export default function Articulo() {
           <p>
             Nutriólogo:{" "}
             <strong>
-              {articulo.nutriologo.user.nombre} {articulo.nutriologo.user.primer_apellido} {articulo.nutriologo.user.segundo_apellido}
+              {articulo.tusuario_nutriologo.nombre} {articulo.tusuario_nutriologo.primer_apellido} {articulo.tusuario_nutriologo.segundo_apellido}
             </strong>
           </p>
           <p>

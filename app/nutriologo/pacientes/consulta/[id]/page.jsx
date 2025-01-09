@@ -250,7 +250,7 @@ export default function Consulta() {
       </div>
       <h2>Agregar datos de consulta actual</h2>
       <div className="row">
-        <div className="col-sm-3">
+        <div className="col-sm-2">
           <label htmlFor="peso" className="form-label">
             Peso <span>(Kg)</span>
           </label>
@@ -272,9 +272,9 @@ export default function Consulta() {
             }
           />
         </div>
-        <div className="col-sm-3">
+        <div className="col-sm-2">
           <label htmlFor="circunferencia_cintura" className="form-label">
-            Circunferencia de cintura <span>(cm)</span>
+            C. de cintura <span>(cm)</span>
           </label>
           <input
             type="number"
@@ -290,7 +290,7 @@ export default function Consulta() {
             }
           />
           <label htmlFor="circunferencia_cadera" className="form-label">
-            Circunferencia de cadera <span>(cm)</span>
+            C. de cadera <span>(cm)</span>
           </label>
           <input
             type="number"
@@ -306,7 +306,7 @@ export default function Consulta() {
             }
           />
           <label htmlFor="circunferencia_brazo" className="form-label">
-            Circunferencia de brazo <span>(cm²)</span>
+            C. de brazo <span>(cm²)</span>
           </label>
           <input
             type="number"
@@ -322,7 +322,7 @@ export default function Consulta() {
             }
           />
         </div>
-        <div className="col-sm-3">
+        <div className="col-sm-2">
           <label htmlFor="pliegue_bicipital" className="form-label">
             Pliegue bicipital <span>(mm)</span>
           </label>
@@ -332,12 +332,7 @@ export default function Consulta() {
             className="form-control"
             name="pliegue_bicipital"
             value={datosFormulario.pliegue_bicipital}
-            onChange={(e) =>
-              setDatosFormulario({
-                ...datosFormulario,
-                pliegue_bicipital: e.target.value,
-              })
-            }
+            onChange={(e) => setDatosFormulario({ ...datosFormulario, pliegue_bicipital: e.target.value })}
           />
           <label htmlFor="pliegue_tricipital" className="form-label">
             Pliegue tricipital <span>(mm)</span>
@@ -356,7 +351,25 @@ export default function Consulta() {
             }
           />
         </div>
-        <div className="col-sm-3">
+        <div className="col-sm-2">
+          <label htmlFor="" className="form-label">
+            Glucosa
+          </label>
+          <input type="number" step="0.001" className="form-control" name="glucosa" />
+          <label htmlFor="" className="form-label">
+            Colesterol
+          </label>
+          <input type="number" step="0.001" className="form-control" name="colesterol" />
+          <label htmlFor="" className="form-label">
+            Trigliceridos
+          </label>
+          <input type="number" step="0.001" className="form-control" name="trigliceridos" />
+          <label htmlFor="" className="form-label">
+            Presion arterial
+          </label>
+          <input type="number" step="0.001" className="form-control" name="presion_arterial" />
+        </div>
+        <div className="col-sm-4">
           <label htmlFor="fecha_medicion" className="form-label">
             Fecha de medicion
           </label>
