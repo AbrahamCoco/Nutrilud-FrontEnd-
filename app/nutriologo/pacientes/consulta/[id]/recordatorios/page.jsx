@@ -5,7 +5,7 @@ import "jspdf-autotable";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
-import { FaEye } from "react-icons/fa";
+import { FaDownload, FaEye } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 import { RecordatorioController } from "./recordatorioController";
 
@@ -25,12 +25,7 @@ export default function Recordatorios() {
 
   const handleSavePDF = async () => {
     if (editorRef.current) {
-      const doc = new jsPDF({
-        orientation: "portrait",
-        unit: "pt",
-        format: "a4",
-      });
-
+      const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
       const contentHTML = editorRef.current.getContent();
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = contentHTML;
@@ -47,58 +42,54 @@ export default function Recordatorios() {
 
       const table = tempDiv.querySelector("table");
       if (table) {
-        const rows = [];
-        const headers = [];
+        const headers = Array.from(table.querySelectorAll("th")).map((header) => header.textContent);
+        const rows = Array.from(table.querySelectorAll("tr"))
+          .map((row) => Array.from(row.querySelectorAll("td")).map((cell) => cell.textContent))
+          .filter((rowData) => rowData.length > 0);
 
-        const headerCells = table.querySelectorAll("th");
-        headerCells.forEach((header) => headers.push(header.textContent));
-
-        const rowCells = table.querySelectorAll("tr");
-        rowCells.forEach((row) => {
-          const rowData = [];
-          row.querySelectorAll("td").forEach((cell) => rowData.push(cell.textContent));
-          if (rowData.length > 0) rows.push(rowData);
-        });
-
-        doc.autoTable({
-          head: [headers],
-          body: rows,
-          startY: 110,
-          theme: "grid",
-          styles: { fontSize: 10 },
-        });
+        doc.autoTable({ head: [headers], body: rows, startY: 110, theme: "grid", styles: { fontSize: 10 } });
       }
 
       const pdfBlob = doc.output("blob");
-
       const fileName = `Recordatorio_${nombre}${primer_apellido}${segundo_apellido}_${fecha.getDate()}_${fecha.getMonth() + 1}_${fecha.getFullYear()}_${fecha
         .getHours()
         .toString()
         .padStart(2, "0")}_${fecha.getMinutes().toString().padStart(2, "0")}_${fecha.getSeconds().toString().padStart(2, "0")}.pdf`;
-
       const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
 
-      const formData = new FormData();
-      formData.append("nutriologo_id", id_nutriologo);
-      formData.append("paciente_id", id_paciente);
-      formData.append("recordatorioPdf", pdfFile);
+      const formData1 = new FormData();
 
-      const response = await RecordatorioController.postRecordatorio(formData);
-      getRecordatorios();
+      formData1.append("nombre", nombre);
+      formData1.append("apellido", primer_apellido);
+      formData1.append("id", id_paciente);
+      formData1.append("file", pdfFile);
+
+      const response = await RecordatorioController.postPdfRecordatorio(formData1);
+      if (response) {
+        const recordatorio = {
+          paciente_id: id_paciente,
+          nutriologo_id: id_nutriologo,
+          recordatorio_pdf: response.data.data,
+        };
+        await RecordatorioController.postRecordatorio(recordatorio);
+        getRecordatorios();
+      } else {
+        console.log("Error al subir el PDF");
+      }
     }
   };
 
   const getRecordatorios = useCallback(async () => {
     try {
       const response = await RecordatorioController.getRecordatorios(id_paciente);
-      setRecordatorios(response.data.recordatorio);
+      setRecordatorios(response.data.data);
     } catch (error) {
       setRecordatorios([]);
     }
   }, [id_paciente]);
 
   useEffect(() => {
-    const storedId = sessionStorage.getItem("nutriologo_id");
+    const storedId = sessionStorage.getItem("id_nutriologo");
     setIdNutriologo(storedId);
     getRecordatorios();
   }, [getRecordatorios]);
@@ -111,22 +102,29 @@ export default function Recordatorios() {
     },
     {
       name: "Nombre/Fecha",
-      selector: (row, index) =>
-        row.created_at ? `Recordatorio de la fecha: ${new Date(row.created_at).toLocaleDateString()} ${new Date(row.created_at).toLocaleTimeString()}` : "Fecha no disponible",
+      selector: (row) => (row.created_at ? `Recordatorio de la fecha: ${new Date(row.created_at).toLocaleDateString()} ${new Date(row.created_at).toLocaleTimeString()}` : "Fecha no disponible"),
       sortable: true,
     },
     {
       name: "Ver",
       cell: (row) => (
-        <Button variant="primary" onClick={() => handleView(row.recordatorioPdf)}>
+        <Button variant="primary" onClick={() => handleView(row.recordatorio_pdf)}>
           <FaEye />
+        </Button>
+      ),
+    },
+    {
+      name: "Descargar",
+      cell: (row) => (
+        <Button variant="primary" onClick={() => handleDownload(row.recordatorio_pdf)}>
+          <FaDownload />
         </Button>
       ),
     },
   ];
 
   const handleView = (row) => {
-    const url = `http://127.0.0.1:8000${row}`;
+    const url = `http://127.0.0.1:8080/api/v1/view/${row}`;
     setPdfUrl(url);
     setShowModal(true);
   };
@@ -134,6 +132,11 @@ export default function Recordatorios() {
   const handleCloseModal = () => {
     setShowModal(false);
     setPdfUrl("");
+  };
+
+  const handleDownload = (row) => {
+    const url = `http://127.0.0.1:8080/api/v1/files/${row}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -147,67 +150,68 @@ export default function Recordatorios() {
             <Editor
               apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
               onInit={(evt, editor) => (editorRef.current = editor)}
-              initialValue="
-            <table border='1'>
-              <tr>
-                <th></th>
-                <th>Hora</th>
-                <th>Lugar</th>
-                <th>Alimentos</th> 
-                <th>Porciones</th> 
-                <th>Marca</th> 
-                <th>Formas de preparacion</th>
-              </tr>
-              <tr>
-                <td>Desayuno</td>
-                <td></td>
-                <td></td> 
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Almuerzo</td>
-                <td></td>
-                <td></td> 
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Media tarde</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Cena</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Colacion</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Otros</td>
-                <td></td>
-              </tr>
-            </table>"
+              initialValue={`
+                <table border='1'>
+                  <tr>
+                    <th></th>
+                    <th>Hora</th>
+                    <th>Lugar</th>
+                    <th>Alimentos</th> 
+                    <th>Porciones</th> 
+                    <th>Marca</th> 
+                    <th>Formas de preparacion</th>
+                  </tr>
+                  <tr>
+                    <td>Desayuno</td>
+                    <td></td>
+                    <td></td> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Almuerzo</td>
+                    <td></td>
+                    <td></td> 
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Media tarde</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Cena</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Colacion</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td>Otros</td>
+                    <td></td>
+                  </tr>
+                </table>
+              `}
               onEditorChange={(content) => setContent(content)}
               init={{
                 height: 500,
@@ -231,17 +235,23 @@ export default function Recordatorios() {
                   "help",
                   "wordcount",
                 ],
-                toolbar: "undo redo | blocks | bold italic backcolor | " + "alignleft aligncenter alignright alignjustify | " + "bullist numlist outdent indent | removeformat | help | fontsizeselect",
+                toolbar: "undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help | fontsizeselect",
                 content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
-              }}></Editor>
+              }}
+            />
           </Col>
-          <Col md={12}>
+          <Col md={6}>
+            <Button variant="primary" onClick={() => window.history.back()}>
+              Regresar
+            </Button>
+          </Col>
+          <Col md={6} className="text-right">
             <Button variant="primary" onClick={handleSavePDF}>
               Guardar recordatorio
             </Button>
           </Col>
           <Col md={12} className="py-4">
-            <DataTable columns={columns} data={recordatorios} pagination striped highlightOnHover theme="dark" responsive />
+            <DataTable columns={columns} data={recordatorios || []} pagination striped highlightOnHover theme="dark" responsive />
           </Col>
         </Row>
       </Container>

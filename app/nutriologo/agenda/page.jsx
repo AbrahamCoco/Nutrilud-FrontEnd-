@@ -6,24 +6,23 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import esLocale from "@fullcalendar/core/locales/es";
-import { AgendaController } from "./agendaController";
+import { NutriologoController } from "./agendaController";
 
 export default function Agenda() {
   const [agenda, setAgenda] = useState(null);
 
   useEffect(() => {
+    const loadAgenda = async () => {
+      try {
+        const response = await NutriologoController.getAgenda(sessionStorage.getItem("id_nutriologo"));
+
+        setAgenda(response);
+      } catch (error) {
+        setAgenda([]);
+      }
+    };
     loadAgenda();
   }, []);
-
-  const loadAgenda = async () => {
-    try {
-      const response = await AgendaController.getAgenda();
-
-      setAgenda(response);
-    } catch (error) {
-      setAgenda([]);
-    }
-  };
 
   return (
     <Container>

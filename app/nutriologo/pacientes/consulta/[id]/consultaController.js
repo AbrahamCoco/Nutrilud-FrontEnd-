@@ -3,61 +3,44 @@ import { Utils } from "@/app/utils/utils";
 
 export class ConsultaController {
   static async getPacienteId(id) {
-    try {
-      const response = await Tarjet.nutriologoApi.getPacienteId(id);
-      Utils.swalSuccess("Paciente cargado correctamente");
-      return response.data;
-    } catch (error) {
-      Utils.swalError("Error al cargar el paciente");
-      return null;
-    }
+    return this.handleRequest(() => Tarjet.nutriologoApi.getPacienteId(id), "Paciente cargado correctamente", "Error al cargar el paciente");
   }
 
   static async getAllConsultas(id) {
+    return this.handleRequest(() => Tarjet.nutriologoApi.getAllConsultas(id), null, "Error al cargar las consultas");
+  }
+
+  static async addConsulta(data) {
+    return this.handleRequest(
+      () =>
+        Tarjet.nutriologoApi.addConsulta(data, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }),
+      "Consulta agregada correctamente",
+      "Error al agregar la consulta"
+    );
+  }
+
+  static async handleRequest(requestFn, successMessage, errorMessage) {
     try {
-      const response = await Tarjet.nutriologoApi.getAllConsultas(id);
-      return response;
+      const response = await requestFn();
+      if (successMessage) Utils.swalSuccess(successMessage);
+      return response.data || response;
     } catch (error) {
-      Utils.swalError("Error al cargar las consultas");
+      if (errorMessage) Utils.swalError(errorMessage);
       return null;
     }
   }
 
-  static async addConsulta(id, data) {
-    try {
-      const response = await Tarjet.nutriologoApi.addConsulta(id, data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      Utils.swalSuccess("Consulta agregada correctamente");
-      return response;
-    } catch (error) {
-      Utils.swalError("Error al agregar la consulta");
-      return null;
-    }
+  static porcentajeGrasa(sexo, imc, edad) {
+    const base = 1.2 * imc + 0.23 * edad;
+    return sexo === "Masculino" ? base - 16.2 : base - 5.4;
   }
 
-  static async porcentajeGrasa(sexo, imc, edad) {
-    let porcentajeGrasa = 0;
-    if (sexo === "Masculino") {
-      porcentajeGrasa = 1.2 * imc + 0.23 * edad - 16.2;
-    } else if (sexo === "Femenino") {
-      porcentajeGrasa = 1.2 * imc + 0.23 * edad - 5.4;
-    }
-    return porcentajeGrasa;
-  }
-
-  static async areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo) {
-    let genero = 0;
-    let areaMuscularBrazo = 0;
-    if (sexo === "Masculino") {
-      genero = 10;
-    } else if (sexo === "Femenino") {
-      genero = 6.5;
-    }
-
-    areaMuscularBrazo = Math.pow(circunBrazo - pliegueTricipital * Math.PI, 2) / (4 * Math.PI) - genero;
-    return areaMuscularBrazo;
+  static areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo) {
+    const genero = sexo === "Masculino" ? 10 : 6.5;
+    return Math.pow(circunBrazo - pliegueTricipital * Math.PI, 2) / (4 * Math.PI) - genero;
   }
 }
