@@ -93,7 +93,7 @@ export default function EstadisticasPaciente() {
     <Container>
       <Row>
         <h1>
-          Estadisticas del paciente {data.data[0].tusuario_paciente.nombre} {data.data[0].tusuario_paciente.primer_apellido} {data.data[0].tusuario_paciente.segundo_apellido}
+          Estadisticas del paciente {data.data[0]?.tusuario_paciente?.nombre} {data.data[0]?.tusuario_paciente?.primer_apellido} {data.data[0]?.tusuario_paciente?.segundo_apellido}
         </h1>
         <Col md={4}>
           <Card>
