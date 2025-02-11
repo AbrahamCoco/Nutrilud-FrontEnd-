@@ -4,7 +4,7 @@ import { Utils } from "@/app/utils/utils";
 export class EstadisticasController {
   static async getDatosPaciente(id) {
     try {
-      const response = await Tarjet.userApi.getUser(id);
+      const response = await Tarjet.nutriologoApi.getAllConsultas(id);
       Utils.swalSuccess("Datos cargados correctamente");
       return response;
     } catch (error) {

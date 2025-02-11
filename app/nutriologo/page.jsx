@@ -11,17 +11,27 @@ export default function Nutriologo() {
   const [agenda, setAgenda] = useState(null);
 
   useEffect(() => {
+    const loadAgenda = async () => {
+      try {
+        const response = await NutriologoController.getAgenda(sessionStorage.getItem("id_nutriologo"));
+        setAgenda(response);
+      } catch (error) {
+        setAgenda(null);
+      }
+    };
     loadAgenda();
   }, []);
 
-  const loadAgenda = async () => {
-    try {
-      const response = await NutriologoController.getAgenda();
-      setAgenda(response);
-    } catch (error) {
-      setAgenda(null);
-    }
-  };
+  const renderCard = (header, body) => (
+    <Card>
+      <Card.Header>{header}</Card.Header>
+      <Card.Body>
+        <Card.Title>
+          <div style={{ textAlign: "center" }}>{body}</div>
+        </Card.Title>
+      </Card.Body>
+    </Card>
+  );
 
   return (
     <Container>
@@ -29,35 +39,20 @@ export default function Nutriologo() {
         <Col md={8}>
           <h1>Dashboard</h1>
           <Row>
+            <Col md={6}>{renderCard("Notificaciones", "Notificaciones")}</Col>
             <Col md={6}>
-              <Card>
-                <Card.Header>Notificaciones</Card.Header>
-                <Card.Body>
-                  <Card.Title>
-                    <div style={{ textAlign: "center" }}>Notificaciones</div>
-                  </Card.Title>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md={6}>
-              <Card>
-                <Card.Header>Fecha y hora</Card.Header>
-                <Card.Body>
-                  <Card.Title>
-                    <div style={{ textAlign: "center" }}>
-                      {new Date().toLocaleDateString("es-ES", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </div>
-                    <div style={{ textAlign: "center" }}>
-                      <Clock />
-                    </div>
-                  </Card.Title>
-                </Card.Body>
-              </Card>
+              {renderCard(
+                "Fecha y hora",
+                <>
+                  {new Date().toLocaleDateString("es-ES", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                  <Clock />
+                </>
+              )}
             </Col>
           </Row>
         </Col>

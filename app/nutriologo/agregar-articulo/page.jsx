@@ -10,22 +10,59 @@ export default function AgregarArticulo() {
   const [selectedFile, setSelectedFile] = useState(null);
   const editorRef = useRef(null);
   const router = useRouter();
+  const pica = require("pica")();
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    }
+    if (file) setSelectedFile(file);
   };
 
   const subirImagen = async () => {
+    if (!selectedFile) return null;
+
     const formData = new FormData();
-    formData.append("image", selectedFile);
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(selectedFile);
+
+    const generarBlob = (canvas) =>
+      new Promise((resolve) => {
+        canvas.toBlob((blob) => resolve(blob), "image/jpeg");
+      });
+
+    const procesarImagen = () =>
+      new Promise((resolve, reject) => {
+        img.onload = async () => {
+          try {
+            const canvas = document.createElement("canvas");
+            const maxWidth = 800;
+            const maxHeight = 400;
+            canvas.width = maxWidth;
+            canvas.height = maxHeight;
+
+            await pica.resize(img, canvas, {
+              unsharpAmount: 80,
+              unsharpThreshold: 2,
+              transferable: true,
+            });
+
+            const blob = await generarBlob(canvas);
+            formData.append("nombre", sessionStorage.getItem("nombre"));
+            formData.append("apellido", sessionStorage.getItem("primer_apellido"));
+            formData.append("id", sessionStorage.getItem("id"));
+            formData.append("file", blob, selectedFile.name);
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        };
+      });
+
     try {
+      await procesarImagen();
       const response = await AgregarArticuloController.uploadImage(formData);
-      return response;
+      return response.data;
     } catch (error) {
-      console.error("Error al subir la imagen", error);
+      console.error("Error al procesar o subir la imagen", error);
       return null;
     }
   };
@@ -40,9 +77,9 @@ export default function AgregarArticulo() {
       }
 
       await AgregarArticuloController.AddArticulo({
-        contenido: contenido,
+        contenido,
         foto: imageUrl,
-        nutriologo_id: sessionStorage.getItem("nutriologo_id"),
+        nutriologo_id: sessionStorage.getItem("id_nutriologo"),
       });
 
       setContenido("");

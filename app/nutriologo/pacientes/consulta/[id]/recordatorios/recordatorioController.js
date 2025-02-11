@@ -2,29 +2,42 @@ import { Tarjet } from "@/app/utils/axiosConfig";
 import { Utils } from "@/app/utils/utils";
 
 export class RecordatorioController {
-  static async postRecordatorio(formData) {
+  static async handleRequest(apiCall, successMessage, errorMessage) {
     try {
-      const response = await Tarjet.nutriologoApi.addRecordatorio(formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      Utils.swalSuccess("Recordatorio agregado correctamente");
+      const response = await apiCall;
+      Utils.swalSuccess(successMessage);
       return response;
     } catch (error) {
-      Utils.swalError("Error al agregar el recordatorio");
+      Utils.swalError(errorMessage);
       return null;
     }
   }
 
+  static async postPdfRecordatorio(formData) {
+    return this.handleRequest(
+      Tarjet.userApi.upluoadImage(formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      "Recordatorio (PDF) agregado correctamente",
+      "Error al agregar el recordatorio"
+    );
+  }
+
+  static async postRecordatorio(formData) {
+    return this.handleRequest(
+      Tarjet.nutriologoApi.addRecordatorio(formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      "Recordatorio agregado correctamente",
+      "Error al agregar el recordatorio"
+    );
+  }
+
   static async getRecordatorios(id_paciente) {
-    try {
-      const response = await Tarjet.nutriologoApi.getRecordatorios(id_paciente);
-      Utils.swalSuccess("Recordatorios cargados correctamente");
-      return response;
-    } catch (error) {
-      Utils.swalError("Error al obtener los recordatorios");
-      return null;
-    }
+    return this.handleRequest(Tarjet.nutriologoApi.getRecordatorios(id_paciente), "Recordatorios cargados correctamente", "Error al obtener los recordatorios");
   }
 }

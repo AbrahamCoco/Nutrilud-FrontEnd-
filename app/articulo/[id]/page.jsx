@@ -45,7 +45,7 @@ export default function Articulo() {
           <p>
             Nutriólogo:{" "}
             <strong>
-              {articulo.nutriologo.user.nombre} {articulo.nutriologo.user.primer_apellido} {articulo.nutriologo.user.segundo_apellido}
+              {articulo.tusuario_nutriologo.nombre} {articulo.tusuario_nutriologo.primer_apellido} {articulo.tusuario_nutriologo.segundo_apellido}
             </strong>
           </p>
           <p>
@@ -58,7 +58,7 @@ export default function Articulo() {
           </p>
         </div>
         <div className="col-sm-4">
-          <Image src={articulo.foto} className="d-block w-100" alt={encabezado} />
+          <Image src={`http://127.0.0.1:8080/api/v1/view/${articulo.foto}`} className="d-block w-100" alt={encabezado} />
         </div>
       </div>
     </div>
