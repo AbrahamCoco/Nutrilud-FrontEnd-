@@ -136,7 +136,7 @@ export default function Pacientes() {
     {
       name: "Estadisticas",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/estadisticas/${row.id}`}>
+        <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}>
           <button className="btn btn-info pb-2">
             <ImStatsDots />
           </button>
