@@ -7,18 +7,7 @@ export class AgregarArticuloController {
   }
 
   static async AddArticulo(data) {
-    return this._handleRequest(
-      () =>
-        Tarjet.nutriologoApi.addArticulo(data, {
-          headers: {
-            Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-            "Content-Type": "application/json",
-          },
-        }),
-      "Error al agregar articulo",
-      "Articulo agregado",
-      "El articulo se agrego correctamente"
-    );
+    return this._handleRequest(() => Tarjet.nutriologoApi.addArticulo(data), "Error al agregar articulo", "Articulo agregado", "El articulo se agrego correctamente");
   }
 
   static async _handleRequest(requestFunc, errorMessage, successTitle = null, successMessage = null) {

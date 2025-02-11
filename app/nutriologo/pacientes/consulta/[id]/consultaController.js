@@ -10,10 +10,10 @@ export class ConsultaController {
     return this.handleRequest(() => Tarjet.nutriologoApi.getAllConsultas(id), null, "Error al cargar las consultas");
   }
 
-  static async addConsulta(id, data) {
+  static async addConsulta(data) {
     return this.handleRequest(
       () =>
-        Tarjet.nutriologoApi.addConsulta(id, data, {
+        Tarjet.nutriologoApi.addConsulta(data, {
           headers: {
             "Content-Type": "application/json",
           },

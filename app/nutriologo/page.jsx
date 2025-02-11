@@ -13,7 +13,7 @@ export default function Nutriologo() {
   useEffect(() => {
     const loadAgenda = async () => {
       try {
-        const response = await NutriologoController.getAgenda();
+        const response = await NutriologoController.getAgenda(sessionStorage.getItem("id_nutriologo"));
         setAgenda(response);
       } catch (error) {
         setAgenda(null);

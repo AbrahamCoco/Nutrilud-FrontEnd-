@@ -1,28 +1,30 @@
 "use client";
+import { Utils } from "@/app/utils/utils";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
-import { useParams } from "next/navigation";
-import { Utils } from "@/app/utils/utils";
-import { BsWhatsapp, BsFileEarmarkMedicalFill } from "react-icons/bs";
-import Link from "next/link";
+import { BsFileEarmarkMedicalFill, BsWhatsapp } from "react-icons/bs";
 import { ConsultaController } from "./consultaController";
 
 export default function Consulta() {
   const { id } = useParams();
   const [paciente, setPaciente] = useState(null);
-  const [consulta, setConsulta] = useState([]);
+  const [consulta, setConsulta] = useState(null);
   const [datosFormulario, setDatosFormulario] = useState({
     nutriologo_id: "",
+    paciente_id: "",
     peso: "",
     estatura: "",
-    imc: "",
-    porcentaje_grasa: "",
-    porcentaje_musculo: "",
-    pliegue_tricipital: "",
-    pliegue_bicipital: "",
     circunferencia_cintura: "",
     circunferencia_cadera: "",
     circunferencia_brazo: "",
+    pliegue_bicipital: "",
+    pliegue_tricipital: "",
+    glucosa: "",
+    colesterol: "",
+    trigliceridos: "",
+    presion_arterial: "",
     fecha_medicion: "",
     siguiente_consulta: "",
   });
@@ -30,7 +32,7 @@ export default function Consulta() {
   const loadDatosConsulta = async () => {
     try {
       const response = await ConsultaController.getAllConsultas(id);
-      const consultas = response.consulta;
+      const consultas = await response.data;
 
       if (!consultas || consultas.length === 0) {
         setConsulta(null);
@@ -49,7 +51,7 @@ export default function Consulta() {
   const loadPaciente = async () => {
     try {
       const response = await ConsultaController.getPacienteId(id);
-      setPaciente(response.paciente);
+      setPaciente(response.data);
     } catch {
       setPaciente(null);
     }
@@ -71,51 +73,27 @@ export default function Consulta() {
   };
 
   const handleGuardarDatos = async () => {
-    const peso = parseFloat(datosFormulario.peso);
-    const estatura = parseFloat(datosFormulario.estatura);
-    const sexo = paciente.sexo;
-    const edad = calcularEdad(paciente.fecha_nacimiento);
-    const circunBrazo = parseFloat(datosFormulario.circunferencia_brazo);
-    const pliegueTricipital = parseFloat(datosFormulario.pliegue_tricipital);
-
-    let imc = 0;
-    let porcentajeGrasa = 0;
-    let porcentajeMusculo = 0;
-
-    if (!isNaN(peso) && !isNaN(estatura) && estatura !== 0) {
-      imc = peso / (estatura * estatura);
-      porcentajeGrasa = ConsultaController.porcentajeGrasa(sexo, imc, edad);
-      const areaMuscularBrazo = ConsultaController.areaMuscularBrazo(circunBrazo, pliegueTricipital, sexo);
-      porcentajeMusculo = !isNaN(areaMuscularBrazo) ? estatura * (0.0264 + 0.0029 * areaMuscularBrazo) : 0;
-    }
-
-    setDatosFormulario((prev) => ({
-      ...prev,
-      nutriologo_id: sessionStorage.getItem("id_user"),
-      imc: imc.toFixed(3),
-      porcentaje_grasa: porcentajeGrasa.toFixed(3),
-      porcentaje_musculo: porcentajeMusculo.toFixed(3),
-    }));
+    const updatedDatosFormulario = {
+      ...datosFormulario,
+      nutriologo_id: sessionStorage.getItem("id_nutriologo"),
+      paciente_id: id,
+    };
 
     try {
-      await ConsultaController.addConsulta(id, {
-        ...datosFormulario,
-        nutriologo_id: sessionStorage.getItem("id_user"),
-        imc: imc.toFixed(3),
-        porcentaje_grasa: porcentajeGrasa.toFixed(3),
-        porcentaje_musculo: porcentajeMusculo.toFixed(3),
-      });
+      await ConsultaController.addConsulta(updatedDatosFormulario);
+      console.log("Datos a mandar", updatedDatosFormulario);
       setDatosFormulario({
         peso: "",
         estatura: "",
-        imc: "",
-        porcentaje_grasa: "",
-        porcentaje_musculo: "",
-        pliegue_tricipital: "",
-        pliegue_bicipital: "",
         circunferencia_cintura: "",
         circunferencia_cadera: "",
         circunferencia_brazo: "",
+        pliegue_bicipital: "",
+        pliegue_tricipital: "",
+        glucosa: "",
+        colesterol: "",
+        trigliceridos: "",
+        presion_arterial: "",
         fecha_medicion: "",
         siguiente_consulta: "",
       });
@@ -156,16 +134,16 @@ export default function Consulta() {
                 <tr>
                   <td>
                     <strong>
-                      {paciente.user.nombre} {paciente.user.primer_apellido} {paciente.user.segundo_apellido}
+                      {paciente.nombre} {paciente.primer_apellido} {paciente.segundo_apellido}
                     </strong>
                   </td>
-                  <td>{paciente.alergias}</td>
-                  <td>{paciente.sexo}</td>
-                  <td>{calcularEdad(paciente.fecha_nacimiento)} años</td>
-                  <td>{paciente.user.correo}</td>
+                  <td>{paciente.tusuario_pacientes.alergias}</td>
+                  <td>{paciente.tusuario_pacientes.sexo}</td>
+                  <td>{calcularEdad(paciente.tusuario_pacientes.fecha_nacimiento)} años</td>
+                  <td>{paciente.correo}</td>
                   <td>
-                    {paciente.telefono}{" "}
-                    <Link href={`https://wa.me/${paciente.telefono}`} target="_blank" rel="noopener noreferrer">
+                    {paciente.tusuario_pacientes.telefono}{" "}
+                    <Link href={`https://wa.me/${paciente.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer">
                       <BsWhatsapp />
                     </Link>
                   </td>
@@ -174,11 +152,11 @@ export default function Consulta() {
                       href={{
                         pathname: `/nutriologo/pacientes/consulta/${id}/recordatorios`,
                         query: {
-                          id_paciente: paciente.id,
-                          nombre: paciente.user.nombre,
-                          primer_apellido: paciente.user.primer_apellido,
-                          segundo_apellido: paciente.user.segundo_apellido,
-                          fecha_nacimiento: paciente.fecha_nacimiento,
+                          id_paciente: paciente.tusuario_pacientes.id,
+                          nombre: paciente.nombre,
+                          primer_apellido: paciente.primer_apellido,
+                          segundo_apellido: paciente.segundo_apellido,
+                          fecha_nacimiento: paciente.tusuario_pacientes.fecha_nacimiento,
                         },
                       }}>
                       <Button variant="info" className="mx-1">
@@ -204,6 +182,10 @@ export default function Consulta() {
                     <th rowSpan={2}>Peso</th>
                     <th rowSpan={2}>Estatura</th>
                     <th rowSpan={2}>IMC</th>
+                    <th rowSpan={2}>Glucosa</th>
+                    <th rowSpan={2}>Colesterol</th>
+                    <th rowSpan={2}>Trigliceridos</th>
+                    <th rowSpan={2}>Presion Arterial</th>
                     <th rowSpan={2}>Porcentaje Grasa Corporal</th>
                     <th rowSpan={2}>Masa Muscular Total</th>
                     <th colSpan={3}>Circunferencia</th>
@@ -231,6 +213,10 @@ export default function Consulta() {
                         <td>{datos.peso.toFixed(3)} kg</td>
                         <td>{datos.estatura.toFixed(2)} m</td>
                         <td>{datos.imc.toFixed(3)} kg/m²</td>
+                        <td>{datos.glucosa.toFixed(2)} mg/dL</td>
+                        <td>{datos.colesterol.toFixed(2)} mg/dL</td>
+                        <td>{datos.trigliceridos.toFixed(2)} mg/dL</td>
+                        <td>{datos.presion_arterial}</td>
                         <td>{datos.porcentaje_grasa.toFixed(2)} %</td>
                         <td>{datos.porcentaje_musculo.toFixed(3)} kg</td>
                         <td>{datos.circunferencia_cintura.toFixed(2)} cm</td>
@@ -355,19 +341,61 @@ export default function Consulta() {
           <label htmlFor="" className="form-label">
             Glucosa
           </label>
-          <input type="number" step="0.001" className="form-control" name="glucosa" />
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="glucosa"
+            value={datosFormulario.glucosa}
+            onChange={(e) => setDatosFormulario({ ...datosFormulario, glucosa: e.target.value })}
+          />
           <label htmlFor="" className="form-label">
             Colesterol
           </label>
-          <input type="number" step="0.001" className="form-control" name="colesterol" />
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="colesterol"
+            value={datosFormulario.colesterol}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                colesterol: e.target.value,
+              })
+            }
+          />
           <label htmlFor="" className="form-label">
             Trigliceridos
           </label>
-          <input type="number" step="0.001" className="form-control" name="trigliceridos" />
+          <input
+            type="number"
+            step="0.001"
+            className="form-control"
+            name="trigliceridos"
+            value={datosFormulario.trigliceridos}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                trigliceridos: e.target.value,
+              })
+            }
+          />
           <label htmlFor="" className="form-label">
             Presion arterial
           </label>
-          <input type="number" step="0.001" className="form-control" name="presion_arterial" />
+          <input
+            type="text"
+            className="form-control"
+            name="presion_arterial"
+            value={datosFormulario.presion_arterial}
+            onChange={(e) =>
+              setDatosFormulario({
+                ...datosFormulario,
+                presion_arterial: e.target.value,
+              })
+            }
+          />
         </div>
         <div className="col-sm-4">
           <label htmlFor="fecha_medicion" className="form-label">

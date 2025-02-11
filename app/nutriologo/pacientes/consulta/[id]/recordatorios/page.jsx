@@ -5,7 +5,7 @@ import "jspdf-autotable";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import DataTable from "react-data-table-component";
-import { FaEye } from "react-icons/fa";
+import { FaDownload, FaEye } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 import { RecordatorioController } from "./recordatorioController";
 
@@ -57,27 +57,39 @@ export default function Recordatorios() {
         .padStart(2, "0")}_${fecha.getMinutes().toString().padStart(2, "0")}_${fecha.getSeconds().toString().padStart(2, "0")}.pdf`;
       const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
 
-      const formData = new FormData();
-      formData.append("nutriologo_id", id_nutriologo);
-      formData.append("paciente_id", id_paciente);
-      formData.append("recordatorioPdf", pdfFile);
+      const formData1 = new FormData();
 
-      await RecordatorioController.postRecordatorio(formData);
-      getRecordatorios();
+      formData1.append("nombre", nombre);
+      formData1.append("apellido", primer_apellido);
+      formData1.append("id", id_paciente);
+      formData1.append("file", pdfFile);
+
+      const response = await RecordatorioController.postPdfRecordatorio(formData1);
+      if (response) {
+        const recordatorio = {
+          paciente_id: id_paciente,
+          nutriologo_id: id_nutriologo,
+          recordatorio_pdf: response.data.data,
+        };
+        await RecordatorioController.postRecordatorio(recordatorio);
+        getRecordatorios();
+      } else {
+        console.log("Error al subir el PDF");
+      }
     }
   };
 
   const getRecordatorios = useCallback(async () => {
     try {
       const response = await RecordatorioController.getRecordatorios(id_paciente);
-      setRecordatorios(response.data.recordatorio);
+      setRecordatorios(response.data.data);
     } catch (error) {
       setRecordatorios([]);
     }
   }, [id_paciente]);
 
   useEffect(() => {
-    const storedId = sessionStorage.getItem("nutriologo_id");
+    const storedId = sessionStorage.getItem("id_nutriologo");
     setIdNutriologo(storedId);
     getRecordatorios();
   }, [getRecordatorios]);
@@ -96,15 +108,23 @@ export default function Recordatorios() {
     {
       name: "Ver",
       cell: (row) => (
-        <Button variant="primary" onClick={() => handleView(row.recordatorioPdf)}>
+        <Button variant="primary" onClick={() => handleView(row.recordatorio_pdf)}>
           <FaEye />
+        </Button>
+      ),
+    },
+    {
+      name: "Descargar",
+      cell: (row) => (
+        <Button variant="primary" onClick={() => handleDownload(row.recordatorio_pdf)}>
+          <FaDownload />
         </Button>
       ),
     },
   ];
 
   const handleView = (row) => {
-    const url = `http://127.0.0.1:8000${row}`;
+    const url = `http://127.0.0.1:8080/api/v1/view/${row}`;
     setPdfUrl(url);
     setShowModal(true);
   };
@@ -112,6 +132,11 @@ export default function Recordatorios() {
   const handleCloseModal = () => {
     setShowModal(false);
     setPdfUrl("");
+  };
+
+  const handleDownload = (row) => {
+    const url = `http://127.0.0.1:8080/api/v1/files/${row}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -226,7 +251,7 @@ export default function Recordatorios() {
             </Button>
           </Col>
           <Col md={12} className="py-4">
-            <DataTable columns={columns} data={recordatorios} pagination striped highlightOnHover theme="dark" responsive />
+            <DataTable columns={columns} data={recordatorios || []} pagination striped highlightOnHover theme="dark" responsive />
           </Col>
         </Row>
       </Container>

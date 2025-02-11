@@ -58,7 +58,7 @@ export default function Articulo() {
           </p>
         </div>
         <div className="col-sm-4">
-          <Image src={articulo.foto} className="d-block w-100" alt={encabezado} />
+          <Image src={`http://127.0.0.1:8080/api/v1/view/${articulo.foto}`} className="d-block w-100" alt={encabezado} />
         </div>
       </div>
     </div>

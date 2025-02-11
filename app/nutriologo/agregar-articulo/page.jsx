@@ -46,7 +46,10 @@ export default function AgregarArticulo() {
             });
 
             const blob = await generarBlob(canvas);
-            formData.append("image", blob, selectedFile.name);
+            formData.append("nombre", sessionStorage.getItem("nombre"));
+            formData.append("apellido", sessionStorage.getItem("primer_apellido"));
+            formData.append("id", sessionStorage.getItem("id"));
+            formData.append("file", blob, selectedFile.name);
             resolve();
           } catch (error) {
             reject(error);
@@ -56,7 +59,8 @@ export default function AgregarArticulo() {
 
     try {
       await procesarImagen();
-      return await AgregarArticuloController.uploadImage(formData);
+      const response = await AgregarArticuloController.uploadImage(formData);
+      return response.data;
     } catch (error) {
       console.error("Error al procesar o subir la imagen", error);
       return null;
@@ -75,7 +79,7 @@ export default function AgregarArticulo() {
       await AgregarArticuloController.AddArticulo({
         contenido,
         foto: imageUrl,
-        nutriologo_id: sessionStorage.getItem("nutriologo_id"),
+        nutriologo_id: sessionStorage.getItem("id_nutriologo"),
       });
 
       setContenido("");

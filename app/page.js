@@ -35,7 +35,7 @@ export default function Home() {
         {articulos.map((articulo, index) => (
           <Carousel.Item key={articulo.id}>
             <Link href={`/articulo/${articulo.id}`}>
-              <Image src={articulo.foto} className="d-block w-100" alt={primerEncabezado[articulo.id]} />
+              <Image src={`http://127.0.0.1:8080/api/v1/view/${articulo.foto}`} className="d-block w-100" alt={primerEncabezado[articulo.id]} />
               <Carousel.Caption>
                 <div dangerouslySetInnerHTML={{ __html: primerEncabezado[articulo.id] }} />
                 <p>

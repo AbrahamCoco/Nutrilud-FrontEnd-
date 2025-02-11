@@ -13,6 +13,18 @@ export class RecordatorioController {
     }
   }
 
+  static async postPdfRecordatorio(formData) {
+    return this.handleRequest(
+      Tarjet.userApi.upluoadImage(formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }),
+      "Recordatorio (PDF) agregado correctamente",
+      "Error al agregar el recordatorio"
+    );
+  }
+
   static async postRecordatorio(formData) {
     return this.handleRequest(
       Tarjet.nutriologoApi.addRecordatorio(formData, {

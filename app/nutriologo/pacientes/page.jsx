@@ -42,7 +42,7 @@ export default function Pacientes() {
   const loadPacientes = async () => {
     try {
       const response = await PacientesController.getAllPacientes();
-      setPacientes(response.pacientes);
+      setPacientes(response.data);
     } catch (error) {
       setPacientes([]);
     }
@@ -58,11 +58,14 @@ export default function Pacientes() {
     }
 
     const formData = new FormData();
-    formData.append("image", selectedFile);
+    formData.append("file", selectedFile);
+    formData.append("nombre", nombre);
+    formData.append("apellido", primer_apellido);
+    formData.append("id", id_paciente);
 
     try {
       const response = await AgregarArticuloController.uploadImage(formData);
-      return response.data.url;
+      return response.data.data;
     } catch (error) {
       return null;
     }
@@ -79,13 +82,13 @@ export default function Pacientes() {
         usuario,
         correo,
         contrasenia,
-        trol_id: 3,
-        foto: imageUrl,
-        alergias,
+        rol_id: 3,
+        foto_paciente: imageUrl,
+        alergias_paciente: alergias,
         id_paciente,
-        fecha_nacimiento,
-        telefono,
-        sexo,
+        fecha_nacimiento_paciente: fecha_nacimiento,
+        telefono_paciente: telefono,
+        sexo_paciente: sexo,
       };
 
       const response = await PacientesController.addPaciente(userData);
@@ -106,25 +109,25 @@ export default function Pacientes() {
     },
     {
       name: "Nombre",
-      selector: (row) => `${row.user.nombre} ${row.user.primer_apellido} ${row.user.segundo_apellido}`,
+      selector: (row) => `${row.nombre} ${row.primer_apellido} ${row.segundo_apellido}`,
       sortable: true,
     },
     {
       name: "Sexo",
-      selector: (row) => row.sexo,
+      selector: (row) => row.tusuario_pacientes.sexo,
       sortable: true,
     },
     {
       name: "Correo",
-      selector: (row) => row.user.correo,
+      selector: (row) => row.correo,
       sortable: true,
     },
     {
       name: "Telefono",
       cell: (row) => (
         <>
-          {row.telefono}{" "}
-          <Link href={`https://wa.me/${row.telefono}`} target="_blank" rel="noopener noreferrer">
+          {row.tusuario_pacientes.telefono}{" "}
+          <Link href={`https://wa.me/${row.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer">
             <BsWhatsapp />
           </Link>
         </>
@@ -133,7 +136,7 @@ export default function Pacientes() {
     {
       name: "Estadisticas",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/estadisticas/${row.user.id}`}>
+        <Link href={`/nutriologo/pacientes/estadisticas/${row.id}`}>
           <button className="btn btn-info pb-2">
             <ImStatsDots />
           </button>
@@ -143,7 +146,7 @@ export default function Pacientes() {
     {
       name: "Dar consulta",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/consulta/${row.id}`}>
+        <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}>
           <button className="btn btn-info pb-2">
             <FaFolderOpen />
           </button>

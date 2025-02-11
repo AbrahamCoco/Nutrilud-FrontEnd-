@@ -2,10 +2,10 @@ import { Tarjet } from "../utils/axiosConfig";
 import { Utils } from "../utils/utils";
 
 export class NutriologoController {
-  static async getAgenda() {
+  static async getAgenda(id_nutriologo) {
     try {
-      const response = await Tarjet.nutriologoApi.getAgenda();
-      const agenda = response.data.agenda;
+      const response = await Tarjet.nutriologoApi.getAgenda(id_nutriologo);
+      const agenda = response.data.data;
 
       if (!agenda.length) {
         Utils.swalInfo("No hay eventos en la agenda");
@@ -17,7 +17,7 @@ export class NutriologoController {
         const fechaFin = new Date(fechaInicio.getTime() + 29 * 60000);
 
         return {
-          title: `Cita con el paciente: ${evento.paciente.user.nombre} ${evento.paciente.user.primer_apellido} ${evento.paciente.user.segundo_apellido}`,
+          title: `Cita con el paciente: ${evento.tusuario_paciente.nombre} ${evento.tusuario_paciente.primer_apellido} ${evento.tusuario_paciente.segundo_apellido}`,
           start: fechaInicio,
           end: fechaFin,
         };
