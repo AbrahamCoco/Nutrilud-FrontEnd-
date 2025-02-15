@@ -1,22 +1,21 @@
 "use client";
-import FullCalendar from "@fullcalendar/react";
-import listPlugin from "@fullcalendar/list";
-import esLocale from "@fullcalendar/core/locales/es";
 import { useEffect, useState } from "react";
 import { Card, Col, Container, Row } from "react-bootstrap";
 import Clock from "../components/Clock";
-import { NutriologoController } from "./nutriologoController";
+import Itinerario from "../components/Itinerario";
+import { NutriologoController } from "./agenda/agendaController";
 
 export default function Nutriologo() {
-  const [agenda, setAgenda] = useState(null);
+  const [eventos, setEventos] = useState(null);
 
   useEffect(() => {
     const loadAgenda = async () => {
       try {
         const response = await NutriologoController.getAgenda(sessionStorage.getItem("id_nutriologo"));
-        setAgenda(response);
+
+        setEventos(response);
       } catch (error) {
-        setAgenda(null);
+        setEventos(null);
       }
     };
     loadAgenda();
@@ -36,11 +35,11 @@ export default function Nutriologo() {
   return (
     <Container>
       <Row>
-        <Col md={8}>
+        <Col md={12}>
           <h1>Dashboard</h1>
           <Row>
-            <Col md={6}>{renderCard("Notificaciones", "Notificaciones")}</Col>
-            <Col md={6}>
+            <Col md={4}>{renderCard("Notificaciones", "Notificaciones")}</Col>
+            <Col md={4}>
               {renderCard(
                 "Fecha y hora",
                 <>
@@ -54,26 +53,8 @@ export default function Nutriologo() {
                 </>
               )}
             </Col>
+            <Col md={4}>{eventos ? <Itinerario eventos={eventos} /> : renderCard("Itinerario", "No hay eventos")}</Col>
           </Row>
-        </Col>
-        <Col md={4}>
-          <FullCalendar
-            locale={esLocale}
-            plugins={[listPlugin]}
-            headerToolbar={{ left: "prev", center: "title", right: "next" }}
-            initialView="listWeek"
-            events={agenda}
-            slotMinTime={"08:00:00"}
-            slotMaxTime={"18:00:00"}
-            themeSystem="bootstrap4"
-            eventDidMount={(info) => {
-              if (info.event.extendedProps.status === "done") {
-                info.el.style.backgroundColor = "green";
-              } else if (info.event.extendedProps.status === "pending") {
-                info.el.style.backgroundColor = "red";
-              }
-            }}
-          />
         </Col>
       </Row>
       <Row>Hola Nutriologo</Row>
