@@ -1,13 +1,14 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import Link from "next/link";
-import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
-import { BsWhatsapp } from "react-icons/bs";
-import { ImStatsDots } from "react-icons/im";
 import DataTable from "react-data-table-component";
-import { PacientesController } from "./pacientesController";
+import { BsWhatsapp } from "react-icons/bs";
+import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
+import { ImStatsDots } from "react-icons/im";
 import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
+import { PacientesController } from "./pacientesController";
+import Table from "@/app/components/Table";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -104,7 +105,7 @@ export default function Pacientes() {
   const columns = [
     {
       name: "No.",
-      selector: (row, index) => index + 1,
+      selector: (row) => row.id,
       sortable: true,
     },
     {
@@ -136,37 +137,45 @@ export default function Pacientes() {
     {
       name: "Estadisticas",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}>
-          <button className="btn btn-info pb-2">
-            <ImStatsDots />
-          </button>
-        </Link>
+        <div className="d-flex justify-content-center">
+          <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}>
+            <button className="btn btn-info pb-2">
+              <ImStatsDots />
+            </button>
+          </Link>
+        </div>
       ),
     },
     {
-      name: "Dar consulta",
+      name: "Consulta",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}>
-          <button className="btn btn-info pb-2">
-            <FaFolderOpen />
-          </button>
-        </Link>
+        <div className="d-flex justify-content-center">
+          <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}>
+            <button className="btn btn-info pb-2">
+              <FaFolderOpen />
+            </button>
+          </Link>
+        </div>
       ),
     },
     {
       name: "Modificar",
       cell: (row) => (
-        <Button variant="warning" onClick={() => console.log(row)}>
-          <FaEdit />
-        </Button>
+        <div className="d-flex justify-content-center">
+          <Button variant="warning" onClick={() => console.log(row)}>
+            <FaEdit />
+          </Button>
+        </div>
       ),
     },
     {
       name: "Eliminar",
       cell: (row) => (
-        <Button variant="danger" onClick={deleteAppClientCache(row.id)}>
-          <FaTrash />
-        </Button>
+        <div className="d-flex justify-content-center">
+          <Button variant="danger" onClick={deleteAppClientCache(row.id)}>
+            <FaTrash />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -185,15 +194,7 @@ export default function Pacientes() {
               </button>
             </div>
           </Col>
-          <DataTable
-            columns={columns}
-            data={pacientes} // Mostrar solo los pacientes filtrados
-            pagination
-            striped
-            highlightOnHover
-            theme="dark"
-            responsive
-          />
+          <Table columns={columns} data={pacientes} pages={10} />
         </Row>
       </Container>
 
