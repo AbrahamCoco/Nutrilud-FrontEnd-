@@ -8,6 +8,7 @@ import DataTable from "react-data-table-component";
 import { FaDownload, FaEye } from "react-icons/fa";
 import { useSearchParams } from "next/navigation";
 import { RecordatorioController } from "./recordatorioController";
+import Table from "@/app/components/Table";
 
 export default function Recordatorios() {
   const searchParams = useSearchParams();
@@ -97,7 +98,7 @@ export default function Recordatorios() {
   const columns = [
     {
       name: "No.",
-      selector: (row, index) => index + 1,
+      selector: (row) => row.id,
       sortable: true,
     },
     {
@@ -251,7 +252,7 @@ export default function Recordatorios() {
             </Button>
           </Col>
           <Col md={12} className="py-4">
-            <DataTable columns={columns} data={recordatorios || []} pagination striped highlightOnHover theme="dark" responsive />
+            <Table columns={columns} data={recordatorios} nameTable={"Historial de recordatorios"} />
           </Col>
         </Row>
       </Container>
