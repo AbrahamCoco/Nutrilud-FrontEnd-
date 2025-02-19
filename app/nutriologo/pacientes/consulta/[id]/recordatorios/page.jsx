@@ -1,14 +1,13 @@
 "use client";
+import Table from "@/app/components/Table";
 import { Editor } from "@tinymce/tinymce-react";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import DataTable from "react-data-table-component";
 import { FaDownload, FaEye } from "react-icons/fa";
-import { useSearchParams } from "next/navigation";
 import { RecordatorioController } from "./recordatorioController";
-import Table from "@/app/components/Table";
 
 export default function Recordatorios() {
   const searchParams = useSearchParams();

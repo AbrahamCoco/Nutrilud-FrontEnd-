@@ -38,12 +38,14 @@ export default function Table({ columns, data, nameTable }) {
     }
   };
 
-  const sortedData = [...filteredData].sort((a, b) => {
-    if (!sortField) return 0;
-    const valueA = a[sortField]?.toString().toLowerCase() || "";
-    const valueB = b[sortField]?.toString().toLowerCase() || "";
-    return valueA < valueB ? (sortOrder === "asc" ? -1 : 1) : valueA > valueB ? (sortOrder === "asc" ? 1 : -1) : 0;
-  });
+  const sortedData = Array.isArray(filteredData)
+    ? [...filteredData].sort((a, b) => {
+        if (!sortField) return 0;
+        const valueA = a[sortField]?.toString().toLowerCase() || "";
+        const valueB = b[sortField]?.toString().toLowerCase() || "";
+        return valueA < valueB ? (sortOrder === "asc" ? -1 : 1) : valueA > valueB ? (sortOrder === "asc" ? 1 : -1) : 0;
+      })
+    : [];
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
