@@ -1,14 +1,13 @@
 "use client";
+import Table from "@/app/components/Table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import DataTable from "react-data-table-component";
 import { BsWhatsapp } from "react-icons/bs";
 import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
 import { ImStatsDots } from "react-icons/im";
 import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
 import { PacientesController } from "./pacientesController";
-import Table from "@/app/components/Table";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -183,18 +182,17 @@ export default function Pacientes() {
   return (
     <>
       <Container>
-        <Row>
-          <Col md={10}>
-            <h1>Pacientes</h1>
+        <Row className="mt-3">
+          <Col md={12}>
+            <Table columns={columns} data={pacientes} nameTable={"Pacientes"} />
           </Col>
           <Col md={2}>
             <div>
-              <button className="btn btn-primary my-2" onClick={openModal}>
+              <button className="btn btn-primary mb-2" onClick={openModal}>
                 Agregar paciente
               </button>
             </div>
           </Col>
-          <Table columns={columns} data={pacientes} pages={10} />
         </Row>
       </Container>
 

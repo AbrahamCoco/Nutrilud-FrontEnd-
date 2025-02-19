@@ -1,14 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import listPlugin from "@fullcalendar/list";
-import esLocale from "@fullcalendar/core/locales/es";
-import { NutriologoController } from "./agendaController";
 import CalendarMonths from "@/app/components/CalendarMonths";
 import Itinerario from "@/app/components/Itinerario";
+import { useEffect, useState } from "react";
+import { Container } from "react-bootstrap";
+import { NutriologoController } from "./agendaController";
 
 export default function Agenda() {
   const [eventos, setEventos] = useState([]);
