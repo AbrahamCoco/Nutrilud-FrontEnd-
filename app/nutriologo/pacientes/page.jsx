@@ -1,13 +1,13 @@
 "use client";
+import Table from "@/app/components/Table";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import Link from "next/link";
-import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
 import { BsWhatsapp } from "react-icons/bs";
+import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
 import { ImStatsDots } from "react-icons/im";
-import DataTable from "react-data-table-component";
-import { PacientesController } from "./pacientesController";
 import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
+import { PacientesController } from "./pacientesController";
 
 export default function Pacientes() {
   const [pacientes, setPacientes] = useState([]);
@@ -61,11 +61,11 @@ export default function Pacientes() {
     formData.append("file", selectedFile);
     formData.append("nombre", nombre);
     formData.append("apellido", primer_apellido);
-    formData.append("id", id_paciente);
+    formData.append("id", sessionStorage.getItem("id_nutriologo"));
 
     try {
       const response = await AgregarArticuloController.uploadImage(formData);
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return null;
     }
@@ -74,6 +74,7 @@ export default function Pacientes() {
   const handleRegisterPaciente = async () => {
     try {
       const imageUrl = await uploadImage();
+      const formated = new Date(fecha_nacimiento).toISOString().split(".")[0];
 
       const userData = {
         nombre,
@@ -86,7 +87,7 @@ export default function Pacientes() {
         foto_paciente: imageUrl,
         alergias_paciente: alergias,
         id_paciente,
-        fecha_nacimiento_paciente: fecha_nacimiento,
+        fecha_nacimiento_paciente: formated,
         telefono_paciente: telefono,
         sexo_paciente: sexo,
       };
@@ -104,7 +105,7 @@ export default function Pacientes() {
   const columns = [
     {
       name: "No.",
-      selector: (row, index) => index + 1,
+      selector: (row) => row.id,
       sortable: true,
     },
     {
@@ -136,37 +137,45 @@ export default function Pacientes() {
     {
       name: "Estadisticas",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}>
-          <button className="btn btn-info pb-2">
-            <ImStatsDots />
-          </button>
-        </Link>
+        <div className="d-flex justify-content-center">
+          <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}>
+            <button className="btn btn-info pb-2">
+              <ImStatsDots />
+            </button>
+          </Link>
+        </div>
       ),
     },
     {
-      name: "Dar consulta",
+      name: "Consulta",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}>
-          <button className="btn btn-info pb-2">
-            <FaFolderOpen />
-          </button>
-        </Link>
+        <div className="d-flex justify-content-center">
+          <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}>
+            <button className="btn btn-info pb-2">
+              <FaFolderOpen />
+            </button>
+          </Link>
+        </div>
       ),
     },
     {
       name: "Modificar",
       cell: (row) => (
-        <Button variant="warning" onClick={() => console.log(row)}>
-          <FaEdit />
-        </Button>
+        <div className="d-flex justify-content-center">
+          <Button variant="warning" onClick={() => console.log(row)}>
+            <FaEdit />
+          </Button>
+        </div>
       ),
     },
     {
       name: "Eliminar",
       cell: (row) => (
-        <Button variant="danger" onClick={deleteAppClientCache(row.id)}>
-          <FaTrash />
-        </Button>
+        <div className="d-flex justify-content-center">
+          <Button variant="danger" onClick={deleteAppClientCache(row.id)}>
+            <FaTrash />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -174,26 +183,17 @@ export default function Pacientes() {
   return (
     <>
       <Container>
-        <Row>
-          <Col md={10}>
-            <h1>Pacientes</h1>
+        <Row className="mt-3">
+          <Col md={12}>
+            <Table columns={columns} data={pacientes} nameTable={"Pacientes"} />
           </Col>
           <Col md={2}>
             <div>
-              <button className="btn btn-primary my-2" onClick={openModal}>
+              <button className="btn btn-primary mb-2" onClick={openModal}>
                 Agregar paciente
               </button>
             </div>
           </Col>
-          <DataTable
-            columns={columns}
-            data={pacientes} // Mostrar solo los pacientes filtrados
-            pagination
-            striped
-            highlightOnHover
-            theme="dark"
-            responsive
-          />
         </Row>
       </Container>
 
