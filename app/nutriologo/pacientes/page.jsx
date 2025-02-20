@@ -61,11 +61,11 @@ export default function Pacientes() {
     formData.append("file", selectedFile);
     formData.append("nombre", nombre);
     formData.append("apellido", primer_apellido);
-    formData.append("id", id_paciente);
+    formData.append("id", sessionStorage.getItem("id_nutriologo"));
 
     try {
       const response = await AgregarArticuloController.uploadImage(formData);
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return null;
     }
@@ -74,6 +74,7 @@ export default function Pacientes() {
   const handleRegisterPaciente = async () => {
     try {
       const imageUrl = await uploadImage();
+      const formated = new Date(fecha_nacimiento).toISOString().split(".")[0];
 
       const userData = {
         nombre,
@@ -86,7 +87,7 @@ export default function Pacientes() {
         foto_paciente: imageUrl,
         alergias_paciente: alergias,
         id_paciente,
-        fecha_nacimiento_paciente: fecha_nacimiento,
+        fecha_nacimiento_paciente: formated,
         telefono_paciente: telefono,
         sexo_paciente: sexo,
       };

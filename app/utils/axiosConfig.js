@@ -10,7 +10,7 @@ export const Tarjet = {
   userApi: {
     login: (usuario, contrasenia) => axiosInstance.get(`/personal_access_token/login?usuario=${usuario}&contrasenia=${contrasenia}`), // Listo
     logout: (config) => axiosInstance.post("/auth/logout", {}, config), // Cambiar la logica de logout
-    register: (data) => axiosInstance.post("/auth/register", data), // Listo
+    register: (data) => axiosInstance.post("/users/insert", data), // Listo
     upluoadImage: (data) => axiosInstance.post("/personal_access_token/insert_archivo", data), // Listo
     getUser: (id) => axiosInstance.get(`/users/findById?id=${id}`), // Listo
   },

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Dropdown, Form, Image, Modal } from "react-bootstrap";
+import { Dropdown, Image, Modal } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import { NavbarController } from "./navbarController";
 import MenuAdmin from "./users/administrador/MenuAdmin";
@@ -11,6 +11,7 @@ import MenuPaciente from "./users/paciente/MenuPaciente";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
+  const [id, setId] = useState(null);
   const [rol, setRol] = useState(null);
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
@@ -21,6 +22,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const storedRol = sessionStorage.getItem("trol_id");
+    setId(sessionStorage.getItem("id"));
     setNombre(`${sessionStorage.getItem("nombre")} ${sessionStorage.getItem("primer_apellido")}`);
     if (storedRol) {
       setRol(Number(storedRol));
@@ -47,6 +49,8 @@ export default function Navbar() {
 
       setNombre(`${response.nombre} ${response.primer_apellido}`);
       setRol(response.rol_id);
+      setUsuario("");
+      setContrasenia("");
       closeModal();
     } catch (error) {
       setRol(null);
@@ -86,7 +90,7 @@ export default function Navbar() {
               {rol ? (
                 <>
                   <li className="nav-item">
-                    <Link href="/perfil" className="nav-link text-white">
+                    <Link href={`/perfil/${id}/${rol}`} className="nav-link text-white">
                       Perfil
                     </Link>
                   </li>
