@@ -25,19 +25,4 @@ export class NavbarController {
       return error;
     }
   }
-
-  static async logout(token) {
-    try {
-      await Tarjet.userApi.logout({ headers: { Authorization: `Bearer ${token}` } });
-      sessionStorage.clear();
-      Utils.swalSuccess("Cerró sesión correctamente");
-    } catch (error) {
-      if (error.response?.status === 401) {
-        Utils.swalError("El token es inválido. Necesita iniciar sesión nuevamente");
-      } else {
-        console.log(error);
-        Utils.swalError("Error al cerrar sesión", error.message);
-      }
-    }
-  }
 }

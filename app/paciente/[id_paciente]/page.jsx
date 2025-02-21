@@ -1,9 +1,9 @@
 "use client";
-import { Card, Col, Container, Row } from "react-bootstrap";
+import { CategoryScale, Chart as ChartJS, Legend, LinearScale, LineElement, PointElement, Title, Tooltip } from "chart.js";
 import { useEffect, useState } from "react";
+import { Card, Col, Container, Row } from "react-bootstrap";
 import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
-import { PacienteController } from "./pacienteController";
+import { ConsulController } from "./consulController";
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -12,7 +12,7 @@ export default function Paciente() {
 
   const fetchData = async () => {
     try {
-      const response = await PacienteController.getUser(sessionStorage.getItem("id_user"));
+      const response = await ConsulController.getDatosPaciente(sessionStorage.getItem("id_paciente"));
       setData(response.data);
     } catch (error) {
       setData(null);
@@ -37,9 +37,8 @@ export default function Paciente() {
   }
 
   const generateChartData = (label, key, borderColor, backgroundColor) => {
-    const consulta = data.data.paciente.consulta || [];
+    const consulta = data.data || [];
 
-    // Si el array está vacío, devuelve datos por defecto o evita el error
     if (consulta.length === 0) {
       const defaultDate = new Date();
       return {
@@ -56,7 +55,7 @@ export default function Paciente() {
     }
 
     const labels = consulta.map((c) => {
-      const date = new Date(c.fecha_medicion || new Date()); // Maneja la posibilidad de fecha_medicion indefinida
+      const date = new Date(c.fecha_medicion || new Date());
       return date.toLocaleDateString("es-ES", { day: "numeric", month: "short" });
     });
 

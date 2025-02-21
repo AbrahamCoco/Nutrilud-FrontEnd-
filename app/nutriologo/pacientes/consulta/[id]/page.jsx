@@ -81,7 +81,6 @@ export default function Consulta() {
 
     try {
       await ConsultaController.addConsulta(updatedDatosFormulario);
-      console.log("Datos a mandar", updatedDatosFormulario);
       setDatosFormulario({
         peso: "",
         estatura: "",
