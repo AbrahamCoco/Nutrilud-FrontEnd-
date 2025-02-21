@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Dropdown, Form, Image, Modal } from "react-bootstrap";
+import { Dropdown, Image, Modal } from "react-bootstrap";
 import { FaUserCircle } from "react-icons/fa";
 import { NavbarController } from "./navbarController";
 import MenuAdmin from "./users/administrador/MenuAdmin";
@@ -11,6 +11,7 @@ import MenuPaciente from "./users/paciente/MenuPaciente";
 // import LogoNutrilud from "../../../public/images/LogoNutrilud.jpg";
 
 export default function Navbar() {
+  const [id, setId] = useState(null);
   const [rol, setRol] = useState(null);
   const [usuario, setUsuario] = useState("");
   const [contrasenia, setContrasenia] = useState("");
@@ -21,11 +22,15 @@ export default function Navbar() {
 
   useEffect(() => {
     const storedRol = sessionStorage.getItem("trol_id");
+    const storedId = sessionStorage.getItem("id");
     setNombre(`${sessionStorage.getItem("nombre")} ${sessionStorage.getItem("primer_apellido")}`);
     if (storedRol) {
       setRol(Number(storedRol));
     }
-    if (storedRol == null) {
+    if (storedId) {
+      setId(Number(storedId));
+    }
+    if (storedRol == null || storedId == null) {
       router.push("/");
     }
   }, [router]);
@@ -33,13 +38,14 @@ export default function Navbar() {
   const handleLogin = async () => {
     try {
       const response = await NavbarController.login(usuario, contrasenia);
+      const id_paciente = response.id_paciente;
 
       if (response.rol_id == 1) {
         router.push("/administrador");
       } else if (response.rol_id == 2) {
         router.push("/nutriologo");
       } else if (response.rol_id == 3) {
-        router.push("/paciente");
+        router.push(`/paciente/${id_paciente}`);
       } else {
         Utils.swalError("Error al iniciar sesión", "Favor de iniciar sesión nuevamente");
         router.push("/");
@@ -47,16 +53,28 @@ export default function Navbar() {
 
       setNombre(`${response.nombre} ${response.primer_apellido}`);
       setRol(response.rol_id);
+      setId(response.id);
+      setUsuario("");
+      setContrasenia("");
       closeModal();
     } catch (error) {
       setRol(null);
+      setId(null);
     }
   };
 
   const handleLogout = async () => {
-    sessionStorage.clear();
-    router.push("/");
-    setRol(null);
+    try {
+      sessionStorage.clear();
+      localStorage.clear();
+
+      setRol(null);
+      setId(null);
+
+      router.replace("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
   };
 
   const openModal = () => setShowModal(true);
@@ -86,7 +104,7 @@ export default function Navbar() {
               {rol ? (
                 <>
                   <li className="nav-item">
-                    <Link href="/perfil" className="nav-link text-white">
+                    <Link href={`/perfil/${id}/${rol}`} className="nav-link text-white">
                       Perfil
                     </Link>
                   </li>
