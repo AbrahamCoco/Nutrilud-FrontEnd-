@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Configura Axios
 const axiosInstance = axios.create({
-  baseURL: "http://127.0.0.1:8080/api/v1", // Base URL de tu API
+  baseURL: "http://54.165.182.210:8080/api/v1", // Base URL de tu API
 });
 
 // Exporta los métodos de la API
