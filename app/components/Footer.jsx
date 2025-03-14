@@ -7,12 +7,12 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
   const contactInfo = [
     { label: "Teléfono", value: "246 265 3921", link: "https://wa.me/2462653921", icon: <BsWhatsapp /> },
-    { label: "Email", value: "info@nutrilud.com o karinetza09@gmail.com" },
+    { label: "Email", value: "karinetza09@gmail.com" },
     { label: "Horario de consultas", value: "Lunes a Viernes de 9:00 A.M. a 5:00 P.M." },
   ];
   const socialLinks = [
-    { href: "https://www.facebook.com/NutriLud", icon: <FaFacebook />, label: "Facebook" },
-    { href: "https://www.instagram.com/nutrilud/", icon: <FaInstagram />, label: "Instagram" },
+    { href: "#", icon: <FaFacebook />, label: "Facebook" },
+    { href: "#", icon: <FaInstagram />, label: "Instagram" },
     { href: "#", icon: <FaTwitter />, label: "Twitter" },
   ];
   const resourcesLinks = [

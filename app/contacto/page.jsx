@@ -1,25 +1,18 @@
 "use client";
 import { useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, FloatingLabel, Form, Row } from "react-bootstrap";
 
 export default function Contacto() {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    email: "",
-    mensaje: "",
-  });
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [mensaje, setMensaje] = useState("");
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const handleSendEmail = () => {
+    const adminEmail = "karinetza09@gmail.com";
+    const subject = encodeURIComponent(`Consulta de ${nombre}`);
+    const body = encodeURIComponent(`Hola, mi nombre es ${nombre}.\n\n${mensaje}`);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Formulario enviado:", formData);
+    window.location.href = `mailto:${adminEmail}?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -34,32 +27,24 @@ export default function Contacto() {
           </p>
           <ul>
             <li>Teléfono: 246 265 3921</li>
-            <li>Email: info@nutrilud.com</li>
+            <li>Email: karinetza09@gmail.com</li>
           </ul>
         </Col>
         <Col md={6}>
           <div className="p-4 rounded bg-info">
             <p>No dudes en llenar el siguiente formulario para contactarnos:</p>
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="formNombre">
-                <Form.Label>Nombre</Form.Label>
-                <Form.Control type="text" placeholder="Ingresa tu nombre" name="nombre" value={formData.nombre} onChange={handleChange} />
-              </Form.Group>
-
-              <Form.Group className="mb-3" controlId="formEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control type="email" placeholder="Ingresa tu email" name="email" value={formData.email} onChange={handleChange} />
-              </Form.Group>
-
-              <Form.Group className="mb-3" controlId="formMensaje">
-                <Form.Label>Mensaje</Form.Label>
-                <Form.Control as="textarea" rows={3} placeholder="Escribe tu mensaje" name="mensaje" value={formData.mensaje} onChange={handleChange} />
-              </Form.Group>
-
-              <Button variant="primary" type="submit">
-                Enviar
-              </Button>
-            </Form>
+            <FloatingLabel controlId="nombre" label="Nombre" className="mb-3">
+              <Form.Control type="text" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+            </FloatingLabel>
+            <FloatingLabel controlId="email" label="Email" className="mb-3">
+              <Form.Control type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </FloatingLabel>
+            <FloatingLabel controlId="mensaje" label="Mensaje" className="mb-3">
+              <Form.Control as="textarea" placeholder="Mensaje" value={mensaje} onChange={(e) => setMensaje(e.target.value)} />
+            </FloatingLabel>
+            <Button variant="primary" type="submit" onClick={handleSendEmail}>
+              Enviar
+            </Button>
           </div>
         </Col>
       </Row>
