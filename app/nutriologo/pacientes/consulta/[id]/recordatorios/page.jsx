@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { FaDownload, FaEye } from "react-icons/fa";
 import { RecordatorioController } from "./recordatorioController";
+import { Tarjet } from "@/app/utils/axiosConfig";
 
 export default function Recordatorios() {
   const searchParams = useSearchParams();
@@ -124,7 +125,7 @@ export default function Recordatorios() {
   ];
 
   const handleView = (row) => {
-    const url = `http://127.0.0.1:8080/api/v1/view/${row}`;
+    const url = `${Tarjet.view}${row.replace(/\\/g, "/")}`;
     setPdfUrl(url);
     setShowModal(true);
   };
@@ -135,7 +136,7 @@ export default function Recordatorios() {
   };
 
   const handleDownload = (row) => {
-    const url = `http://127.0.0.1:8080/api/v1/files/${row}`;
+    const url = `${Tarjet.pdf}${row.replace(/\\/g, "/")}`;
     window.open(url, "_blank");
   };
 
