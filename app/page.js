@@ -1,37 +1,30 @@
-import Link from "next/link";
+import { Col, Container, Row } from "react-bootstrap";
+import ArticulosCard from "./components/ArticulosCard";
 import ArticulosCarousel from "./components/ArticulosCarousel";
 import { IndexController } from "./indexController";
 
 export default async function Home() {
   const { articulos, primerEncabezado } = await IndexController.getArticulos();
 
+  if (!articulos) {
+    <Container>
+      <Row>
+        <Col md={12}>
+          <h1>Todavia no hay articulos nutricionales disponibles</h1>
+        </Col>
+      </Row>
+    </Container>;
+  }
+
+  const ultimosArticulos = articulos.slice(-5);
+
   return (
     <>
-      <ArticulosCarousel articulos={articulos} primerEncabezado={primerEncabezado} />
+      <ArticulosCarousel articulos={ultimosArticulos} primerEncabezado={primerEncabezado} />
       <div className="container">
         <h1>Artículos Nutricionales</h1>
         <div className="row">
-          {articulos.map((articulo) => (
-            <div className="col-md-4 mb-4" key={articulo.id}>
-              <div className="card">
-                <div className="card-body">
-                  <Link href={`/articulo/${articulo.id}`}>
-                    <h3>{primerEncabezado[articulo.id]}</h3>
-                  </Link>
-                  <p className="card-text">
-                    <small className="text-muted">
-                      Publicado el{" "}
-                      {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </small>
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
+          <ArticulosCard articulos={articulos} primerEncabezado={primerEncabezado} />
         </div>
       </div>
     </>

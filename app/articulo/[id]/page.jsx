@@ -8,7 +8,7 @@ export default async function Articulo({ params }) {
   return (
     <div className="container my-4">
       <div className="row">
-        <div className="col-sm-8 text-justify">
+        <div className="col-sm-12 text-justify">
           <h1>{titulo}</h1>
           <div dangerouslySetInnerHTML={{ __html: contenidoModificado }} />
           <p>
@@ -25,9 +25,6 @@ export default async function Articulo({ params }) {
               day: "numeric",
             })}
           </p>
-        </div>
-        <div className="col-sm-4">
-          <Image src={`http://127.0.0.1:8080/api/v1/view/${articuloData.foto}`} className="d-block w-100" alt={titulo} />
         </div>
       </div>
     </div>
