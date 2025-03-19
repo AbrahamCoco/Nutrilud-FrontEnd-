@@ -8,8 +8,11 @@ export default function MenuAdmin() {
         Dashboard
       </Dropdown.Item>
       <Dropdown.Divider />
-      <Dropdown.Item as={Link} href="/registro">
+      <Dropdown.Item as={Link} href="/administrador/registro">
         Registrar usuarios
+      </Dropdown.Item>
+      <Dropdown.Item as={Link} href="/administrador/usuarios">
+        Listar usuarios
       </Dropdown.Item>
       <Dropdown.Divider />
     </>
