@@ -4,7 +4,6 @@ import axios from "axios";
 const axiosInstance = axios.create({
   baseURL: "http://127.0.0.1:8080/api/v1", // Base URL de tu API
 });
-
 // Exporta los métodos de la API
 export const Tarjet = {
   userApi: {
