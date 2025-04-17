@@ -111,6 +111,7 @@ export default function Registro() {
   return (
     <div className="container my-4">
       <div className="row">
+        <h1>Registro</h1>
         <div className="col-sm-6">
           <div className="mb-2">
             <FloatingLabel controlId="floatingInput" label="Nombre" className="mb-3">

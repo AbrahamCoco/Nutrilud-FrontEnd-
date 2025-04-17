@@ -6,14 +6,16 @@ import { IndexController } from "./indexController";
 export default async function Home() {
   const { articulos, primerEncabezado } = await IndexController.getArticulos();
 
-  if (!articulos) {
-    <Container>
-      <Row>
-        <Col md={12}>
-          <h1>Todavia no hay articulos nutricionales disponibles</h1>
-        </Col>
-      </Row>
-    </Container>;
+  if (!articulos || articulos.length === 0) {
+    return (
+      <Container>
+        <Row>
+          <Col md={12}>
+            <h1>Todavia no hay articulos nutricionales disponibles</h1>
+          </Col>
+        </Row>
+      </Container>
+    );
   }
 
   const ultimosArticulos = articulos.slice(-5);
