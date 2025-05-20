@@ -27,6 +27,10 @@ export default async function Home() {
       <h1>Comentarios de nuestros pacientes</h1>
       <div className="row">{/* Aquí se pueden agregar los artículos */}</div>
     </div>
+
+    <h1 className="text-3xl font-bold text-blue-500">
+      ¡Tailwind está funcionando!
+    </h1>
   </>
   );
 }
