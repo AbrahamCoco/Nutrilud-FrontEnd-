@@ -93,6 +93,26 @@ export default function Navbar() {
                 </Link>
               </li>
               <li className="nav-item">
+                <Link href="/articulo" className="nav-link text-white">
+                  Artículos
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/servicios" className="nav-link text-white">
+                  Servicios
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/nutriologos" className="nav-link text-white">
+                  Nutriologos
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link href="/precios" className="nav-link text-white">
+                  Precios
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link href="/contacto" className="nav-link text-white">
                   Contacto
                 </Link>
