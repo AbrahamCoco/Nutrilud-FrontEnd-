@@ -1,79 +1,124 @@
-import Link from "next/link";
-import { Col, Row } from "react-bootstrap";
-import { FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
-import { BsWhatsapp } from "react-icons/bs";
+import Link from 'next/link';
+import { FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { BsWhatsapp } from 'react-icons/bs';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
   const contactInfo = [
-    { label: "Teléfono", value: "246 265 3921", link: "https://wa.me/2462653921", icon: <BsWhatsapp /> },
-    { label: "Email", value: "karinetza09@gmail.com" },
-    { label: "Horario de consultas", value: "Lunes a Viernes de 9:00 A.M. a 5:00 P.M." },
+    {
+      label: 'Teléfono',
+      value: '246 265 3921',
+      link: 'https://wa.me/2462653921',
+      icon: <BsWhatsapp className="inline ml-1" />,
+    },
+    {
+      label: 'Email',
+      value: 'karinetza09@gmail.com',
+      link: 'mailto:karinetza09@gmail.com',
+    },
+    { label: 'Horario', value: 'Lunes a Viernes 9:00 AM - 5:00 PM' },
   ];
+
   const socialLinks = [
-    { href: "#", icon: <FaFacebook />, label: "Facebook" },
-    { href: "#", icon: <FaInstagram />, label: "Instagram" },
-    { href: "#", icon: <FaTwitter />, label: "Twitter" },
+    { href: '#', icon: <FaFacebook className="text-xl" />, label: 'Facebook' },
+    {
+      href: '#',
+      icon: <FaInstagram className="text-xl" />,
+      label: 'Instagram',
+    },
+    { href: '#', icon: <FaTwitter className="text-xl" />, label: 'Twitter' },
   ];
+
   const resourcesLinks = [
-    { href: "/nutriologo/recursos", label: "Recursos de nutrición" },
-    { href: "/nutriologo/guias", label: "Guías de alimentación saludable" },
-    { href: "/nutriologo/estilos", label: "Información sobre estilos de vida activos" },
+    { href: '/articulo', label: 'Artículos de nutrición' },
+    { href: '/servicios', label: 'Nuestros servicios' },
+    { href: '/nutriologos', label: 'Equipo de nutriólogos' },
   ];
 
   return (
-    <footer className="footer py-4 bg-success bg-gradient text-light mt-auto">
-      <Row className="justify-content-center">
-        <Col md={4} sm={12} className="text-center text-md-start">
-          <h5>Información de contacto:</h5>
-          <ul className="list-unstyled">
-            {contactInfo.map((info, index) => (
-              <li key={index}>
-                {info.label}:{" "}
-                <strong>
+    <footer className="bg-green-700 text-white mt-auto">
+      <div className="mx-auto px-3 sm:px-3 lg:px-4 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Información de contacto */}
+          <div className="space-y-4">
+            <h5 className="text-lg font-bold text-green-100">Contacto</h5>
+            <ul className="space-y-2">
+              {contactInfo.map((info, index) => (
+                <li key={index} className="text-green-50">
+                  <span className="font-medium">{info.label}:</span>{' '}
                   {info.link ? (
-                    <Link href={info.link} target="_blank" rel="noopener noreferrer" className="text-light">
+                    <Link
+                      href={info.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors duration-200"
+                    >
                       {info.value} {info.icon}
                     </Link>
                   ) : (
-                    info.value
+                    <span>{info.value}</span>
                   )}
-                </strong>
-              </li>
-            ))}
-          </ul>
-        </Col>
-        <Col md={4} sm={12} className="text-center">
-          <h5>Redes sociales:</h5>
-          <ul className="list-unstyled">
-            {socialLinks.map((link, index) => (
-              <li key={index}>
-                <a href={link.href} className="text-light">
-                  {link.icon} {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </Col>
-        <Col md={4} sm={12} className="text-center text-md-end">
-          <h5>Recursos útiles:</h5>
-          <ul className="list-unstyled">
-            {resourcesLinks.map((link, index) => (
-              <li key={index}>
-                <Link href={link.href} className="text-light">
-                  {link.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Redes sociales */}
+          <div className="space-y-4">
+            <h5 className="text-lg font-bold text-green-100 text-center">
+              Síguenos
+            </h5>
+            <div className="flex justify-center space-x-4">
+              {socialLinks.map((link, index) => (
+                <Link
+                  key={index}
+                  href={link.href}
+                  className="text-white hover:text-green-200 transition-colors duration-200 flex items-center justify-center w-8 h-8"
+                  aria-label={link.label}
+                >
+                  {link.icon}
                 </Link>
-              </li>
-            ))}
-          </ul>
-        </Col>
-        <Col md={12} className="text-center">
-          NutriLud {currentYear} &copy; Todos los derechos reservados | Desarrollado por{" "}
-          <a href="https://github.com/DevCraftersMx" className="text-light" target="_blank">
-            DevCraftersMx
-          </a>
-        </Col>
-      </Row>
+              ))}
+            </div>
+            <p className="text-green-50 text-center">
+              Mantente al día con nuestras últimas noticias y consejos de
+              nutrición.
+            </p>
+          </div>
+
+          {/* Recursos útiles */}
+          <div className="space-y-4 text-end">
+            <h5 className="text-lg font-bold text-green-100">Recursos</h5>
+            <ul className="space-y-2">
+              {resourcesLinks.map((link, index) => (
+                <li key={index}>
+                  <Link
+                    href={link.href}
+                    className="text-green-50 hover:text-green-300 transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        {/* Derechos de autor */}
+        <div className="mt-8 pt-6 border-t border-green-700 text-center text-green-100">
+          <p>
+            &copy; {currentYear} NutriLud - Todos los derechos reservados |
+            Desarrollado por{' '}
+            <Link
+              href="https://github.com/DevCraftersMx"
+              target="_blank"
+              className="text-white hover:text-green-200 transition-colors duration-200"
+            >
+              DevCraftersMx
+            </Link>
+          </p>
+        </div>
+      </div>
     </footer>
   );
 }
