@@ -177,15 +177,16 @@ export default function EstadisticasPaciente() {
     </div>
   );
 
-  const LineChart = ({ labels, values, color }) => {
-    console.log("Valores:", values);
-    console.log("Etiquetas:", labels);
+  const LineChart = ({ labels, values, color = "#10B981" }) => {
+    const cleanedPoints = values
+      .map((value, i) => {
+        if (value === null || typeof value !== "number") return null;
+        const x = labels.length > 1 ? (i / (labels.length - 1)) * 100 : 50;
+        return { value, label: labels[i], x };
+      })
+      .filter(Boolean);
 
-    const filteredValues = values.filter(
-      (v) => v !== null && typeof v === "number"
-    );
-
-    if (!filteredValues.length) {
+    if (!cleanedPoints.length) {
       return (
         <div className="h-48 w-full flex items-center justify-center text-gray-400">
           No hay datos disponibles
@@ -193,8 +194,9 @@ export default function EstadisticasPaciente() {
       );
     }
 
-    const maxValue = Math.max(...filteredValues);
-    const minValue = Math.min(...filteredValues);
+    const numericValues = cleanedPoints.map((p) => p.value);
+    const maxValue = Math.max(...numericValues);
+    const minValue = Math.min(...numericValues);
     const range = maxValue - minValue || 1;
 
     return (
@@ -206,57 +208,48 @@ export default function EstadisticasPaciente() {
           ))}
         </div>
 
-        {/* SVG con línea */}
+        {/* SVG con polyline */}
         <svg
           className="absolute inset-0 w-full h-full pointer-events-none"
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
+          role="img"
+          aria-label="Gráfico de línea de métricas del paciente"
         >
           <polyline
             fill="none"
             stroke={color}
             strokeWidth="2"
-            points={values
-              .map((value, i) => {
-                if (value === null || typeof value !== "number") return null;
-                const x = (i / (labels.length - 1)) * 100;
+            points={cleanedPoints
+              .map(({ x, value }) => {
                 const y = 100 - ((value - minValue) / range) * 100;
-                return `${x},${y}`; // ← Aquí ya sin %
+                return `${x},${y}`;
               })
-              .filter(Boolean)
               .join(" ")}
           />
         </svg>
 
         {/* Puntos y etiquetas */}
         <div className="relative h-full w-full">
-          {values.map((value, i) => {
-            if (value === null || typeof value !== "number") return null;
-
-            const height = ((value - minValue) / range) * 100;
-            const pointLeft =
-              labels.length > 1 ? (i / (labels.length - 1)) * 100 : 50;
+          {cleanedPoints.map((point, i) => {
+            const height = ((point.value - minValue) / range) * 100;
 
             return (
               <div
-                key={i}
-                className="absolute bottom-0"
-                style={{ left: `${pointLeft}%` }}
+                className="absolute"
+                style={{ left: `${point.x}%`, top: `${100 - height}%` }}
               >
-                {/* Punto */}
                 <div
                   className="absolute w-3 h-3 rounded-full transform -translate-x-1/2 -translate-y-1/2"
                   style={{
                     backgroundColor: color,
-                    bottom: `${height}%`,
                     boxShadow: `0 0 0 4px ${color}20`,
                   }}
                 ></div>
 
-                {/* Etiqueta */}
-                {i % 2 === 0 && (
+                {i % Math.ceil(labels.length / 6) === 0 && (
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-xs text-gray-500">
-                    {labels[i]}
+                    {point.label}
                   </div>
                 )}
               </div>
