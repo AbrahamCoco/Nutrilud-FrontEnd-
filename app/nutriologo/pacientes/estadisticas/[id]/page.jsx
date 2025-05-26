@@ -249,7 +249,7 @@ export default function EstadisticasPaciente() {
 
                 {i % Math.ceil(labels.length / 6) === 0 && (
                   <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-xs text-gray-500">
-                    {point.label}
+                    {point.value}
                   </div>
                 )}
               </div>

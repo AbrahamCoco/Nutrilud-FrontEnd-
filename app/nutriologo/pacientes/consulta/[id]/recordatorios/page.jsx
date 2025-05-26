@@ -5,8 +5,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
-import { FaDownload, FaEye } from "react-icons/fa";
+import { FaDownload, FaEye, FaArrowLeft } from "react-icons/fa";
 import { RecordatorioController } from "./recordatorioController";
 import { Tarjet } from "@/app/utils/axiosConfig";
 
@@ -109,17 +108,17 @@ export default function Recordatorios() {
     {
       name: "Ver",
       cell: (row) => (
-        <Button variant="primary" onClick={() => handleView(row.recordatorio_pdf)}>
-          <FaEye />
-        </Button>
+        <button onClick={() => handleView(row.recordatorio_pdf)} className="p-2 text-blue-600 hover:text-blue-800 transition-colors">
+          <FaEye className="text-xl" />
+        </button>
       ),
     },
     {
       name: "Descargar",
       cell: (row) => (
-        <Button variant="primary" onClick={() => handleDownload(row.recordatorio_pdf)}>
-          <FaDownload />
-        </Button>
+        <button onClick={() => handleDownload(row.recordatorio_pdf)} className="p-2 text-green-600 hover:text-green-800 transition-colors">
+          <FaDownload className="text-xl" />
+        </button>
       ),
     },
   ];
@@ -141,135 +140,154 @@ export default function Recordatorios() {
   };
 
   return (
-    <>
-      <Container>
-        <Row>
-          <Col md={12}>
-            <h1>Recordatorio de 24 hrs</h1>
-          </Col>
-          <Col md={12} className="py-4">
-            <Editor
-              apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
-              onInit={(evt, editor) => (editorRef.current = editor)}
-              initialValue={`
-                <table border='1'>
-                  <tr>
-                    <th></th>
-                    <th>Hora</th>
-                    <th>Lugar</th>
-                    <th>Alimentos</th> 
-                    <th>Porciones</th> 
-                    <th>Marca</th> 
-                    <th>Formas de preparacion</th>
-                  </tr>
-                  <tr>
-                    <td>Desayuno</td>
-                    <td></td>
-                    <td></td> 
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Almuerzo</td>
-                    <td></td>
-                    <td></td> 
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Media tarde</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Cena</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Colacion</td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                  </tr>
-                  <tr>
-                    <td>Otros</td>
-                    <td></td>
-                  </tr>
-                </table>
-              `}
-              onEditorChange={(content) => setContent(content)}
-              init={{
-                height: 500,
-                menubar: true,
-                plugins: [
-                  "advlist",
-                  "autolink",
-                  "lists",
-                  "link",
-                  "image",
-                  "charmap",
-                  "preview",
-                  "anchor",
-                  "searchreplace",
-                  "visualblocks",
-                  "code",
-                  "fullscreen",
-                  "insertdatetime",
-                  "media",
-                  "table",
-                  "help",
-                  "wordcount",
-                ],
-                toolbar: "undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help | fontsizeselect",
-                content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
-              }}
-            />
-          </Col>
-          <Col md={6}>
-            <Button variant="primary" onClick={() => window.history.back()}>
-              Regresar
-            </Button>
-          </Col>
-          <Col md={6} className="text-right">
-            <Button variant="primary" onClick={handleSavePDF}>
-              Guardar recordatorio
-            </Button>
-          </Col>
-          <Col md={12} className="py-4">
-            <Table columns={columns} data={recordatorios} nameTable={"Historial de recordatorios"} />
-          </Col>
-        </Row>
-      </Container>
+    <div className="mx-auto">
+      {showModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity" onClick={handleCloseModal}></div>
 
-      <Modal show={showModal} onHide={handleCloseModal} size="xl">
-        <Modal.Header closeButton>
-          <Modal.Title>Visualizar PDF</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <iframe src={pdfUrl} width="100%" height="700px" style={{ border: "none" }} title="Visualizar PDF" />
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Cerrar
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </>
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-6xl sm:w-full relative max-h-[90vh] flex-col">
+              <div className="bg-green-600 px-4 py-3 sm:px-6 flex justify-between items-center">
+                <h3 className="text-lg font-medium text-white">Visualizar PDF</h3>
+                <button onClick={handleCloseModal} className="text-white hover:text-gray-200">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 flex-grow overflow-hidden">
+                <iframe src={pdfUrl} className="w-full h-full border-none" title="Visualizar PDF" />
+              </div>
+
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  onClick={handleCloseModal}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Recordatorio de 24 hrs</h1>
+
+        <div className="mb-8">
+          <Editor
+            apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
+            onInit={(evt, editor) => (editorRef.current = editor)}
+            initialValue={`
+              <table border='1'>
+                <tr>
+                  <th></th>
+                  <th>Hora</th>
+                  <th>Lugar</th>
+                  <th>Alimentos</th> 
+                  <th>Porciones</th> 
+                  <th>Marca</th> 
+                  <th>Formas de preparacion</th>
+                </tr>
+                <tr>
+                  <td>Desayuno</td>
+                  <td></td>
+                  <td></td> 
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Almuerzo</td>
+                  <td></td>
+                  <td></td> 
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Media tarde</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Cena</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Colacion</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Otros</td>
+                  <td></td>
+                </tr>
+              </table>
+            `}
+            onEditorChange={(content) => setContent(content)}
+            init={{
+              height: 500,
+              menubar: true,
+              plugins: [
+                "advlist",
+                "autolink",
+                "lists",
+                "link",
+                "image",
+                "charmap",
+                "preview",
+                "anchor",
+                "searchreplace",
+                "visualblocks",
+                "code",
+                "fullscreen",
+                "insertdatetime",
+                "media",
+                "table",
+                "help",
+                "wordcount",
+              ],
+              toolbar: "undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help | fontsizeselect",
+              content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
+            }}
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
+          <button onClick={() => window.history.back()} className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors">
+            <FaArrowLeft />
+            Regresar
+          </button>
+          <button
+            onClick={handleSavePDF}
+            className="px-6 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+          >
+            Guardar recordatorio
+          </button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <Table columns={columns} data={recordatorios} nameTable={"Historial de recordatorios"} />
+        </div>
+      </div>
+    </div>
   );
 }

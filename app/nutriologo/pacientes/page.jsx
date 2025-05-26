@@ -3,13 +3,7 @@ import Table from "@/app/components/Table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BsWhatsapp } from "react-icons/bs";
-import {
-  FaEdit,
-  FaFolderOpen,
-  FaTrash,
-  FaPlus,
-  FaUserPlus,
-} from "react-icons/fa";
+import { FaEdit, FaFolderOpen, FaTrash, FaPlus, FaUserPlus } from "react-icons/fa";
 import { ImStatsDots } from "react-icons/im";
 import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
 import { PacientesController } from "./pacientesController";
@@ -115,8 +109,7 @@ export default function Pacientes() {
     },
     {
       name: "Nombre",
-      selector: (row) =>
-        `${row.nombre} ${row.primer_apellido} ${row.segundo_apellido}`,
+      selector: (row) => `${row.nombre} ${row.primer_apellido} ${row.segundo_apellido}`,
       sortable: true,
     },
     {
@@ -133,15 +126,9 @@ export default function Pacientes() {
       name: "Teléfono",
       cell: (row) => (
         <div className="flex items-center gap-2">
-          <Link
-            href={`https://wa.me/${row.tusuario_pacientes.telefono}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-green-500 hover:text-green-600 transition-colors"
-          >
+          <Link href={`https://wa.me/${row.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-600 transition-colors">
             <span className="flex items-center gap-1">
-              {row.tusuario_pacientes.telefono}{" "}
-              <BsWhatsapp className="text-lg" />
+              {row.tusuario_pacientes.telefono} <BsWhatsapp className="text-lg" />
             </span>
           </Link>
         </div>
@@ -150,10 +137,7 @@ export default function Pacientes() {
     {
       name: "Estadísticas",
       cell: (row) => (
-        <Link
-          href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}
-          className="flex justify-center"
-        >
+        <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`} className="flex justify-center">
           <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
             <ImStatsDots />
           </button>
@@ -163,10 +147,7 @@ export default function Pacientes() {
     {
       name: "Consulta",
       cell: (row) => (
-        <Link
-          href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}
-          className="flex justify-center"
-        >
+        <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`} className="flex justify-center">
           <button className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors">
             <FaFolderOpen />
           </button>
@@ -177,10 +158,7 @@ export default function Pacientes() {
       name: "Modificar",
       cell: (row) => (
         <div className="flex justify-center">
-          <button
-            onClick={() => console.log(row)}
-            className="p-2 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200 transition-colors"
-          >
+          <button onClick={() => console.log(row)} className="p-2 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200 transition-colors">
             <FaEdit />
           </button>
         </div>
@@ -190,10 +168,7 @@ export default function Pacientes() {
       name: "Eliminar",
       cell: (row) => (
         <div className="flex justify-center">
-          <button
-            onClick={deleteAppClientCache(row.id)}
-            className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-          >
+          <button onClick={deleteAppClientCache(row.id)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
             <FaTrash />
           </button>
         </div>
@@ -204,67 +179,34 @@ export default function Pacientes() {
   return (
     <div className="mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">
-          Gestión de Pacientes
-        </h1>
-        <button
-          onClick={openModal}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-        >
+        <h1 className="text-2xl font-bold text-gray-800">Gestión de Pacientes</h1>
+        <button onClick={openModal} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
           <FaUserPlus /> Nuevo Paciente
         </button>
       </div>
 
       <Table columns={columns} data={pacientes} nameTable={"Pacientes"} />
 
-      {/* Modal para nuevo paciente */}
       {showModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          {/* Fondo con blur - ahora está correctamente posicionado */}
-          <div
-            className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity"
-            onClick={closeModal}
-          ></div>
+          <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity" onClick={closeModal}></div>
 
-          {/* Contenido del modal */}
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            {/* Este div centra el contenido del modal */}
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative">
-              {/* Encabezado */}
               <div className="bg-green-600 px-4 py-3 sm:px-6 flex justify-between items-center">
-                <h3 className="text-lg font-medium text-white">
-                  Agregar nuevo paciente
-                </h3>
-                <button
-                  onClick={closeModal}
-                  className="text-white hover:text-gray-200"
-                >
-                  <svg
-                    className="h-6 w-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
+                <h3 className="text-lg font-medium text-white">Agregar nuevo paciente</h3>
+                <button onClick={closeModal} className="text-white hover:text-gray-200">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
 
-              {/* Cuerpo */}
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Columna izquierda */}
                   <div className="space-y-4">
                     <div>
-                      <label
-                        htmlFor="image"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
                         Foto del paciente
                       </label>
                       <input
@@ -276,10 +218,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="nombre"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
                         Nombre
                       </label>
                       <input
@@ -292,10 +231,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="primer_apellido"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="primer_apellido" className="block text-sm font-medium text-gray-700 mb-1">
                         Primer apellido
                       </label>
                       <input
@@ -308,10 +244,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="segundo_apellido"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="segundo_apellido" className="block text-sm font-medium text-gray-700 mb-1">
                         Segundo apellido
                       </label>
                       <input
@@ -324,10 +257,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="usuario"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="usuario" className="block text-sm font-medium text-gray-700 mb-1">
                         Usuario
                       </label>
                       <input
@@ -340,13 +270,9 @@ export default function Pacientes() {
                     </div>
                   </div>
 
-                  {/* Columna derecha */}
                   <div className="space-y-4">
                     <div>
-                      <label
-                        htmlFor="correo"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-1">
                         Correo electrónico
                       </label>
                       <input
@@ -359,10 +285,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="contrasenia"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="contrasenia" className="block text-sm font-medium text-gray-700 mb-1">
                         Contraseña
                       </label>
                       <input
@@ -375,10 +298,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="telefono"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
                         Teléfono
                       </label>
                       <input
@@ -391,10 +311,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label
-                        htmlFor="fecha_nacimiento"
-                        className="block text-sm font-medium text-gray-700 mb-1"
-                      >
+                      <label htmlFor="fecha_nacimiento" className="block text-sm font-medium text-gray-700 mb-1">
                         Fecha de nacimiento
                       </label>
                       <input
@@ -407,9 +324,7 @@ export default function Pacientes() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Sexo
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
                       <div className="flex space-x-4">
                         <label className="inline-flex items-center">
                           <input
@@ -439,7 +354,6 @@ export default function Pacientes() {
                 </div>
               </div>
 
-              {/* Pie del modal */}
               <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                 <button
                   onClick={handleRegisterPaciente}
