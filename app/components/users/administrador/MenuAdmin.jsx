@@ -1,17 +1,28 @@
 import Link from "next/link";
-import { Dropdown } from "react-bootstrap";
 
 export default function MenuAdmin() {
   return (
     <>
-      <Dropdown.Item as={Link} href="/administrador">
+      <Link 
+        href="/administrador" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
         Dashboard
-      </Dropdown.Item>
-      <Dropdown.Divider />
-      <Dropdown.Item as={Link} href="/registro">
+      </Link>
+      <div className="border-t border-gray-200 my-1"></div>
+      <Link 
+        href="/administrador/registro" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
         Registrar usuarios
-      </Dropdown.Item>
-      <Dropdown.Divider />
+      </Link>
+      <Link 
+        href="/administrador/usuarios" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
+        Listar usuarios
+      </Link>
+      <div className="border-t border-gray-200 my-1"></div>
     </>
   );
 }

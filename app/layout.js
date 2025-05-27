@@ -1,10 +1,6 @@
-import { Inter } from "next/font/google";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./globals.css";
+import './globals.css';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Nutrilud",
@@ -13,12 +9,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es">
-      <body className={inter.className}>
+    <html lang="es" className="h-full">
+      <body className="flex flex-col min-h-screen">
         <Navbar />
-        <div id="main-content" style={{ flex: 1 }}>
+        <main className="flex-grow p-4 pt-2">
           {children}
-        </div>
+        </main>
         <Footer />
       </body>
     </html>

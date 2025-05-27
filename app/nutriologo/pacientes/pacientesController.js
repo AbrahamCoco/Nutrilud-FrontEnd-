@@ -20,10 +20,10 @@ export class PacientesController {
       const response = await Tarjet.userApi.register(data, {
         headers: { "Content-Type": "application/json" },
       });
-      Utils.swalSuccess("Paciente guardado correctamente");
+      Utils.swalSuccess("Usuario guardado correctamente");
       return response;
     } catch (error) {
-      Utils.swalError("Error al guardar paciente", error.message);
+      Utils.swalError("Error al guardar Usuario", error.message);
       return null;
     }
   }

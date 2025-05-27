@@ -1,23 +1,34 @@
 import Link from "next/link";
-import { Dropdown } from "react-bootstrap";
 
 export default function MenuNutri() {
   return (
     <>
-      <Dropdown.Item as={Link} href="/nutriologo">
+      <Link 
+        href="/nutriologo" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
         Dashboard
-      </Dropdown.Item>
-      <Dropdown.Divider />
-      <Dropdown.Item as={Link} href="/nutriologo/agregar-articulo">
-        Agregar articulo
-      </Dropdown.Item>
-      <Dropdown.Item as={Link} href="/nutriologo/agenda">
+      </Link>
+      <div className="border-t border-gray-200 my-1"></div>
+      <Link 
+        href="/nutriologo/agregar-articulo" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
+        Agregar artículo
+      </Link>
+      <Link 
+        href="/nutriologo/agenda" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
         Agenda
-      </Dropdown.Item>
-      <Dropdown.Item as={Link} href="/nutriologo/pacientes">
+      </Link>
+      <Link 
+        href="/nutriologo/pacientes" 
+        className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+      >
         Pacientes
-      </Dropdown.Item>
-      <Dropdown.Divider />
+      </Link>
+      <div className="border-t border-gray-200 my-1"></div>
     </>
   );
 }

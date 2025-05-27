@@ -1,5 +1,5 @@
-import { Tarjet } from "../utils/axiosConfig";
-import { Utils } from "../utils/utils";
+import { Tarjet } from "../../utils/axiosConfig";
+import { Utils } from "../../utils/utils";
 
 export class RegistroController {
   static async addUser(data) {
