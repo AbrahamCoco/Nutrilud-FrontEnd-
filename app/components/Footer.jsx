@@ -37,21 +37,16 @@ export default function Footer() {
 
   return (
     <footer className="bg-green-700 text-white mt-auto">
-      <div className="mx-auto px-3 sm:px-3 lg:px-4 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="space-y-4">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="text-center md:text-left space-y-4">
             <h5 className="text-lg font-bold text-green-100">Contacto</h5>
             <ul className="space-y-2">
               {contactInfo.map((info, index) => (
                 <li key={index} className="text-green-50">
                   <span className="font-medium">{info.label}:</span>{" "}
                   {info.link ? (
-                    <Link
-                      href={info.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:text-white transition-colors duration-200"
-                    >
+                    <Link href={info.link} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-200 inline-flex items-center">
                       {info.value} {info.icon}
                     </Link>
                   ) : (
@@ -63,36 +58,28 @@ export default function Footer() {
           </div>
 
           <div className="space-y-4">
-            <h5 className="text-lg font-bold text-green-100 text-center">
-              Síguenos
-            </h5>
-            <div className="flex justify-center space-x-4">
+            <h5 className="text-lg font-bold text-green-100 text-center">Síguenos</h5>
+            <div className="flex justify-center space-x-6">
               {socialLinks.map((link, index) => (
                 <Link
                   key={index}
                   href={link.href}
-                  className="text-white hover:text-green-200 transition-colors duration-200 flex items-center justify-center w-8 h-8"
+                  className="text-white hover:text-green-200 transition-colors duration-200 flex items-center justify-center w-10 h-10 bg-green-800 rounded-full"
                   aria-label={link.label}
                 >
                   {link.icon}
                 </Link>
               ))}
             </div>
-            <p className="text-green-50 text-center">
-              Mantente al día con nuestras últimas noticias y consejos de
-              nutrición.
-            </p>
+            <p className="text-green-50 text-center max-w-md mx-auto">Mantente al día con nuestras últimas noticias y consejos de nutrición.</p>
           </div>
 
-          <div className="space-y-4 text-end">
+          <div className="text-center md:text-right space-y-4">
             <h5 className="text-lg font-bold text-green-100">Recursos</h5>
             <ul className="space-y-2">
               {resourcesLinks.map((link, index) => (
                 <li key={index}>
-                  <Link
-                    href={link.href}
-                    className="text-green-50 hover:text-green-300 transition-colors duration-200"
-                  >
+                  <Link href={link.href} className="text-green-50 hover:text-green-300 transition-colors duration-200 inline-block">
                     {link.label}
                   </Link>
                 </li>
@@ -101,15 +88,10 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-green-700 text-center text-green-100">
-          <p>
-            &copy; {currentYear} NutriLud - Todos los derechos reservados |
-            Desarrollado por{" "}
-            <Link
-              href="https://github.com/DevCraftersMx"
-              target="_blank"
-              className="text-white hover:text-green-200 transition-colors duration-200"
-            >
+        <div className="mt-8 pt-6 border-t border-green-600">
+          <p className="text-center text-green-100 text-sm sm:text-base">
+            &copy; {currentYear} NutriLud - Todos los derechos reservados | Desarrollado por{" "}
+            <Link href="https://github.com/DevCraftersMx" target="_blank" className="text-white hover:text-green-200 transition-colors duration-200">
               DevCraftersMx
             </Link>
           </p>
