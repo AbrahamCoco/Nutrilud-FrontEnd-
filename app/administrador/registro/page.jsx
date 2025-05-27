@@ -84,7 +84,6 @@ export default function Registro() {
 
   return (
     <div className="mx-auto px-4 sm:px-6">
-      {/* Encabezado con gradiente verde */}
       <div className="text-center mb-8">
         <div className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg shadow-lg mb-3">
           <h1 className="text-3xl font-bold">Registro de Usuario</h1>
@@ -92,14 +91,11 @@ export default function Registro() {
         <p className="text-gray-600">Complete el formulario para crear una nueva cuenta</p>
       </div>
 
-      {/* Tarjeta del formulario */}
       <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
-        {/* Barra de progreso verde */}
         <div className="h-1 bg-gradient-to-r from-green-100 via-green-200 to-green-300"></div>
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Columna izquierda */}
             <div className="space-y-5">
               <div className="form-group">
                 <label htmlFor="nombre" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
@@ -177,7 +173,6 @@ export default function Registro() {
               </div>
             </div>
 
-            {/* Columna derecha */}
             <div className="space-y-5">
               <div className="form-group">
                 <label className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
@@ -302,7 +297,6 @@ export default function Registro() {
             </div>
           </div>
 
-          {/* Campos condicionales */}
           {formData.trol_id === 1 && (
             <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="form-group">
@@ -449,7 +443,6 @@ export default function Registro() {
             </div>
           )}
 
-          {/* Botón de submit */}
           <div className="mt-8">
             <button
               type="submit"
@@ -467,7 +460,6 @@ export default function Registro() {
             </button>
           </div>
 
-          {/* Enlace a login */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               ¿Ya tienes una cuenta?{" "}
