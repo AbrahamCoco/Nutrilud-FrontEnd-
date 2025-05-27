@@ -1,210 +1,483 @@
 "use client";
 import { AgregarArticuloController } from "@/app/nutriologo/agregar-articulo/agregarArticuloController";
 import { useState } from "react";
-import { FloatingLabel, Form } from "react-bootstrap";
+import { useRouter } from "next/navigation";
 
 export default function Registro() {
-  const [nombre, setNombre] = useState("");
-  const [primer_apellido, setPrimerApellido] = useState("");
-  const [segundo_apellido, setSegundoApellido] = useState("");
-  const [usuario, setUsuario] = useState("");
-  const [correo, setCorreo] = useState("");
-  const [contrasenia, setContrasenia] = useState("");
-  const [selectedImage, setSelectedImage] = useState(null);
+  const router = useRouter();
+  const [formData, setFormData] = useState({
+    nombre: "",
+    primer_apellido: "",
+    segundo_apellido: "",
+    usuario: "",
+    correo: "",
+    contrasenia: "",
+    descripcion: "",
+    telefono: "",
+    direccion: "",
+    cedula_profesional: "",
+    trol_id: null,
+  });
   const [selectedFile, setSelectedFile] = useState(null);
-  const [descripcion, setDescripcion] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [cedula_profesional, setCedulaProfesional] = useState("");
-  const [trol_id, setTrolId] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
 
-  const handleRoleChange = (event) => {
-    setTrolId(parseInt(event.target.value));
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleRoleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      trol_id: parseInt(e.target.value),
+    }));
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   const uploadImage = async () => {
-    if (!selectedFile) {
-      console.log("No se ha seleccionado un archivo");
-      return null;
-    }
+    if (!selectedFile) return null;
 
     const formData = new FormData();
-    formData.append("file", selectedImage);
-    formData.append("nombre", nombre);
-    formData.append("apellido", primer_apellido);
+    formData.append("file", selectedFile);
+    formData.append("nombre", formData.nombre);
+    formData.append("apellido", formData.primer_apellido);
     formData.append("id", sessionStorage.getItem("id_nutriologo"));
 
     try {
       const response = await AgregarArticuloController.uploadImage(formData);
       return response.data;
     } catch (error) {
+      console.error("Error uploading image:", error);
       return null;
     }
   };
 
-  const handleRegister = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const imageurl = await uploadImage();
+      const imageUrl = await uploadImage();
 
       const userData = {
-        trol_id: trol_id,
-        nombre: nombre,
-        primer_apellido: primer_apellido,
-        segundo_apellido: segundo_apellido,
-        usuario: usuario,
-        correo: correo,
-        contrasenia: contrasenia,
+        ...formData,
+        foto: imageUrl,
       };
 
-      let tipoUsuarioData = null;
+      const response = await PacientesController.addPaciente(userData);
 
-      // Agregamos los datos del tipo de usuario al objeto userData
-      switch (trol_id) {
-        case 1:
-          tipoUsuarioData = {
-            descripcion: descripcion,
-            foto: imageurl,
-            telefono: telefono,
-          };
-          break;
-        case 2:
-          tipoUsuarioData = {
-            descripcion: descripcion,
-            foto: imageurl,
-            telefono: telefono,
-            direccion: direccion,
-            cedula_profesional: cedula_profesional,
-          };
-          break;
+      if (response.success) {
+        router.push("/login");
       }
-
-      const data = { ...userData, ...tipoUsuarioData };
-      console.log(data);
-
-      const response = await PacientesController.addPaciente(data);
-
-      setTrolId(null);
-      setNombre("");
-      setPrimerApellido("");
-      setSegundoApellido("");
-      setUsuario("");
-      setCorreo("");
-      setContrasenia("");
-
-      if (trol_id === 1) {
-        setDescripcion("");
-        setSelectedImage(null);
-        setTelefono("");
-      } else if (trol_id === 2) {
-        setDescripcion("");
-        setSelectedImage(null);
-        setTelefono("");
-        setDireccion("");
-        setCedulaProfesional("");
-      }
-      return response;
     } catch (error) {
-      return error;
+      console.error("Registration error:", error);
     }
   };
 
   return (
-    <div className="container my-4">
-      <div className="row">
-        <h1>Registro</h1>
-        <div className="col-sm-6">
-          <div className="mb-2">
-            <FloatingLabel controlId="floatingInput" label="Nombre" className="mb-3">
-              <Form.Control type="text" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-            </FloatingLabel>
-          </div>
-          <div className="mb-2">
-            <FloatingLabel controlId="floatingInput" label="Primer Apellido" className="mb-3">
-              <Form.Control type="text" placeholder="Primer Apellido" value={primer_apellido} onChange={(e) => setPrimerApellido(e.target.value)} />
-            </FloatingLabel>
-          </div>
-          <div className="mb-2">
-            <FloatingLabel controlId="floatingInput" label="Segundo Apellido" className="mb-3">
-              <Form.Control type="text" placeholder="Segundo Apellido" value={segundo_apellido} onChange={(e) => setSegundoApellido(e.target.value)} />
-            </FloatingLabel>
-          </div>
-          <div className="mb-2">
-            <FloatingLabel controlId="floatingInput" label="Usuario" className="mb-3">
-              <Form.Control type="text" placeholder="Usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
-            </FloatingLabel>
-          </div>
+    <div className="mx-auto px-4 sm:px-6">
+      {/* Encabezado con gradiente verde */}
+      <div className="text-center mb-8">
+        <div className="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg shadow-lg mb-3">
+          <h1 className="text-3xl font-bold">Registro de Usuario</h1>
         </div>
-        <div className="col-sm-6">
-          <div className="mb-2">
-            <label htmlFor="imagen" className="form-label">
-              Imagen
-            </label>
-            <input type="file" className="form-control" id="image" onChange={(e) => setSelectedFile(e.target.files[0])} />
-          </div>
-          <div className="mb-2">
-            <FloatingLabel controlId="floatingInput" label="Correo" className="mb-3">
-              <Form.Control type="email" placeholder="Correo" value={correo} onChange={(e) => setCorreo(e.target.value)} />
-            </FloatingLabel>
-          </div>
-          <div className="mb-2">
-            <FloatingLabel controlId="floatingInput" label="Contraseña" className="mb-3">
-              <Form.Control type="password" placeholder="Contraseña" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)} />
-            </FloatingLabel>
-          </div>
-          <label htmlFor="tipoUsuario" className="form-label">
-            Tipo de usuario
-          </label>
-          <div className="mb-2">
-            <div className="form-check-inline">
-              <label htmlFor="admin-bill" className="form-check-label">
-                <input type="radio" className="form-check-input bill" name="bill" id="admin-bill" value={1} checked={trol_id === 1} onChange={handleRoleChange} /> Administrador
-              </label>
-            </div>
-            <div className="form-check-inline">
-              <label htmlFor="nutriologo-bill" className="form-check-label">
-                <input type="radio" className="form-check-input bill" name="bill" id="nutriologo-bill" value={2} checked={trol_id === 2} onChange={handleRoleChange} /> Nutriologo
-              </label>
-            </div>
-          </div>
-        </div>
+        <p className="text-gray-600">Complete el formulario para crear una nueva cuenta</p>
       </div>
-      {trol_id === 1 && (
-        <div id="admin" className="row mb-2">
-          <div className="col-sm-6">
-            <FloatingLabel controlId="floatingInput" label="Descripcion" className="mb-3">
-              <Form.Control type="text" placeholder="Descripcion" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-            </FloatingLabel>
+
+      {/* Tarjeta del formulario */}
+      <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100">
+        {/* Barra de progreso verde */}
+        <div className="h-1 bg-gradient-to-r from-green-100 via-green-200 to-green-300"></div>
+
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Columna izquierda */}
+            <div className="space-y-5">
+              <div className="form-group">
+                <label htmlFor="nombre" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Nombre *
+                </label>
+                <input
+                  type="text"
+                  id="nombre"
+                  name="nombre"
+                  value={formData.nombre}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  required
+                  placeholder="Ingrese su nombre"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="primer_apellido" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Primer Apellido *
+                </label>
+                <input
+                  type="text"
+                  id="primer_apellido"
+                  name="primer_apellido"
+                  value={formData.primer_apellido}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  required
+                  placeholder="Ingrese su primer apellido"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="segundo_apellido" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Segundo Apellido
+                </label>
+                <input
+                  type="text"
+                  id="segundo_apellido"
+                  name="segundo_apellido"
+                  value={formData.segundo_apellido}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  placeholder="Ingrese su segundo apellido"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="usuario" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                  Nombre de Usuario *
+                </label>
+                <input
+                  type="text"
+                  id="usuario"
+                  name="usuario"
+                  value={formData.usuario}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  required
+                  placeholder="Cree un nombre de usuario"
+                />
+              </div>
+            </div>
+
+            {/* Columna derecha */}
+            <div className="space-y-5">
+              <div className="form-group">
+                <label className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                    ></path>
+                  </svg>
+                  Foto de Perfil
+                </label>
+                <div className="flex items-center justify-center">
+                  <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors overflow-hidden">
+                    {previewImage ? (
+                      <>
+                        <img src={previewImage} alt="Preview" className="h-full w-full object-cover" />
+                        <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                          <span className="bg-white text-green-600 px-3 py-1 rounded-full text-sm font-medium">Cambiar imagen</span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center p-5">
+                        <svg className="w-10 h-10 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <p className="mb-1 text-sm text-gray-500 text-center">
+                          <span className="font-semibold">Haz clic para subir</span>
+                        </p>
+                        <p className="text-xs text-gray-400">PNG, JPG (MAX. 5MB)</p>
+                      </div>
+                    )}
+                    <input id="image" type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="correo" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                  Correo Electrónico *
+                </label>
+                <input
+                  type="email"
+                  id="correo"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  required
+                  placeholder="ejemplo@dominio.com"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="contrasenia" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                  </svg>
+                  Contraseña *
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    id="contrasenia"
+                    name="contrasenia"
+                    value={formData.contrasenia}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                    required
+                    placeholder="Cree una contraseña segura"
+                  />
+                  <button type="button" className="absolute right-3 top-3 text-gray-400 hover:text-green-500">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-gray-500">Mínimo 8 caracteres con números y símbolos</p>
+              </div>
+
+              <div className="form-group">
+                <label className="text-sm font-medium text-gray-700 mb-2 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                    ></path>
+                  </svg>
+                  Tipo de Usuario *
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  <label
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      formData.trol_id === 1 ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-green-300"
+                    }`}
+                  >
+                    <input type="radio" className="form-radio h-4 w-4 text-green-600" name="trol_id" value={1} checked={formData.trol_id === 1} onChange={handleRoleChange} required />
+                    <span className="ml-2 text-gray-700">Administrador</span>
+                  </label>
+                  <label
+                    className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
+                      formData.trol_id === 2 ? "border-green-500 bg-green-50" : "border-gray-200 hover:border-green-300"
+                    }`}
+                  >
+                    <input type="radio" className="form-radio h-4 w-4 text-green-600" name="trol_id" value={2} checked={formData.trol_id === 2} onChange={handleRoleChange} />
+                    <span className="ml-2 text-gray-700">Nutriólogo</span>
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="col-sm-6">
-            <FloatingLabel controlId="floatingInput" label="Telefono" className="mb-3">
-              <Form.Control type="text" placeholder="Telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-            </FloatingLabel>
+
+          {/* Campos condicionales */}
+          {formData.trol_id === 1 && (
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="form-group">
+                <label htmlFor="telefono" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    ></path>
+                  </svg>
+                  Teléfono *
+                </label>
+                <input
+                  type="tel"
+                  id="telefono"
+                  name="telefono"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  required
+                  placeholder="Número de contacto"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="descripcion" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                  <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                    ></path>
+                  </svg>
+                  Descripción
+                </label>
+                <textarea
+                  id="descripcion"
+                  name="descripcion"
+                  value={formData.descripcion}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                  rows="3"
+                  placeholder="Descripción del administrador"
+                ></textarea>
+              </div>
+            </div>
+          )}
+
+          {formData.trol_id === 2 && (
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-5">
+                <div className="form-group">
+                  <label htmlFor="telefono" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                      ></path>
+                    </svg>
+                    Teléfono de Contacto *
+                  </label>
+                  <input
+                    type="tel"
+                    id="telefono"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                    required
+                    placeholder="Número profesional"
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="cedula_profesional" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                      ></path>
+                    </svg>
+                    Cédula Profesional *
+                  </label>
+                  <input
+                    type="text"
+                    id="cedula_profesional"
+                    name="cedula_profesional"
+                    value={formData.cedula_profesional}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                    required
+                    placeholder="Número de cédula"
+                  />
+                  <p className="mt-1 text-xs text-gray-500">Ingrese su cédula profesional válida</p>
+                </div>
+              </div>
+              <div className="space-y-5">
+                <div className="form-group">
+                  <label htmlFor="descripcion" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                      ></path>
+                    </svg>
+                    Descripción Profesional
+                  </label>
+                  <textarea
+                    id="descripcion"
+                    name="descripcion"
+                    value={formData.descripcion}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                    rows="3"
+                    placeholder="Especialidad y experiencia"
+                  ></textarea>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="direccion" className="text-sm font-medium text-gray-700 mb-1 inline-flex items-center">
+                    <svg className="w-4 h-4 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    Dirección del Consultorio
+                  </label>
+                  <input
+                    type="text"
+                    id="direccion"
+                    name="direccion"
+                    value={formData.direccion}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
+                    placeholder="Dirección completa"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Botón de submit */}
+          <div className="mt-8">
+            <button
+              type="submit"
+              className="flex items-center justify-center py-3 px-6 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
+            >
+              <svg className="w-5 h-5 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                ></path>
+              </svg>
+              Registrar Usuario
+            </button>
           </div>
-        </div>
-      )}
-      {trol_id === 2 && (
-        <div id="nutriologo" className="row">
-          <div className="col-sm-6">
-            <FloatingLabel controlId="floatingInput" label="Descripcion" className="mb-3">
-              <Form.Control type="text" placeholder="Descripcion" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-            </FloatingLabel>
-            <FloatingLabel controlId="floatingInput" label="Direccion" className="mb-3">
-              <Form.Control type="text" placeholder="Direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
-            </FloatingLabel>
+
+          {/* Enlace a login */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              ¿Ya tienes una cuenta?{" "}
+              <a href="/login" className="font-medium text-green-600 hover:text-green-500">
+                Inicia sesión aquí
+              </a>
+            </p>
           </div>
-          <div className="col-sm-6">
-            <FloatingLabel controlId="floatingInput" label="Telefono" className="mb-3">
-              <Form.Control type="text" placeholder="Telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-            </FloatingLabel>
-            <FloatingLabel controlId="floatingInput" label="Cedula Profesional" className="mb-3">
-              <Form.Control type="text" placeholder="Cedula Profesional" value={cedula_profesional} onChange={(e) => setCedulaProfesional(e.target.value)} />
-            </FloatingLabel>
-          </div>
-        </div>
-      )}
-      <button type="button" className="btn btn-success" onClick={handleRegister}>
-        Registrarse
-      </button>
+        </form>
+      </div>
     </div>
   );
 }
