@@ -23,7 +23,6 @@ export default function Contacto() {
         </div>
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          {/* Información de contacto */}
           <div className="space-y-6">
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Información de contacto</h2>
@@ -85,7 +84,6 @@ export default function Contacto() {
             </div> */}
           </div>
 
-          {/* Formulario de contacto */}
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Envíanos un mensaje</h2>
 
