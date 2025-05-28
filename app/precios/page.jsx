@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function PreciosPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -12,7 +14,7 @@ export default function PreciosPage() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
             <div className="h-48 overflow-hidden">
-              <img src="/images/precio1.jpg" alt="Consulta Nutricional" className="w-full h-full object-cover" />
+              <Image src="/images/precio1.jpg" alt="Consulta Nutricional" width={288} height={192} className="w-full h-full object-cover" />
             </div>
             <div className="p-6">
               <div className="flex items-center justify-between mb-3">
@@ -34,7 +36,7 @@ export default function PreciosPage() {
 
           <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
             <div className="h-48 overflow-hidden">
-              <img src="/images/precio2.jpg" alt="Plan de Alimentación" className="w-full h-full object-cover" />
+              <Image src="/images/precio2.jpg" alt="Plan de Alimentación" className="w-full h-full object-cover" />
             </div>
             <div className="p-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Plan de Alimentación</h3>
@@ -53,7 +55,7 @@ export default function PreciosPage() {
 
           <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
             <div className="h-48 overflow-hidden">
-              <img src="/images/precio3.jpg" alt="Seguimiento Nutricional" className="w-full h-full object-cover" />
+              <Image src="/images/precio3.jpg" alt="Seguimiento Nutricional" className="w-full h-full object-cover" />
             </div>
             <div className="p-6">
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Seguimiento Nutricional</h3>

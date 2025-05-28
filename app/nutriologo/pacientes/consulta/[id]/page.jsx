@@ -28,38 +28,38 @@ export default function Consulta() {
     siguiente_consulta: "",
   });
 
-  const loadDatosConsulta = async () => {
-    try {
-      const response = await ConsultaController.getAllConsultas(id);
-      const consultas = await response.data;
-
-      if (!consultas || consultas.length === 0) {
-        setConsulta(null);
-        Utils.swalWarning("No hay datos de consulta previos");
-      } else {
-        setConsulta(consultas);
-        Utils.swalSuccess("Datos de consulta cargados correctamente");
-      }
-    } catch (error) {
-      const message = error.response?.data?.message || "No se encontraron datos de consulta.";
-      Utils.swalWarning(message);
-      setConsulta(null);
-    }
-  };
-
-  const loadPaciente = async () => {
-    try {
-      const response = await ConsultaController.getPacienteId(id);
-      setPaciente(response.data);
-    } catch {
-      setPaciente(null);
-    }
-  };
-
   useEffect(() => {
-    loadPaciente();
-    loadDatosConsulta();
-  }, []);
+    const fetchPaciente = async () => {
+      try {
+        const response = await ConsultaController.getPacienteId(id);
+        setPaciente(response.data);
+      } catch {
+        setPaciente(null);
+      }
+    };
+
+    const fetchConsultas = async () => {
+      try {
+        const response = await ConsultaController.getAllConsultas(id);
+        const consultas = await response.data;
+
+        if (!consultas || consultas.length === 0) {
+          setConsulta(null);
+          Utils.swalWarning("No hay datos de consulta previos");
+        } else {
+          setConsulta(consultas);
+          Utils.swalSuccess("Datos de consulta cargados correctamente");
+        }
+      } catch (error) {
+        const message = error.response?.data?.message || "No se encontraron datos de consulta.";
+        Utils.swalWarning(message);
+        setConsulta(null);
+      }
+    };
+
+    fetchPaciente();
+    fetchConsultas();
+  }, [id]);
 
   const calcularEdad = (fechaNacimiento) => {
     const fechaNac = new Date(fechaNacimiento);

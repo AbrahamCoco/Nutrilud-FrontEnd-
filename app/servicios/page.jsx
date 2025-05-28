@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function ServiciosPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -9,7 +11,7 @@ export default function ServiciosPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           <div className="h-48 overflow-hidden">
-            <img src="/images/servicio1.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Consulta Nutricional" />
+            <Image src="/images/servicio1.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Consulta Nutricional" />
           </div>
           <div className="p-6">
             <div className="flex items-center mb-4">
@@ -32,7 +34,7 @@ export default function ServiciosPage() {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           <div className="h-48 overflow-hidden">
-            <img src="/images/servicio2.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Plan de Alimentación" />
+            <Image src="/images/servicio2.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Plan de Alimentación" />
           </div>
           <div className="p-6">
             <div className="flex items-center mb-4">
@@ -55,7 +57,7 @@ export default function ServiciosPage() {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           <div className="h-48 overflow-hidden">
-            <img src="/images/servicio3.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Seguimiento Nutricional" />
+            <Image src="/images/servicio3.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Seguimiento Nutricional" />
           </div>
           <div className="p-6">
             <div className="flex items-center mb-4">
