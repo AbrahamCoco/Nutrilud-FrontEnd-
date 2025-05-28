@@ -14,7 +14,7 @@ export default function PreciosPage() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
             <div className="h-48 overflow-hidden">
-              <Image src="/images/precio1.jpg" alt="Consulta Nutricional" className="w-full h-full object-cover" />
+              <Image src="/images/precio1.jpg" alt="Consulta Nutricional" width={288} height={192} className="w-full h-full object-cover" />
             </div>
             <div className="p-6">
               <div className="flex items-center justify-between mb-3">
