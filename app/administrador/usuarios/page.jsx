@@ -1,9 +1,24 @@
-import { UsersController } from "./usersController";
+"use client";
+import { useEffect, useState } from "react";
 import { FaEdit, FaTrash, FaUserCircle } from "react-icons/fa";
+import { UsersController } from "./usersController";
 
-export default async function ListaUsuarios() {
-  const { users } = await UsersController.getAllUsers();
-  const data = users.data;
+export default function ListaUsuarios() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await UsersController.getAllUsers();
+        setData(response?.users?.data);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setData([]);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="mx-auto">
