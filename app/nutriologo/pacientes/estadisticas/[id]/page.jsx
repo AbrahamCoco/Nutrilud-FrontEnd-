@@ -205,7 +205,7 @@ export default function EstadisticasPaciente() {
             const height = ((point.value - minValue) / range) * 100;
 
             return (
-              <div className="absolute" style={{ left: `${point.x}%`, top: `${100 - height}%` }}>
+              <div key={i} className="absolute" style={{ left: `${point.x}%`, top: `${100 - height}%` }}>
                 <div
                   className="absolute w-3 h-3 rounded-full transform -translate-x-1/2 -translate-y-1/2"
                   style={{
