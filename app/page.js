@@ -1,5 +1,5 @@
-import Head from "next/head";
-import { FaLeaf, FaAppleAlt, FaHeartbeat, FaWeight } from "react-icons/fa";
+import Image from "next/image";
+import { FaAppleAlt, FaHeartbeat, FaLeaf, FaWeight } from "react-icons/fa";
 
 export default function Home() {
   const services = [
@@ -105,7 +105,7 @@ export default function Home() {
             {experts.map((expert, index) => (
               <div key={index} className="text-center">
                 <div className="bg-white p-2 rounded-full inline-block mb-4">
-                  <img src={expert.img} alt={expert.name} className="rounded-full w-32 h-32 object-cover border-4 border-green-300" />
+                  <Image src={expert.img} alt={expert.name} className="rounded-full w-32 h-32 object-cover border-4 border-green-300" />
                 </div>
                 <h3 className="text-lg font-bold text-green-700">{expert.name}</h3>
                 <p className="text-green-600">{expert.specialty}</p>
@@ -126,7 +126,7 @@ export default function Home() {
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-green-50 rounded-xl p-6 shadow-md hover:shadow-lg transition duration-300">
                 <div className="flex items-start mb-4">
-                  <img src="/client.png" alt={testimonial.name} className="rounded-full w-12 h-12 mr-4" />
+                  <Image src="/client.png" alt={testimonial.name} className="rounded-full w-12 h-12 mr-4" />
                   <div>
                     <p className="font-bold text-green-700">{testimonial.name}</p>
                     <div className="flex text-yellow-400">
@@ -138,7 +138,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-                <p className="text-gray-600 italic">"{testimonial.text}"</p>
+                <p className="text-gray-600 italic">{`"${testimonial.text}"`}</p>
               </div>
             ))}
           </div>

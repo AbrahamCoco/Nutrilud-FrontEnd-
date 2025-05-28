@@ -14,9 +14,7 @@ export default function EstadisticasPaciente() {
     const fetchData = async () => {
       try {
         const response = await EstadisticasController.getDatosPaciente(id);
-        const sortedData = response.data.data.sort(
-          (a, b) => new Date(a.fecha_medicion) - new Date(b.fecha_medicion)
-        );
+        const sortedData = response.data.data.sort((a, b) => new Date(a.fecha_medicion) - new Date(b.fecha_medicion));
         setData({
           ...response.data,
           data: sortedData,
@@ -50,9 +48,7 @@ export default function EstadisticasPaciente() {
   }
 
   const paciente = data.data[0]?.tusuario_paciente;
-  const nombreCompleto = `${paciente?.nombre ?? ""} ${
-    paciente?.primer_apellido ?? ""
-  } ${paciente?.segundo_apellido ?? ""}`;
+  const nombreCompleto = `${paciente?.nombre ?? ""} ${paciente?.primer_apellido ?? ""} ${paciente?.segundo_apellido ?? ""}`;
 
   const filterDataByTimeRange = (consultas) => {
     if (timeRange === "all") return consultas;
@@ -133,12 +129,7 @@ export default function EstadisticasPaciente() {
     cadera: generateChartData("circunferencia_cadera", "Cadera", "cm", 1),
     colesterol: generateChartData("colesterol", "Colesterol", "mg/dL", 0),
     glucosa: generateChartData("glucosa", "Glucosa", "mg/dL", 0),
-    trigliceridos: generateChartData(
-      "trigliceridos",
-      "Triglicéridos",
-      "mg/dL",
-      0
-    ),
+    trigliceridos: generateChartData("trigliceridos", "Triglicéridos", "mg/dL", 0),
     presion: {
       ...generateChartData("presion_arterial", "Presión", "mmHg", 0),
       values: consultasFiltradas.map((c) => {
@@ -150,25 +141,14 @@ export default function EstadisticasPaciente() {
   };
 
   const MetricCard = ({ title, value, change, unit, onClick, isActive }) => (
-    <div
-      onClick={onClick}
-      className={`p-4 rounded-xl cursor-pointer transition-all ${
-        isActive
-          ? "bg-white shadow-lg border-2 border-green-500"
-          : "bg-gray-50 hover:bg-gray-100"
-      }`}
-    >
+    <div onClick={onClick} className={`p-4 rounded-xl cursor-pointer transition-all ${isActive ? "bg-white shadow-lg border-2 border-green-500" : "bg-gray-50 hover:bg-gray-100"}`}>
       <h3 className="text-sm font-medium text-gray-500">{title}</h3>
       <div className="flex items-end mt-2">
         <span className="text-2xl font-bold">{value ?? "N/A"}</span>
         {unit && <span className="text-sm text-gray-500 ml-1">{unit}</span>}
       </div>
       {change !== null && (
-        <div
-          className={`mt-2 text-sm flex items-center ${
-            change >= 0 ? "text-green-600" : "text-red-600"
-          }`}
-        >
+        <div className={`mt-2 text-sm flex items-center ${change >= 0 ? "text-green-600" : "text-red-600"}`}>
           <span>
             {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(1)}%
           </span>
@@ -187,11 +167,7 @@ export default function EstadisticasPaciente() {
       .filter(Boolean);
 
     if (!cleanedPoints.length) {
-      return (
-        <div className="h-48 w-full flex items-center justify-center text-gray-400">
-          No hay datos disponibles
-        </div>
-      );
+      return <div className="h-48 w-full flex items-center justify-center text-gray-400">No hay datos disponibles</div>;
     }
 
     const numericValues = cleanedPoints.map((p) => p.value);
@@ -209,13 +185,7 @@ export default function EstadisticasPaciente() {
         </div>
 
         {/* SVG con polyline */}
-        <svg
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          role="img"
-          aria-label="Gráfico de línea de métricas del paciente"
-        >
+        <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none" role="img" aria-label="Gráfico de línea de métricas del paciente">
           <polyline
             fill="none"
             stroke={color}
@@ -235,10 +205,7 @@ export default function EstadisticasPaciente() {
             const height = ((point.value - minValue) / range) * 100;
 
             return (
-              <div
-                className="absolute"
-                style={{ left: `${point.x}%`, top: `${100 - height}%` }}
-              >
+              <div className="absolute" style={{ left: `${point.x}%`, top: `${100 - height}%` }}>
                 <div
                   className="absolute w-3 h-3 rounded-full transform -translate-x-1/2 -translate-y-1/2"
                   style={{
@@ -247,11 +214,7 @@ export default function EstadisticasPaciente() {
                   }}
                 ></div>
 
-                {i % Math.ceil(labels.length / 6) === 0 && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-xs text-gray-500">
-                    {point.value}
-                  </div>
-                )}
+                {i % Math.ceil(labels.length / 6) === 0 && <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 text-xs text-gray-500">{point.value}</div>}
               </div>
             );
           })}
@@ -268,8 +231,7 @@ export default function EstadisticasPaciente() {
         <h1 className="text-3xl font-bold">Estadísticas del Paciente</h1>
         <p className="text-lg text-gray-700">{nombreCompleto}</p>
         <p className="text-sm text-gray-500">
-          Nutriólogo: {data.data[0]?.tusuario_nutriologo?.nombre ?? ""}{" "}
-          {data.data[0]?.tusuario_nutriologo?.primer_apellido ?? ""}
+          Nutriólogo: {data.data[0]?.tusuario_nutriologo?.nombre ?? ""} {data.data[0]?.tusuario_nutriologo?.primer_apellido ?? ""}
         </p>
       </div>
 
@@ -279,21 +241,9 @@ export default function EstadisticasPaciente() {
           <button
             key={range}
             onClick={() => setTimeRange(range)}
-            className={`px-3 py-1 rounded-full text-sm ${
-              timeRange === range
-                ? "bg-green-600 text-white"
-                : "bg-white text-gray-700 border hover:bg-gray-100"
-            }`}
+            className={`px-3 py-1 rounded-full text-sm ${timeRange === range ? "bg-green-600 text-white" : "bg-white text-gray-700 border hover:bg-gray-100"}`}
           >
-            {range === "1m"
-              ? "1 mes"
-              : range === "3m"
-              ? "3 meses"
-              : range === "6m"
-              ? "6 meses"
-              : range === "1y"
-              ? "1 año"
-              : "Todo"}
+            {range === "1m" ? "1 mes" : range === "3m" ? "3 meses" : range === "6m" ? "6 meses" : range === "1y" ? "1 año" : "Todo"}
           </button>
         ))}
       </div>
@@ -302,37 +252,17 @@ export default function EstadisticasPaciente() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
         {["peso", "imc", "grasa", "musculo", "presion"].map((key) => {
           const metric = metricas[key];
-          const isNumber =
-            typeof metric.currentValue === "number" &&
-            !isNaN(metric.currentValue);
-          const displayValue =
-            key === "presion"
-              ? metric.currentValue
-              : isNumber
-              ? metric.currentValue.toFixed(metric.precision)
-              : "N/A";
+          const isNumber = typeof metric.currentValue === "number" && !isNaN(metric.currentValue);
+          const displayValue = key === "presion" ? metric.currentValue : isNumber ? metric.currentValue.toFixed(metric.precision) : "N/A";
 
-          return (
-            <MetricCard
-              key={key}
-              title={metric.label}
-              value={displayValue}
-              change={metric.change}
-              unit={metric.unit}
-              onClick={() => setActiveTab(key)}
-              isActive={activeTab === key}
-            />
-          );
+          return <MetricCard key={key} title={metric.label} value={displayValue} change={metric.change} unit={metric.unit} onClick={() => setActiveTab(key)} isActive={activeTab === key} />;
         })}
       </div>
 
       {/* Gráfico principal */}
       <div className="bg-white rounded-xl p-6 shadow">
         <h2 className="text-xl font-semibold mb-4">{currentMetric.label}</h2>
-        <LineChart
-          labels={currentMetric.labels}
-          values={currentMetric.values}
-        />
+        <LineChart labels={currentMetric.labels} values={currentMetric.values} />
       </div>
     </div>
   );

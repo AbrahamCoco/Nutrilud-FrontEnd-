@@ -2,6 +2,7 @@
 import { AgregarArticuloController } from "@/app/nutriologo/agregar-articulo/agregarArticuloController";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function Registro() {
   const router = useRouter();
@@ -190,7 +191,7 @@ export default function Registro() {
                   <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors overflow-hidden">
                     {previewImage ? (
                       <>
-                        <img src={previewImage} alt="Preview" className="h-full w-full object-cover" />
+                        <Image src={previewImage} alt="Preview" className="h-full w-full object-cover" />
                         <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                           <span className="bg-white text-green-600 px-3 py-1 rounded-full text-sm font-medium">Cambiar imagen</span>
                         </div>

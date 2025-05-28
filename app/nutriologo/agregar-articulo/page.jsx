@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { useRouter } from "next/navigation";
 import { AgregarArticuloController } from "./agregarArticuloController";
+import Image from "next/image";
 
 export default function AgregarArticulo() {
   const [contenido, setContenido] = useState("");
@@ -156,7 +157,7 @@ export default function AgregarArticulo() {
                 <div className="space-y-1 text-center">
                   {previewImage ? (
                     <>
-                      <img src={previewImage} alt="Preview" className="mx-auto h-48 object-cover rounded-md" />
+                      <Image src={previewImage} alt="Preview" className="mx-auto h-48 object-cover rounded-md" />
                       <div className="flex text-sm text-gray-600 justify-center mt-2">
                         <button
                           type="button"
