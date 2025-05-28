@@ -2,7 +2,6 @@ import PerfilAdmin from "@/app/components/users/administrador/PerfilAdmin";
 import PerfilNutriologo from "@/app/components/users/nutriologo/PerfilNutriologo";
 import PerfilPaciente from "@/app/components/users/paciente/PerfilPaciente";
 import "boxicons/css/boxicons.min.css";
-import { Container } from "react-bootstrap";
 
 export default async function Perfil({ params }) {
   let { id } = await params;
@@ -24,5 +23,5 @@ export default async function Perfil({ params }) {
     }
   };
 
-  return <Container>{renderPerfil()}</Container>;
+  return renderPerfil();
 }

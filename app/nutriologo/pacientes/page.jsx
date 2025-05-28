@@ -2,9 +2,8 @@
 import Table from "@/app/components/Table";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { BsWhatsapp } from "react-icons/bs";
-import { FaEdit, FaFolderOpen, FaTrash } from "react-icons/fa";
+import { FaEdit, FaFolderOpen, FaTrash, FaPlus, FaUserPlus } from "react-icons/fa";
 import { ImStatsDots } from "react-icons/im";
 import { AgregarArticuloController } from "../agregar-articulo/agregarArticuloController";
 import { PacientesController } from "./pacientesController";
@@ -124,162 +123,255 @@ export default function Pacientes() {
       sortable: true,
     },
     {
-      name: "Telefono",
+      name: "Teléfono",
       cell: (row) => (
-        <>
-          {row.tusuario_pacientes.telefono}{" "}
-          <Link href={`https://wa.me/${row.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer">
-            <BsWhatsapp />
+        <div className="flex items-center gap-2">
+          <Link href={`https://wa.me/${row.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-600 transition-colors">
+            <span className="flex items-center gap-1">
+              {row.tusuario_pacientes.telefono} <BsWhatsapp className="text-lg" />
+            </span>
           </Link>
-        </>
+        </div>
       ),
     },
     {
-      name: "Estadisticas",
+      name: "Estadísticas",
       cell: (row) => (
-        <div className="d-flex justify-content-center">
-          <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`}>
-            <button className="btn btn-info pb-2">
-              <ImStatsDots />
-            </button>
-          </Link>
-        </div>
+        <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`} className="flex justify-center">
+          <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
+            <ImStatsDots />
+          </button>
+        </Link>
       ),
     },
     {
       name: "Consulta",
       cell: (row) => (
-        <div className="d-flex justify-content-center">
-          <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`}>
-            <button className="btn btn-info pb-2">
-              <FaFolderOpen />
-            </button>
-          </Link>
-        </div>
+        <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`} className="flex justify-center">
+          <button className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors">
+            <FaFolderOpen />
+          </button>
+        </Link>
       ),
     },
     {
       name: "Modificar",
       cell: (row) => (
-        <div className="d-flex justify-content-center">
-          <Button variant="warning" onClick={() => console.log(row)}>
+        <div className="flex justify-center">
+          <button onClick={() => console.log(row)} className="p-2 bg-yellow-100 text-yellow-600 rounded-lg hover:bg-yellow-200 transition-colors">
             <FaEdit />
-          </Button>
+          </button>
         </div>
       ),
     },
     {
       name: "Eliminar",
       cell: (row) => (
-        <div className="d-flex justify-content-center">
-          <Button variant="danger" onClick={deleteAppClientCache(row.id)}>
+        <div className="flex justify-center">
+          <button onClick={deleteAppClientCache(row.id)} className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors">
             <FaTrash />
-          </Button>
+          </button>
         </div>
       ),
     },
   ];
 
   return (
-    <>
-      <Container>
-        <Row className="mt-3">
-          <Col md={12}>
-            <Table columns={columns} data={pacientes} nameTable={"Pacientes"} />
-          </Col>
-          <Col md={2}>
-            <div>
-              <button className="btn btn-primary mb-2" onClick={openModal}>
-                Agregar paciente
-              </button>
-            </div>
-          </Col>
-        </Row>
-      </Container>
+    <div className="mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Gestión de Pacientes</h1>
+        <button onClick={openModal} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+          <FaUserPlus /> Nuevo Paciente
+        </button>
+      </div>
 
-      <Modal show={showModal} onHide={closeModal} dialogClassName="modal-custom">
-        <Modal.Header closeButton>
-          <Modal.Title>Agregar nuevo paciente</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Container>
-            <Row>
-              <label htmlFor="image" className="form-label">
-                Imagen
-              </label>
-              <input type="file" className="form-control" id="image" onChange={(e) => setSelectedFile(e.target.files[0])} />
-              <Col md={6}>
-                <label htmlFor="" className="form-label">
-                  Nombre
-                </label>
-                <input type="text" className="form-control" id="nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Primer apellido
-                </label>
-                <input type="text" className="form-control" id="primer_apellido" value={primer_apellido} onChange={(e) => setPrimer_apellido(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Segundo apellido
-                </label>
-                <input type="text" className="form-control" id="segundo_apellido" value={segundo_apellido} onChange={(e) => setSegundo_apellido(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Usuario
-                </label>
-                <input type="text" className="form-control" id="usuario" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Correo electronico
-                </label>
-                <input type="email" className="form-control" id="correo" value={correo} onChange={(e) => setCorreo(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Alergias
-                </label>
-                <input type="text" className="form-control" id="alergias" value={alergias} onChange={(e) => setAlergias(e.target.value)} />
-              </Col>
-              <Col md={6}>
-                <label htmlFor="" className="form-label">
-                  Contraseña
-                </label>
-                <input type="password" className="form-control" id="contrasenia" value={contrasenia} onChange={(e) => setContrasenia(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  ID paciente
-                </label>
-                <input type="text" className="form-control" id="id_paciente" value={id_paciente} onChange={(e) => setId_paciente(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Fecha de nacimiento
-                </label>
-                <input type="date" className="form-control" id="fecha_nacimiento" value={fecha_nacimiento} onChange={(e) => setFecha_nacimiento(e.target.value)} />
-                <label htmlFor="" className="form-label">
-                  Telefono
-                </label>
-                <input type="text" className="form-control" id="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-                <label htmlFor="sexo" className="form-label">
-                  Sexo
-                </label>
-                <div className="mb-2">
-                  <div className="form-check-inline">
-                    <label htmlFor="masculino" className="form-check-label">
-                      <input type="radio" className="form-check-input" name="sexo" id="masculino" value="Masculino" checked={sexo === "Masculino"} onChange={(e) => setSexo(e.target.value)} />{" "}
-                      Masculino
-                    </label>
+      <Table columns={columns} data={pacientes} nameTable={"Pacientes"} />
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-gray-900/75 backdrop-blur-sm transition-opacity" onClick={closeModal}></div>
+
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full relative">
+              <div className="bg-green-600 px-4 py-3 sm:px-6 flex justify-between items-center">
+                <h3 className="text-lg font-medium text-white">Agregar nuevo paciente</h3>
+                <button onClick={closeModal} className="text-white hover:text-gray-200">
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
+                        Foto del paciente
+                      </label>
+                      <input
+                        type="file"
+                        id="image"
+                        className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-100 file:text-green-700 hover:file:bg-green-200"
+                        onChange={(e) => setSelectedFile(e.target.files[0])}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre
+                      </label>
+                      <input
+                        type="text"
+                        id="nombre"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={nombre}
+                        onChange={(e) => setNombre(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="primer_apellido" className="block text-sm font-medium text-gray-700 mb-1">
+                        Primer apellido
+                      </label>
+                      <input
+                        type="text"
+                        id="primer_apellido"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={primer_apellido}
+                        onChange={(e) => setPrimer_apellido(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="segundo_apellido" className="block text-sm font-medium text-gray-700 mb-1">
+                        Segundo apellido
+                      </label>
+                      <input
+                        type="text"
+                        id="segundo_apellido"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={segundo_apellido}
+                        onChange={(e) => setSegundo_apellido(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="usuario" className="block text-sm font-medium text-gray-700 mb-1">
+                        Usuario
+                      </label>
+                      <input
+                        type="text"
+                        id="usuario"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={usuario}
+                        onChange={(e) => setUsuario(e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="form-check-inline">
-                    <label htmlFor="femenino" className="form-check-label">
-                      <input type="radio" className="form-check-input" name="sexo" id="femenino" value="Femenino" checked={sexo === "Femenino"} onChange={(e) => setSexo(e.target.value)} /> Femenino
-                    </label>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="correo" className="block text-sm font-medium text-gray-700 mb-1">
+                        Correo electrónico
+                      </label>
+                      <input
+                        type="email"
+                        id="correo"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={correo}
+                        onChange={(e) => setCorreo(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="contrasenia" className="block text-sm font-medium text-gray-700 mb-1">
+                        Contraseña
+                      </label>
+                      <input
+                        type="password"
+                        id="contrasenia"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={contrasenia}
+                        onChange={(e) => setContrasenia(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">
+                        Teléfono
+                      </label>
+                      <input
+                        type="text"
+                        id="telefono"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={telefono}
+                        onChange={(e) => setTelefono(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="fecha_nacimiento" className="block text-sm font-medium text-gray-700 mb-1">
+                        Fecha de nacimiento
+                      </label>
+                      <input
+                        type="date"
+                        id="fecha_nacimiento"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
+                        value={fecha_nacimiento}
+                        onChange={(e) => setFecha_nacimiento(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Sexo</label>
+                      <div className="flex space-x-4">
+                        <label className="inline-flex items-center">
+                          <input
+                            type="radio"
+                            name="sexo"
+                            value="Masculino"
+                            checked={sexo === "Masculino"}
+                            onChange={(e) => setSexo(e.target.value)}
+                            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                          />
+                          <span className="ml-2 text-gray-700">Masculino</span>
+                        </label>
+                        <label className="inline-flex items-center">
+                          <input
+                            type="radio"
+                            name="sexo"
+                            value="Femenino"
+                            checked={sexo === "Femenino"}
+                            onChange={(e) => setSexo(e.target.value)}
+                            className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                          />
+                          <span className="ml-2 text-gray-700">Femenino</span>
+                        </label>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </Col>
-            </Row>
-          </Container>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-secondary" onClick={closeModal}>
-            Cancelar
-          </button>
-          <button className="btn btn-primary" onClick={handleRegisterPaciente}>
-            Guardar paciente
-          </button>
-        </Modal.Footer>
-      </Modal>
-    </>
+              </div>
+
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  onClick={handleRegisterPaciente}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-green-600 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Guardar paciente
+                </button>
+                <button
+                  onClick={closeModal}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

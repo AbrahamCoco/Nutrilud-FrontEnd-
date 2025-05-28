@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function Clock() {
+export default function Clock({ className = "" }) {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -14,8 +14,25 @@ export default function Clock() {
     const seconds = String(time.getSeconds()).padStart(2, "0");
     const ampm = time.getHours() >= 12 ? "PM" : "AM";
 
-    return `${hours}:${minutes}:${seconds} ${ampm}`;
+    return (
+      <>
+        <span className="hours">{hours}</span>
+        <span className="separator">:</span>
+        <span className="minutes">{minutes}</span>
+        <span className="separator">:</span>
+        <span className="seconds">{seconds}</span>
+        <span className="ampm ml-2">{ampm}</span>
+      </>
+    );
   };
 
-  return <div>{formatTime(currentTime)}</div>;
+  return (
+    <div className={`flex items-center justify-center font-mono ${className}`}>
+      <div className="bg-gray-100 rounded-lg p-3 shadow-inner">
+        <div className="text-2xl font-bold text-gray-800 tracking-wider">
+          {formatTime(currentTime)}
+        </div>
+      </div>
+    </div>
+  );
 }
