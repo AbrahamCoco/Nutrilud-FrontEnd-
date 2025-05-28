@@ -1,11 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import {
-  FaArrowAltCircleLeft,
-  FaArrowAltCircleRight,
-  FaSearch,
-  FaTimes,
-} from "react-icons/fa";
+import { FaArrowAltCircleLeft, FaArrowAltCircleRight, FaSearch, FaSortDown, FaSortUp, FaTimes } from "react-icons/fa";
 
 export default function Table({ columns, data, nameTable }) {
   const [sortField, setSortField] = useState(null);
@@ -20,9 +15,7 @@ export default function Table({ columns, data, nameTable }) {
 
     if (searchText) {
       newFilteredData = data.filter((row) => {
-        const nombreColumn = columns.find(
-          (col) => col.name.toLowerCase() === "nombre"
-        );
+        const nombreColumn = columns.find((col) => col.name.toLowerCase() === "nombre");
         if (nombreColumn && nombreColumn.selector) {
           const value = nombreColumn.selector(row)?.toString().toLowerCase();
           return value?.includes(searchText.toLowerCase());
@@ -49,15 +42,7 @@ export default function Table({ columns, data, nameTable }) {
         if (!sortField) return 0;
         const valueA = a[sortField]?.toString().toLowerCase() || "";
         const valueB = b[sortField]?.toString().toLowerCase() || "";
-        return valueA < valueB
-          ? sortOrder === "asc"
-            ? -1
-            : 1
-          : valueA > valueB
-          ? sortOrder === "asc"
-            ? 1
-            : -1
-          : 0;
+        return valueA < valueB ? (sortOrder === "asc" ? -1 : 1) : valueA > valueB ? (sortOrder === "asc" ? 1 : -1) : 0;
       })
     : [];
 
@@ -87,10 +72,7 @@ export default function Table({ columns, data, nameTable }) {
             onChange={(e) => setSearchText(e.target.value)}
           />
           {searchText && (
-            <button
-              onClick={clearSearch}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-green-600 transition-colors"
-            >
+            <button onClick={clearSearch} className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-green-600 transition-colors">
               <FaTimes className="text-green-500" />
             </button>
           )}
@@ -111,11 +93,7 @@ export default function Table({ columns, data, nameTable }) {
                 >
                   <div className="flex items-center gap-1">
                     {column.name}
-                    {sortField === column.name && (
-                      <span className="text-green-600">
-                        {sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />}
-                      </span>
-                    )}
+                    {sortField === column.name && <span className="text-green-600">{sortOrder === "asc" ? <FaSortUp /> : <FaSortDown />}</span>}
                   </div>
                 </th>
               ))}
@@ -124,22 +102,10 @@ export default function Table({ columns, data, nameTable }) {
           <tbody className="bg-white divide-y divide-green-100">
             {paginatedData.length > 0 ? (
               paginatedData.map((row, rowIndex) => (
-                <tr
-                  key={row.id}
-                  className={`hover:bg-green-50 transition-colors ${
-                    rowIndex % 2 === 0 ? "bg-white" : "bg-green-50"
-                  }`}
-                >
+                <tr key={row.id} className={`hover:bg-green-50 transition-colors ${rowIndex % 2 === 0 ? "bg-white" : "bg-green-50"}`}>
                   {columns.map((column, colIndex) => (
-                    <td
-                      key={colIndex}
-                      className="px-6 py-4 whitespace-nowrap text-sm text-gray-800"
-                    >
-                      {column.cell
-                        ? column.cell(row)
-                        : column.selector
-                        ? column.selector(row)
-                        : null}
+                    <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                      {column.cell ? column.cell(row) : column.selector ? column.selector(row) : null}
                     </td>
                   ))}
                 </tr>
@@ -148,26 +114,11 @@ export default function Table({ columns, data, nameTable }) {
               <tr>
                 <td colSpan={columns.length} className="px-6 py-8 text-center">
                   <div className="text-green-600 flex flex-col items-center justify-center">
-                    <svg
-                      className="w-12 h-12 mb-3 text-green-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1.5}
-                        d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                      />
+                    <svg className="w-12 h-12 mb-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="text-lg font-medium">
-                      No se encontraron resultados
-                    </span>
-                    <button
-                      onClick={clearSearch}
-                      className="mt-2 text-green-600 hover:text-green-800 text-sm flex items-center"
-                    >
+                    <span className="text-lg font-medium">No se encontraron resultados</span>
+                    <button onClick={clearSearch} className="mt-2 text-green-600 hover:text-green-800 text-sm flex items-center">
                       <FaTimes className="mr-1" /> Limpiar búsqueda
                     </button>
                   </div>
@@ -185,9 +136,7 @@ export default function Table({ columns, data, nameTable }) {
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
-              currentPage === 1
-                ? "border-green-200 bg-green-100 text-green-400"
-                : "border-green-300 bg-white text-green-700 hover:bg-green-100"
+              currentPage === 1 ? "border-green-200 bg-green-100 text-green-400" : "border-green-300 bg-white text-green-700 hover:bg-green-100"
             }`}
           >
             Anterior
@@ -199,9 +148,7 @@ export default function Table({ columns, data, nameTable }) {
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
             className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
-              currentPage === totalPages
-                ? "border-green-200 bg-green-100 text-green-400"
-                : "border-green-300 bg-white text-green-700 hover:bg-green-100"
+              currentPage === totalPages ? "border-green-200 bg-green-100 text-green-400" : "border-green-300 bg-white text-green-700 hover:bg-green-100"
             }`}
           >
             Siguiente
@@ -211,19 +158,8 @@ export default function Table({ columns, data, nameTable }) {
         <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <p className="text-sm text-green-700">
-              Mostrando{" "}
-              <span className="font-medium text-green-800">
-                {startIndex + 1}
-              </span>{" "}
-              a{" "}
-              <span className="font-medium text-green-800">
-                {startIndex + paginatedData.length}
-              </span>{" "}
-              de{" "}
-              <span className="font-medium text-green-800">
-                {sortedData.length}
-              </span>{" "}
-              registros
+              Mostrando <span className="font-medium text-green-800">{startIndex + 1}</span> a <span className="font-medium text-green-800">{startIndex + paginatedData.length}</span> de{" "}
+              <span className="font-medium text-green-800">{sortedData.length}</span> registros
             </p>
             <select
               className="block w-20 pl-3 pr-10 py-2 text-base border-green-300 focus:outline-none focus:ring-green-400 focus:border-green-500 sm:text-sm rounded-md text-green-700 bg-white"
@@ -242,28 +178,19 @@ export default function Table({ columns, data, nameTable }) {
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`p-2 rounded-full ${
-                currentPage === 1
-                  ? "text-green-300"
-                  : "text-green-600 hover:bg-green-100 hover:text-green-800"
-              } transition-colors`}
+              className={`p-2 rounded-full ${currentPage === 1 ? "text-green-300" : "text-green-600 hover:bg-green-100 hover:text-green-800"} transition-colors`}
             >
               <FaArrowAltCircleLeft className="h-5 w-5" />
             </button>
 
             <span className="text-sm text-green-700">
-              Página <span className="font-medium">{currentPage}</span> de{" "}
-              <span className="font-medium">{totalPages}</span>
+              Página <span className="font-medium">{currentPage}</span> de <span className="font-medium">{totalPages}</span>
             </span>
 
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`p-2 rounded-full ${
-                currentPage === totalPages
-                  ? "text-green-300"
-                  : "text-green-600 hover:bg-green-100 hover:text-green-800"
-              } transition-colors`}
+              className={`p-2 rounded-full ${currentPage === totalPages ? "text-green-300" : "text-green-600 hover:bg-green-100 hover:text-green-800"} transition-colors`}
             >
               <FaArrowAltCircleRight className="h-5 w-5" />
             </button>
