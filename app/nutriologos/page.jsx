@@ -11,7 +11,10 @@ export default function NutriologosPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           <div className="relative h-64 overflow-hidden">
-            <Image src="/images/nutriologo1.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Nutriólogo 1" />
+            <Image src="/images/nutriologo1.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Nutriólogo 1"
+            width={500}
+            height={300}
+             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
           </div>
           <div className="p-6">
@@ -27,7 +30,10 @@ export default function NutriologosPage() {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           <div className="relative h-64 overflow-hidden">
-            <Image src="/images/nutriologo2.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Nutriólogo 2" />
+            <Image src="/images/nutriologo2.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Nutriólogo 2"
+            width={500}
+            height={300}
+            />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
           </div>
           <div className="p-6">
@@ -43,7 +49,10 @@ export default function NutriologosPage() {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
           <div className="relative h-64 overflow-hidden">
-            <Image src="/images/nutriologo3.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Nutriólogo 3" />
+            <Image src="/images/nutriologo3.jpg" className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" alt="Nutriólogo 3"
+            width={500}
+            height={300}
+             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
           </div>
           <div className="p-6">
