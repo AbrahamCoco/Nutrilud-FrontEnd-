@@ -50,7 +50,7 @@ export default function ArticulosCarousel({ articulos, primerEncabezado }) {
                 />
                 <p className="text-gray-200 text-sm text-center">
                   Publicado el{" "}
-                  {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
+                  {new Date(articulo.articulocreated.split(" ")[0]).toLocaleDateString("es-ES", {
                     year: "numeric",
                     month: "long",
                     day: "numeric",

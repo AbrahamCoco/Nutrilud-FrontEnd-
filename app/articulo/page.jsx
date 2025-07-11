@@ -55,7 +55,7 @@ export default function ArticulosPage() {
                       <p className="text-gray-500 text-sm mt-auto">
                         Publicado el{" "}
                         <span className="font-medium">
-                          {new Date(articulo.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
+                          {new Date(articulo.articulocreated.split(" ")[0]).toLocaleDateString("es-ES", {
                             year: "numeric",
                             month: "long",
                             day: "numeric",

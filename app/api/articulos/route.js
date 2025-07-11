@@ -36,7 +36,7 @@ export async function GET(request) {
     // Obtener un solo artículo por ID
     try {
       const response = await Tarjet.nutriologoApi.getArticuloId(id);
-      const articuloData = response.data.data[0];
+      const articuloData = response.data.data;
 
       if (!articuloData || !articuloData.contenido) {
         return new Response(JSON.stringify({ error: "Contenido del artículo no encontrado" }), {

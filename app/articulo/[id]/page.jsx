@@ -40,13 +40,13 @@ export default function Articulo({ params }) {
             <div>
               <p className="font-medium text-gray-700">Nutriólogo:</p>
               <p className="text-green-800 font-semibold">
-                {articuloData?.tusuario_nutriologo?.nombre} {articuloData?.tusuario_nutriologo?.primer_apellido} {articuloData?.tusuario_nutriologo?.segundo_apellido}
+                {articuloData?.nameNutriologo}
               </p>
             </div>
             <div>
               <p className="font-medium text-gray-700">Fecha de publicación:</p>
               <p className="text-green-800">
-                {new Date(articuloData?.created_at.split(" ")[0]).toLocaleDateString("es-ES", {
+                {new Date(articuloData?.articulocreated.split(" ")[0]).toLocaleDateString("es-ES", {
                   year: "numeric",
                   month: "long",
                   day: "numeric",
