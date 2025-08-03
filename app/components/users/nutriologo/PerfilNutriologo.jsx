@@ -1,10 +1,22 @@
+"use client";
 import { PerfilController } from "@/app/perfil/[id]/[rol]/perfilController";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
-export default async function PerfilNutriologo({ id }) {
-  const response = await PerfilController.getUser(id);
-  const userData = response?.data;
-  const nutriologoData = userData?.tusuario_nutriologos;
+export default function PerfilNutriologo({ id }) {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await PerfilController.getUser(id);
+      console.log("User Data:", response?.data);
+      if (response?.data) {
+        setUserData(response.data);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   return (
     <div className="mx-auto px-2 sm:px-2 lg:px-3 py-3">
@@ -32,10 +44,10 @@ export default async function PerfilNutriologo({ id }) {
           <div className="flex flex-col md:flex-row gap-8">
             <div className="md:w-1/4 flex flex-col items-center">
               <div className="relative group">
-                {nutriologoData?.foto ? (
+                {userData?.foto ? (
                   <Image
                     src={nutriologoData.foto}
-                    alt={`${userData.nombre} ${userData.primer_apellido}`}
+                    alt={`${userData.nombre}`}
                     className="w-48 h-48 md:w-64 md:h-64 rounded-full object-cover border-4 border-white shadow-lg transition-all duration-300 group-hover:border-green-500 group-hover:scale-105"
                   />
                 ) : (
@@ -71,9 +83,9 @@ export default async function PerfilNutriologo({ id }) {
             <div className="md:w-3/4 space-y-6">
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
-                  {userData?.nombre} {userData?.primer_apellido} {userData?.segundo_apellido}
+                  {userData?.nombre}
                 </h2>
-                {nutriologoData?.especialidad && (
+                {/* {userData?.especialidad && ( */}
                   <p className="text-green-600 font-medium mt-2 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                       <path
@@ -82,9 +94,9 @@ export default async function PerfilNutriologo({ id }) {
                         clipRule="evenodd"
                       />
                     </svg>
-                    {nutriologoData.especialidad}
+                    {userData?.especialidad || "Nutrición General"}
                   </p>
-                )}
+                {/* )} */}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -111,7 +123,7 @@ export default async function PerfilNutriologo({ id }) {
                       </svg>
                       Teléfono
                     </h3>
-                    <p className="mt-2 text-gray-700 font-medium">{nutriologoData?.telefono || "No proporcionado"}</p>
+                    <p className="mt-2 text-gray-700 font-medium">{userData?.telefono || "No proporcionado"}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg hover:bg-green-50 transition-colors duration-200">
@@ -122,7 +134,7 @@ export default async function PerfilNutriologo({ id }) {
                       </svg>
                       Dirección
                     </h3>
-                    <p className="mt-2 text-gray-700 font-medium">{nutriologoData?.direccion || "No proporcionada"}</p>
+                    <p className="mt-2 text-gray-700 font-medium">{userData?.direccion || "No proporcionada"}</p>
                   </div>
                 </div>
 
@@ -139,7 +151,7 @@ export default async function PerfilNutriologo({ id }) {
                       </svg>
                       Cédula Profesional
                     </h3>
-                    <p className="mt-2 text-gray-700 font-medium">{nutriologoData?.cedula_profesional || "No proporcionada"}</p>
+                    <p className="mt-2 text-gray-700 font-medium">{userData?.cedula || "No proporcionada"}</p>
                   </div>
 
                   <div className="bg-gray-50 p-4 rounded-lg hover:bg-green-50 transition-colors duration-200">
@@ -154,7 +166,7 @@ export default async function PerfilNutriologo({ id }) {
                       </svg>
                       Descripción
                     </h3>
-                    <p className="mt-2 text-gray-700">{nutriologoData?.descripcion || "Este profesional no ha agregado una descripción."}</p>
+                    <p className="mt-2 text-gray-700">{userData?.descripcion || "Este profesional no ha agregado una descripción."}</p>
                   </div>
 
                   <div className="pt-2">

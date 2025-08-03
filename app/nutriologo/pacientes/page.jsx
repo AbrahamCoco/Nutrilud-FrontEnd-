@@ -109,12 +109,12 @@ export default function Pacientes() {
     },
     {
       name: "Nombre",
-      selector: (row) => `${row.nombre} ${row.primer_apellido} ${row.segundo_apellido}`,
+      selector: (row) => `${row.nombrePaciente}`,
       sortable: true,
     },
     {
       name: "Sexo",
-      selector: (row) => row.tusuario_pacientes.sexo,
+      selector: (row) => row.sexo,
       sortable: true,
     },
     {
@@ -126,9 +126,9 @@ export default function Pacientes() {
       name: "Teléfono",
       cell: (row) => (
         <div className="flex items-center gap-2">
-          <Link href={`https://wa.me/${row.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-600 transition-colors">
+          <Link href={`https://wa.me/${row.telefono}`} target="_blank" rel="noopener noreferrer" className="text-green-500 hover:text-green-600 transition-colors">
             <span className="flex items-center gap-1">
-              {row.tusuario_pacientes.telefono} <BsWhatsapp className="text-lg" />
+              {row.telefono} <BsWhatsapp className="text-lg" />
             </span>
           </Link>
         </div>
@@ -137,7 +137,7 @@ export default function Pacientes() {
     {
       name: "Estadísticas",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/estadisticas/${row.tusuario_pacientes.id}`} className="flex justify-center">
+        <Link href={`/nutriologo/pacientes/estadisticas/${row.id_paciente}`} className="flex justify-center">
           <button className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors">
             <ImStatsDots />
           </button>
@@ -147,7 +147,7 @@ export default function Pacientes() {
     {
       name: "Consulta",
       cell: (row) => (
-        <Link href={`/nutriologo/pacientes/consulta/${row.tusuario_pacientes.id}`} className="flex justify-center">
+        <Link href={`/nutriologo/pacientes/consulta/${row.id_paciente}`} className="flex justify-center">
           <button className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-colors">
             <FaFolderOpen />
           </button>

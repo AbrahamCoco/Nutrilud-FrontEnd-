@@ -3,7 +3,7 @@ import { Utils } from "@/app/utils/utils";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BsFileEarmarkMedicalFill, BsWhatsapp } from "react-icons/bs";
+import { BsWhatsapp } from "react-icons/bs";
 import { ConsultaController } from "./consultaController";
 
 export default function Consulta() {
@@ -133,34 +133,33 @@ export default function Consulta() {
               <tr className="border-b border-gray-200 hover:bg-gray-50">
                 <td className="py-3 px-4">
                   <strong>
-                    {paciente.nombre} {paciente.primer_apellido} {paciente.segundo_apellido}
+                    {paciente.nombrePaciente}
                   </strong>
                 </td>
-                <td className="py-3 px-4">{paciente.tusuario_pacientes.alergias}</td>
-                <td className="py-3 px-4">{paciente.tusuario_pacientes.sexo}</td>
-                <td className="py-3 px-4">{calcularEdad(paciente.tusuario_pacientes.fecha_nacimiento)} años</td>
+                <td className="py-3 px-4">{paciente.alergias}</td>
+                <td className="py-3 px-4">{paciente.sexo}</td>
+                <td className="py-3 px-4">{calcularEdad(paciente.fechaNacimiento)} años</td>
                 <td className="py-3 px-4">{paciente.correo}</td>
                 <td className="py-3 px-4 flex items-center">
-                  {paciente.tusuario_pacientes.telefono}
-                  <Link href={`https://wa.me/${paciente.tusuario_pacientes.telefono}`} target="_blank" rel="noopener noreferrer" className="ml-2 text-green-600 hover:text-green-800">
+                  {paciente.telefono}
+                  <Link href={`https://wa.me/${paciente.telefono}`} target="_blank" rel="noopener noreferrer" className="ml-2 text-green-600 hover:text-green-800">
                     <BsWhatsapp className="text-xl" />
                   </Link>
                 </td>
                 <td className="py-3 px-4">
                   <Link
-                    href={{
-                      pathname: `/nutriologo/pacientes/consulta/${id}/recordatorios`,
-                      query: {
-                        id_paciente: paciente.tusuario_pacientes.id,
-                        nombre: paciente.nombre,
-                        primer_apellido: paciente.primer_apellido,
-                        segundo_apellido: paciente.segundo_apellido,
-                        fecha_nacimiento: paciente.tusuario_pacientes.fecha_nacimiento,
-                      },
-                    }}
+                    href={{pathname: `/nutriologo/pacientes/consulta/${id}/new_recordatorios`}}
                     className="inline-flex items-center justify-center p-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
                   >
-                    <BsFileEarmarkMedicalFill className="text-lg" />
+                    Nuevo
+                  </Link>
+                  <Link
+                    href={{
+                      pathname: `/nutriologo/pacientes/consulta/${id}/history_recordatorios`,
+                    }}
+                    className="ml-2 inline-flex items-center justify-center p-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    Historial
                   </Link>
                 </td>
               </tr>
