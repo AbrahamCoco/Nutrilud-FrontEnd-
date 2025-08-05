@@ -113,7 +113,7 @@ export default function Navbar(){
               </Link>
 
               <div className="hidden md:flex space-x-6">
-                <Link href="/articulo" className="text-green-100 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200">
+                <Link href="/articulos" className="text-green-100 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200">
                   Artículos
                 </Link>
                 <Link href="/servicios" className="text-green-100 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200">
