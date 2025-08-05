@@ -56,4 +56,18 @@ export class Utils {
       timerProgressBar: true,
     })
   }
+
+  static swalInfo(message: string) {
+    Swal.fire({
+      position: "bottom-end",
+      toast: true,
+      showConfirmButton: false,
+      icon: "info",
+      width: 300,
+      title: "Informacion...!",
+      text: message,
+      timer: 3000,
+      timerProgressBar: true,
+    })
+  }
 }
