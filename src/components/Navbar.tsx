@@ -134,7 +134,7 @@ export default function Navbar(){
             <div className="flex items-center">
               {rol ? (
                 <div className="flex items-center space-x-4">
-                  <Link href={`/perfil/${id}/${rol}`} className="hidden md:block text-green-100 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200">
+                  <Link href={`/perfil/${rol}/${id}`} className="hidden md:block text-green-100 hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200">
                     Mi Perfil
                   </Link>
                   <div className="relative">
