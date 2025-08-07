@@ -1,7 +1,7 @@
 "use client";
 import Clock from "@/components/Clock";
-import Itinerario from "@/components/Itinerario";
-import { NutriologoController } from "@/controllers/nutriologo/agendaController";
+import Itinerario from "@/components/users/nutriologo/Itinerario";
+import { AgendaController } from "@/controllers/nutriologo/agendaController";
 import { JSX, useEffect, useState } from "react";
 
 export default function NutriologoPage() {
@@ -10,7 +10,7 @@ export default function NutriologoPage() {
   useEffect(() => {
     const loadAgenda = async () => {
       try {
-        const response = await NutriologoController.getAgenda(parseInt(sessionStorage.getItem("id_nutriologo") || "0"));
+        const response = await AgendaController.getAgenda(parseInt(sessionStorage.getItem("id_nutriologo") || "0"));
         setEventos(response || []);
       } catch (error) {
         setEventos([]);

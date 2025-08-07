@@ -3,7 +3,7 @@
 import dayjs from "dayjs";
 import localeEs from "dayjs/locale/es";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import advancedFormat from "dayjs/plugin/advancedFormat"; // para usar [de], etc.
+import advancedFormat from "dayjs/plugin/advancedFormat";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -11,7 +11,7 @@ dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(advancedFormat);
 dayjs.locale(localeEs);
-// Tipado del evento
+
 interface Evento {
   id?: number | string;
   title: string;

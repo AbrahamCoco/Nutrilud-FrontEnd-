@@ -1,7 +1,7 @@
 import { Tarjet } from "@/utils/axiosConfig";
 import { Utils } from "@/utils/utils";
 
-export class NutriologoController {
+export class AgendaController {
   static async getAgenda(id_nutriologo: number) {
     try {
       const response = await Tarjet.nutriologoApi.getAgenda(id_nutriologo);
