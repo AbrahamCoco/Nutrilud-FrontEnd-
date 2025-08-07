@@ -7,7 +7,7 @@ export class AgregarArticuloController {
     return this._handleRequest(() => Tarjet.userApi.upluoadImage(data, {headers: { "Content-Type": "multipart/form-data" }}), "No se subio ninguna imagen.", "Imagen guardada");
   }
 
-  static async AddArticulo(data: string) {
+  static async AddArticulo(data: any) {
     return this._handleRequest(() => Tarjet.nutriologoApi.addArticulo(data), "Error al agregar articulo", "Articulo agregado");
   }
 

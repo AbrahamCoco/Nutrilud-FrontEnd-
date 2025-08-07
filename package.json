@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tinymce/tinymce-react": "^6.3.0",
     "axios": "^1.11.0",
     "dayjs": "^1.11.13",
     "jsdom": "^26.1.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.4.5",
+    "pica": "^9.0.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "sweetalert2": "^11.22.2"
