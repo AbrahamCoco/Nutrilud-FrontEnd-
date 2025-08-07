@@ -1,5 +1,5 @@
 import type { ResponseApi } from "@/interfaces/responseApi";
-import axios, { AxiosInstance, AxiosResponse } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 const baseURL: string = "http://localhost:8080/api/v1";
 
@@ -13,11 +13,11 @@ export const Tarjet = {
     login: (usuario: string, contrasenia: string): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.post(`/personal_access_token/login`, {usuario, contrasenia}),
 
-    register: (data: any): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.post("/users/insert", data),
+    register: (data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
+      axiosInstance.post("/users/insert", data, config),
 
-    upluoadImage: (data: FormData): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.post("/personal_access_token/insert_archivo", data),
+    upluoadImage: (data: FormData, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
+      axiosInstance.post("/personal_access_token/insert_archivo", data, config),
 
     getUser: (id: number): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.get(`/users/findById`, { params: { id } }),
