@@ -1,8 +1,8 @@
 "use client";
-
 import { use } from "react";
 import { Utils } from "@/utils/utils";
 import { useEffect, useState } from "react";
+import { Params } from "@/interfaces/params";
 
 interface Articulo {
   nameNutriologo: string;
@@ -10,12 +10,8 @@ interface Articulo {
   [key: string]: any;
 }
 
-interface Props {
-  params: Promise<{ id: string }>; // <- ahora es una Promise
-}
-
-export default function ArticuloPage({ params }: Props) {
-  const resolvedParams = use(params); // <- se resuelve al inicio
+export default function ArticuloPage({ params }: Params) {
+  const resolvedParams = use(params);
   const { id } = resolvedParams;
 
   const [titulo, setTitulo] = useState<string | null>(null);
