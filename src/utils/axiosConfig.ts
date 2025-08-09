@@ -1,3 +1,4 @@
+import { ConsultaFormulario } from "@/interfaces/nutriologo/consultaFormulario.d";
 import type { ResponseApi } from "@/interfaces/responseApi";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
@@ -53,8 +54,8 @@ export const Tarjet = {
     getAllConsultas: (id: number): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.get(`/tdatos_consultas/findConsultasByPaciente`, { params: { id } }),
 
-    addConsulta: (data: any): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.post(`/tdatos_consultas/insert`, data),
+    addConsulta: (data: ConsultaFormulario, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
+      axiosInstance.post(`/tdatos_consultas/insert`, data, config),
 
     addRecordatorio: (data: any): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.post("/t_recordatorios/insert", data),
