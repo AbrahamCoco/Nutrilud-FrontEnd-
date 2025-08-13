@@ -60,40 +60,26 @@ public/             # Assets estáticos
 
 ## ✨ Características UI/UX
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin: 20px 0">
-  <div style="background: #f7fafc; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h3 style="font-size: 1.25rem; color: #2d3748; margin-bottom: 10px">🎨 Diseño Moderno</h3>
-    <ul style="list-style: none; padding: 0; margin: 0; color: #4a5568;">
-      <li>Sistema de diseño basado en Tailwind</li>
-      <li>Paleta de colores profesionales</li>
-      <li>Tipografía legible y accesible</li>
-    </ul>
-  </div>
-  <div style="background: #f7fafc; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h3 style="font-size: 1.25rem; color: #2d3748; margin-bottom: 10px">📱 Responsive Design</h3>
-    <ul style="list-style: none; padding: 0; margin: 0; color: #4a5568;">
-      <li>Adaptable a móvil, tablet y desktop</li>
-      <li>Componentes flexibles</li>
-      <li>Optimización de touch targets</li>
-    </ul>
-  </div>
-  <div style="background: #f7fafc; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h3 style="font-size: 1.25rem; color: #2d3748; margin-bottom: 10px">⚡ Performance</h3>
-    <ul style="list-style: none; padding: 0; margin: 0; color: #4a5568;">
-      <li>Carga optimizada</li>
-      <li>Code splitting automático</li>
-      <li>Imágenes lazy-loaded</li>
-    </ul>
-  </div>
-  <div style="background: #f7fafc; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-    <h3 style="font-size: 1.25rem; color: #2d3748; margin-bottom: 10px">♿ Accesibilidad</h3>
-    <ul style="list-style: none; padding: 0; margin: 0; color: #4a5568;">
-      <li>ARIA labels completos</li>
-      <li>Contraste AA/AAA</li>
-      <li>Navegación por teclado</li>
-    </ul>
-  </div>
-</div>
+### 🎨 Diseño Moderno
+
+- Sistema de diseño basado en Tailwind
+- Paleta de colores profesionales
+- Tipografía legible y accesible
+
+### 📱 Responsive Design
+- Adaptable a móvil, tablet y desktop
+- Componentes flexibles
+- Optimización de touch targets
+
+### ⚡ Performance
+- Carga optimizada
+- Code splitting automático
+- Imágenes lazy-loaded
+
+### ♿ Accesibilidad
+- ARIA labels completos
+- Contraste AA/AAA
+- Navegación por teclado
 
 ---
 
