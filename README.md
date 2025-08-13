@@ -1,5 +1,3 @@
----
-
 ## 🗺️ Roadmap
 
 - [x] Estructura base con Next.js y Tailwind CSS
