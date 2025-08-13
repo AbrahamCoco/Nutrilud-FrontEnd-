@@ -29,7 +29,7 @@ Nutrilud FrontEnd es una plataforma profesional para la gestión nutricional que
 
 ### Frontend Principal
 | Tecnología       | Versión  | Uso Principal                |
-|-----------------------------|------------------------------|
+|------------------|----------|------------------------------|
 | Next.js          | 15.4.5   | Framework base               |
 | React            | 19.1.0   | Componentes UI               |
 | TypeScript       | 5        | Tipado estático              |
@@ -105,9 +105,19 @@ public/             # Assets estáticos
 - npm 9 o superior
 
 ### Instalación
+
+Clona el repositorio:
 ```bash
 git clone https://github.com/AbrahamCoco/Nutrilud-FrontEnd-.git
+```
+
+Navega al directorio del proyecto:
+```bash
 cd Nutrilud-FrontEnd-
+```
+
+Instala las dependencias:
+```bash
 npm install
 ```
 
@@ -129,7 +139,7 @@ npm install
 ## 📬 Contacto
 
 Para más información o contribuciones, contacta a:
-- **Abraham Coco** - [GitHub](abrahamCoco) | [LinkedIn](www.linkedin.com/in/abraham-cocoletzi-zempoalteca)
+- **Abraham Coco**
 - **Email**: abraham.cocoletzi.z@gmail.com
 
 ## 📜 Licencia
@@ -138,10 +148,10 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE)
 
 <div align="center" style="margin-top: 40px">
   <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px">
-    <img src="public/next.svg" width="50" />
-    <img src="public/vercel.svg" width="50" />
-    <img src="public/window.svg" width="50" />
-    <img src="public/file.svg" width="50" />
+    <img src="https://img.shields.io/logo/nextdotjs" width="50" />
+    <img src="https://img.shields.io/logo/vercel" width="50" />
+    <img src="https://img.shields.io/logo/windows" width="50" />
+    <img src="https://img.shields.io/logo/github" width="50" />
   </div> 
   <p style="font-size: 1.1rem; color: #4a5568">
     <strong>¡Contribuciones bienvenidas!</strong> Ayúdanos a mejorar la salud digital 💚
