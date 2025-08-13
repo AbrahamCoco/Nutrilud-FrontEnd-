@@ -1,10 +1,9 @@
 "use client";
 import { EstadisticasController } from "@/controllers/nutriologo/estadisticasController";
-import { Params } from "@/interfaces/params";
 import { MetricKey } from "@/types/metricKey";
 import { use, useEffect, useState } from "react";
 
-export default function EstadisticasPacientePage({params}: Params) {
+export default function EstadisticasPacientePage({params}: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [data, setData] = useState<any []>([]);
   const [activeTab, setActiveTab] = useState<MetricKey>("peso");

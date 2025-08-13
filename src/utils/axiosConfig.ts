@@ -57,8 +57,8 @@ export const Tarjet = {
     addConsulta: (data: ConsultaFormulario, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.post(`/tdatos_consultas/insert`, data, config),
 
-    addRecordatorio: (data: any): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.post("/t_recordatorios/insert", data),
+    addRecordatorio: (data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
+      axiosInstance.post("/t_recordatorios/insert", data, config),
 
     getRecordatorios: (id: number): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.get(`/t_recordatorios/findRecordatorioByPacienteId`, { params: { id } }),

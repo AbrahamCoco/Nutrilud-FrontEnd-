@@ -2,7 +2,6 @@
 import { ConsultaController } from "@/controllers/nutriologo/consultaController";
 import { ConsultaFormulario } from "@/interfaces/nutriologo/consultaFormulario";
 import { PacienteData } from "@/interfaces/nutriologo/pacienteData";
-import { Params } from "@/interfaces/params";
 import { Utils } from "@/utils/utils";
 import Link from "next/link";
 import { use, useEffect, useState } from "react";
@@ -25,7 +24,7 @@ const initialDatosFormulario: ConsultaFormulario = {
   siguiente_consulta: null,
 };
 
-export default function ConsultaPage({ params }: Params) {
+export default function ConsultaPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [paciente, setPaciente] = useState<PacienteData>();
   const [consulta, setConsulta] = useState<any[]>([]);
