@@ -73,10 +73,27 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Recordatorio de 24 hrs</h1>
-        <p className="text-gray-600 mb-6">Complete su registro alimenticio diario</p>
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-1 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Recordatorio de 24 Horas
+            </h1>
+            <p className="text-gray-600">Registro detallado de su consumo alimentario</p>
+          </div>
+          <div className="mt-4 md:mt-0">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </span>
+          </div>
+        </div>
 
-        <div className="overflow-x-auto bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="overflow-x-auto bg-white rounded-xl shadow-md border border-gray-100">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -85,29 +102,46 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
                     key={header}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    {header}
+                    <div className="flex items-center">
+                      {header}
+                      {header === "Hora" && (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                    </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {comidas.map((meal, i) => (
-                <tr key={meal} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{meal}</td>
+                <tr key={meal} className="hover:bg-gray-50 transition-colors duration-150">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="time"
-                      value={hora[i]}
-                      onChange={(e) => handleChange(setHora, i, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                    />
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0 h-8 w-8 rounded-full bg-green-50 flex items-center justify-center mr-3">
+                        <span className="text-green-600 font-medium">{i+1}</span>
+                      </div>
+                      <span className="font-medium text-gray-900">{meal}</span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="relative">
+                      <input
+                        type="time"
+                        value={hora[i]}
+                        onChange={(e) => handleChange(setHora, i, e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      />
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="text"
                       value={lugar[i]}
                       onChange={(e) => handleChange(setLugar, i, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Ej: Casa, Restaurante"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -115,7 +149,8 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
                       type="text"
                       value={alimentos[i]}
                       onChange={(e) => handleChange(setAlimentos, i, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Qué comió"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -123,7 +158,8 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
                       type="text"
                       value={porciones[i]}
                       onChange={(e) => handleChange(setPorciones, i, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Cantidad"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -131,7 +167,8 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
                       type="text"
                       value={marca[i]}
                       onChange={(e) => handleChange(setMarca, i, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Marca comercial"
                     />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -139,34 +176,45 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
                       type="text"
                       value={preparacion[i]}
                       onChange={(e) => handleChange(setPreparacion, i, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                      placeholder="Cómo se preparó"
                     />
                   </td>
                 </tr>
               ))}
 
-              <tr className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Otros</td>
+              <tr className="hover:bg-gray-50 transition-colors duration-150">
+                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Otros
+                </td>
                 <td colSpan={6} className="px-6 py-4">
                   <input
                     type="text"
                     value={otros}
                     onChange={(e) => setOtros(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                    placeholder="Detalles adicionales"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    placeholder="Bebidas, snacks, suplementos, etc."
                   />
                 </td>
               </tr>
 
-              <tr className="hover:bg-gray-50 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Comentarios</td>
+              <tr className="hover:bg-gray-50 transition-colors duration-150">
+                <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                  </svg>
+                  Comentarios
+                </td>
                 <td colSpan={6} className="px-6 py-4">
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={observaciones}
                     onChange={(e) => setObservaciones(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                    placeholder="Notas adicionales sobre su alimentación"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                    placeholder="Observaciones importantes, síntomas, etc."
                   />
                 </td>
               </tr>
@@ -174,18 +222,24 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
           </table>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mt-6">
+        <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 mt-8">
           <button
             onClick={() => window.history.back()}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
             Regresar
           </button>
           <button
             onClick={handleGuardarRecordatorio}
-            className="px-6 py-2 bg-green-600 text-white font-medium rounded-md hover:bg-green-700"
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-medium rounded-lg shadow-md hover:from-green-700 hover:to-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all transform hover:-translate-y-0.5"
           >
-            Guardar recordatorio
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            Guardar Recordatorio
           </button>
         </div>
       </div>
