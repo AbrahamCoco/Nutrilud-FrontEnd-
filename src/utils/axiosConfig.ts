@@ -62,6 +62,9 @@ export const Tarjet = {
 
     getRecordatorios: (id: number): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.get(`/t_recordatorios/findRecordatorioByPacienteId`, { params: { id } }),
+
+    updatePaciente: (id: number, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
+      axiosInstance.post(`/users/updatePaciente`, data, { params: { id }, ...config } ),
   },
 
   pacienteApi: {},

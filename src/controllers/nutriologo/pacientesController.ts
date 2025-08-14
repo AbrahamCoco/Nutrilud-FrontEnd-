@@ -31,10 +31,34 @@ export class PacientesController{
   static async deletePaciente(id: number) {
     try {
       const response = await Tarjet.nutriologoApi.deletePaciente(id);
-      Utils.swalSuccess("Paciente eliminado correctamente");
-      return response;
+      if (response.data.success) {
+        Utils.swalSuccess("Paciente eliminado correctamente");
+        return response.data;
+      } else {
+        Utils.swalError(response.data.message || "Error al eliminar el paciente.");
+        console.error("Error al eliminar el paciente:", response.data.message);
+      }
     } catch (error) {
       const errorMessage = (error instanceof Error) ? error.message : "Error al eliminar el paciente.";
+      Utils.swalError(errorMessage);
+      return null;
+    }
+  }
+
+  static async updatePaciente(id: number, data: any) {
+    try {
+      const response = await Tarjet.nutriologoApi.updatePaciente(id, data, {
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.data.success) {
+        Utils.swalSuccess("Paciente actualizado correctamente");
+        return response.data;
+      } else {
+        Utils.swalError(response.data.message || "Error al actualizar el paciente.");
+        console.error("Error al actualizar el paciente:", response.data.message);
+      }
+    } catch (error) {
+      const errorMessage = (error instanceof Error) ? error.message : "Error al actualizar el paciente.";
       Utils.swalError(errorMessage);
       return null;
     }
