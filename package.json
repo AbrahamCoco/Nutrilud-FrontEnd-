@@ -20,7 +20,7 @@
     "jspdf": "^3.0.1",
     "jspdf-autotable": "^5.0.2",
     "moment": "^2.30.1",
-    "next": "^15.2.4",
+    "next": "^15.3.3",
     "nutrilud-frontend-": "file:",
     "pica": "^9.0.1",
     "quill": "^2.0.3",
