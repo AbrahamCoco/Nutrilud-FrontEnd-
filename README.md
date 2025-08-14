@@ -1,45 +1,9 @@
-## 🗺️ Roadmap
-
-- [x] Estructura base con Next.js y Tailwind CSS
-- [x] Gestión de usuarios por roles (paciente, nutriólogo, administrador)
-- [x] Agendamiento de consultas y expedientes
-- [x] Publicación de artículos nutricionales
-- [x] Estadísticas y reportes
-- [ ] Sistema de notificaciones y recordatorios
-- [ ] Integración con servicios externos (Google Calendar, WhatsApp)
-- [ ] Tema oscuro y personalización avanzada
-- [ ] Internacionalización (i18n)
-- [ ] Pruebas automatizadas (unitarias y de integración)
-- [ ] Documentación técnica completa
-
----
-
-## ❓ Preguntas Frecuentes (FAQ)
-
-**¿Qué roles existen en la plataforma?**
-- Paciente, Nutriólogo y Administrador. Cada uno tiene acceso a funcionalidades específicas.
-
-**¿Cómo puedo contribuir al proyecto?**
-- Realiza un fork, crea tu rama y envía un pull request. Consulta la sección de Contribuciones en la documentación.
-
-**¿Qué tecnologías debo conocer para colaborar?**
-- Next.js, React, TypeScript y Tailwind CSS. El proyecto está documentado y es fácil de seguir.
-
-**¿El sistema es seguro?**
-- Sí, se implementan buenas prácticas de seguridad y manejo de datos sensibles.
-
-**¿Puedo desplegar el proyecto en Vercel?**
-- Sí, está optimizado para despliegue en Vercel y otros servicios compatibles con Next.js.
-
-**¿Dónde reporto errores o solicito nuevas funciones?**
-- Usa la sección de Issues en GitHub o contacta al autor por email.
-
 <div align="center">
   <img src="public/globe.svg" width="100" alt="Nutrilud Logo" />
   <h1>Nutrilud FrontEnd</h1>
   <p>🌱 <b>Transforma tu salud con nutrición inteligente</b> 🥗</p>
   <br/>
-  <img src="https://img.shields.io/github/workflow/status/AbrahamCoco/Nutrilud-FrontEnd-/CI?style=flat-square" alt="build status" />
+  <img src="https://img.shields.io/github/actions/workflow/status/AbrahamCoco/Nutrilud-FrontEnd-/CI.yml?style=flat-square" alt="build status" />
   <img src="https://img.shields.io/github/issues/AbrahamCoco/Nutrilud-FrontEnd-?style=flat-square" alt="issues" />
   <img src="https://img.shields.io/github/license/AbrahamCoco/Nutrilud-FrontEnd-?style=flat-square" alt="license" />
   <img src="https://img.shields.io/github/languages/top/AbrahamCoco/Nutrilud-FrontEnd-?style=flat-square" alt="main language" />
@@ -52,150 +16,167 @@
 
 ---
 
-
 ## 🎯 Descripción del Proyecto
-Nutrilud FrontEnd es una plataforma profesional para la gestión nutricional que ofrece:
 
-- **👨‍⚕️ Gestión integral** de pacientes y nutriólogos
-- **📅 Agendamiento inteligente** de consultas
-- **📊 Visualización avanzada** de estadísticas de salud
-- **📝 Publicación de artículos** nutricionales
-- **📱 Experiencia responsiva** optimizada para todos los dispositivos
+**Nutrilud FrontEnd** es una plataforma moderna y escalable para la **gestión nutricional** que integra:
+
+- **👨‍⚕️ Gestión integral** de pacientes y nutriólogos.
+- **📅 Agendamiento inteligente** de consultas y expedientes.
+- **📊 Estadísticas y reportes** de salud detallados.
+- **📝 Publicación de artículos** nutricionales.
+- **📱 Experiencia responsiva** optimizada para cualquier dispositivo.
 
 ---
-
----
-
 
 ## 🛠️ Stack Tecnológico
 
-### Frontend Principal
-- **Next.js 15.4.5** — Framework base
-- **React 19.1.0** — Componentes UI
-- **TypeScript 5** — Tipado estático
-- **Tailwind CSS 4** — Estilización
+### Framework y Core
+- **Next.js 15.4.5** — Framework principal.
+- **React 19.1.0** — Desarrollo de interfaces dinámicas.
+- **TypeScript 5** — Tipado estático y robustez.
+- **Tailwind CSS 4** — Estilos y diseño responsive.
 
-### Librerías Clave
-- **Axios 1.11.0** — Peticiones HTTP
-- **jsPDF 3.0.1** — Generación de PDFs
-- **ESLint 9** — Linting y calidad de código
-
----
+### Librerías Destacadas
+- **Axios 1.11.0** — Consumo de APIs.
+- **jsPDF 3.0.1** — Exportación de reportes en PDF.
+- **ESLint 9** — Control de calidad de código.
 
 ---
-
 
 ## 🗂️ Estructura del Proyecto
 
 ```bash
 src/
-├── [app](src/app/)            # Routing y páginas principales
-├── [components](src/components/)     # Componentes UI reutilizables
-├── [controllers](src/controllers/)    # Lógica de negocio
-├── [interfaces](src/interfaces/)     # Tipos TypeScript
-├── [types](src/types/)          # Tipos globales
-├── [utils](src/utils/)          # Funciones helper
-public/             # Assets estáticos
+├── app/               # Páginas y rutas de la aplicación
+├── components/        # Componentes UI reutilizables
+├── controllers/       # Lógica de negocio y controladores
+├── interfaces/        # Interfaces TypeScript
+├── types/             # Tipos globales
+├── utils/             # Funciones auxiliares (helpers)
+public/                # Recursos y assets estáticos
 ```
 
 ---
-
----
-
 
 ## ✨ Características UI/UX
 
 ### 🎨 Diseño Moderno
-- Sistema de diseño basado en Tailwind CSS
-- Paleta de colores profesional y accesible
-- Tipografía legible y jerárquica
+- Basado en **Tailwind CSS** con enfoque en accesibilidad.
+- Paleta de colores profesional.
+- Tipografía optimizada para lectura.
 
-### 📱 Responsive Design
-- Adaptable a móvil, tablet y desktop
-- Componentes flexibles y reutilizables
-- Optimización de touch targets y gestos
-
-### ⚡ Performance
-- Carga optimizada y code splitting automático
-- Imágenes lazy-loaded y optimizadas
+### 📱 Diseño Responsivo
+- Optimizado para móvil, tablet y escritorio.
+- Interfaz adaptable y reutilizable.
+  
+### ⚡ Rendimiento
+- Code splitting automático.
+- Carga diferida (lazy loading) de imágenes y componentes.
 
 ### ♿ Accesibilidad
-- ARIA labels completos
-- Contraste AA/AAA
-- Navegación por teclado y lectores de pantalla
+- Compatibilidad con lectores de pantalla.
+- Navegación por teclado y contraste AA/AAA.
 
 ---
 
----
+## 🗺️ Roadmap
 
+- [x] Estructura base con Next.js y Tailwind CSS  
+- [x] Gestión de usuarios por roles (paciente, nutriólogo, administrador)  
+- [x] Agendamiento de consultas y expedientes  
+- [x] Publicación de artículos nutricionales  
+- [x] Estadísticas y reportes  
+- [ ] Sistema de notificaciones y recordatorios  
+- [ ] Integración con Google Calendar y WhatsApp  
+- [ ] Tema oscuro y personalización avanzada  
+- [ ] Internacionalización (i18n)  
+- [ ] Pruebas automatizadas (unitarias y de integración)  
+- [ ] Documentación técnica completa  
+
+---
 
 ## 🚀 Guía Rápida
 
-### Requisitos
-- Node.js 18 o superior
-- npm 9 o superior
+### Requisitos Previos
+- Node.js **18+**
+- npm **9+**
 
 ### Instalación
-
-Clona el repositorio:
 ```bash
+# Clonar repositorio
 git clone https://github.com/AbrahamCoco/Nutrilud-FrontEnd-.git
-```
 
-Navega al directorio del proyecto:
-```bash
+# Acceder al proyecto
 cd Nutrilud-FrontEnd-
-```
 
-Instala las dependencias:
-```bash
+# Instalar dependencias
 npm install
 ```
 
-### Comandos básicos
-- `npm run dev`    — Inicia el servidor de desarrollo
-- `npm run build`  — Compila la aplicación para producción
-- `npm run start`  — Inicia el servidor en modo producción
-- `npm run lint`   — Ejecuta el linter ESLint
+### Comandos Clave
+- `npm run dev` — Inicia el entorno de desarrollo.  
+- `npm run build` — Compila la aplicación para producción.  
+- `npm run start` — Ejecuta en modo producción.  
+- `npm run lint` — Analiza y corrige errores de código.  
 
 ---
 
-## 🧭 Ejemplo de flujo de usuario
-1. El usuario inicia sesión como paciente, nutriólogo o administrador.
-2. Accede a su panel personalizado según el rol.
-3. Puede agendar consultas, revisar expedientes, publicar artículos o visualizar estadísticas.
-4. La navegación es intuitiva y cada acción está acompañada de feedback visual.
+## 🧭 Flujo de Usuario
+
+1. El usuario inicia sesión con su rol correspondiente.  
+2. Accede a un panel personalizado.  
+3. Puede gestionar citas, expedientes, artículos o estadísticas.  
+4. Recibe retroalimentación visual y notificaciones de cada acción.  
 
 ---
 
+## ❓ Preguntas Frecuentes (FAQ)
+
+**¿Qué roles existen?**  
+Paciente, Nutriólogo y Administrador, cada uno con permisos específicos.
+
+**¿Cómo puedo contribuir?**  
+Realiza un fork, crea una rama y envía un Pull Request.
+
+**¿Qué tecnologías debo dominar para colaborar?**  
+Next.js, React, TypeScript y Tailwind CSS.
+
+**¿Es seguro el sistema?**  
+Sí, con buenas prácticas de seguridad y manejo de datos.
+
+**¿Puedo desplegar en Vercel?**  
+Sí, el proyecto está optimizado para este servicio.
+
+**¿Dónde reporto errores?**  
+En la sección de *Issues* de GitHub o por correo al autor.
+
+---
 
 ## 📚 Documentación
-- [Next.js](https://nextjs.org/docs)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [TypeScript](https://www.typescriptlang.org/docs/)
+- [Next.js Docs](https://nextjs.org/docs)
+- [Tailwind CSS Docs](https://tailwindcss.com/docs)
+- [TypeScript Docs](https://www.typescriptlang.org/docs/)
 
 ---
-
 
 ## 📬 Contacto
-¿Tienes dudas, sugerencias o quieres contribuir?
-- **Autor:** Abraham Coco
-- **Email:** abraham.cocoletzi.z@gmail.com
+**Autor:** Abraham Coco  
+**Email:** abraham.cocoletzi.z@gmail.com  
 
 ---
-
 
 ## 📜 Licencia
-Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
+Este proyecto está bajo la **Licencia MIT**. Consulta [LICENSE](LICENSE) para más detalles.
 
 ---
+
 <div align="center" style="margin-top: 40px">
   <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 20px">
     <img src="https://www.svgrepo.com/show/306466/next-dot-js.svg" width="50" />
     <img src="https://www.svgrepo.com/show/327408/logo-vercel.svg" width="50" />
     <img src="https://www.svgrepo.com/show/475654/github-color.svg" width="50" />
-  </div> 
+  </div>
   <p style="font-size: 1.1rem; color: #4a5568">
-    <strong>¡Contribuciones bienvenidas!</strong> Ayúdanos a mejorar la salud digital 💚
-  </p> 
+    <strong>¡Contribuciones bienvenidas!</strong> Mejoremos la salud digital juntos 💚
+  </p>
 </div>
