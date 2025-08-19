@@ -26,9 +26,10 @@ jobs:
                     git checkout master
                     git reset --hard origin/master
                     git clean -fd
-                    npm install
+                    npm ci
                     npm run build
                     cd ..
 
                     pm2 start nutrilud-frontend
+
 
