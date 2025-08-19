@@ -1,4 +1,6 @@
 "use client";
+import SelectorCitaModal from "@/components/users/nutriologo/SelectorCita";
+import { AgendaController } from "@/controllers/nutriologo/agendaController";
 import { ConsultaController } from "@/controllers/nutriologo/consultaController";
 import { ConsultaFormulario } from "@/interfaces/nutriologo/consultaFormulario";
 import { PacienteData } from "@/interfaces/nutriologo/pacienteData";
@@ -28,6 +30,7 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
   const { id } = use(params);
   const [paciente, setPaciente] = useState<PacienteData>();
   const [consulta, setConsulta] = useState<any[]>([]);
+  const [eventos, setEventos] = useState<any[]>([]);
   const [datosFormulario, setDatosFormulario] = useState<ConsultaFormulario>(initialDatosFormulario);
 
   const fetchPaciente = async () => {
@@ -57,10 +60,20 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
     }
   };
 
+  const fetchEventos = async () => {
+    try {
+      const response = await AgendaController.getAgenda(parseInt(sessionStorage.getItem("id_nutriologo") || "0"));
+      setEventos(response || []);
+    } catch (error) {
+      setEventos([]);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       fetchPaciente();
       fetchConsultas();
+      fetchEventos();
     }
   }, [id]);
 
@@ -745,20 +758,12 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="fecha_siguiente_consulta" className="block text-sm font-medium text-gray-700 mb-1">
-                  Próxima Consulta
-                </label>
-                <div className="relative">
-                  <input
-                    type="datetime-local"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
-                    name="siguiente_consulta"
-                    value={datosFormulario.siguiente_consulta ?? ""}
-                    onChange={(e) => setDatosFormulario({...datosFormulario, siguiente_consulta: e.target.value})}
-                  />
-                </div>
-              </div>
+              <SelectorCitaModal
+                eventos={eventos}
+                onSelect={(fecha) =>
+                  setDatosFormulario((prev) => ({ ...prev, siguiente_consulta: fecha }))
+                }
+              />
 
               <div className="pt-4">
                 <button
