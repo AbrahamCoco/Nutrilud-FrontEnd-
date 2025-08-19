@@ -7,7 +7,7 @@ export class AgendaController {
       const response = await Tarjet.nutriologoApi.getAgenda(id_nutriologo);
       const agenda = response.data.data;
 
-      if (!agenda.length) {
+      if (!Array.isArray(agenda) || agenda.length === 0) {
         Utils.swalInfo("No hay eventos en la agenda.");
         return null;
       }
@@ -17,17 +17,18 @@ export class AgendaController {
         const fechaFin = new Date(fechaInicio.getTime() + 29 * 60000);
 
         return {
-          title: `Cita con el paciente: ${evento.tusuario_paciente.nombre} ${evento.tusuario_paciente.primer_apellido} ${evento.tusuario_paciente.segundo_apellido}`,
+          id_paciente: evento.id_paciente,
+          title: `Cita con el paciente: ${evento.nombre} ${evento.primer_apellido} ${evento.segundo_apellido}`,
           start: fechaInicio,
           end: fechaFin,
-        }
-      })
+        };
+      });
 
-      Utils.swalSuccess("Agenda cargada correctamente.");
+      eventos.sort((a: any, b: any) => a.start.getTime() - b.start.getTime());
       return eventos;
     } catch (error) {
       const errorMessage = (error instanceof Error) ? error.message : String(error);
-      Utils.swalError("Error al cargar la agenda. Intente nuevamente." + errorMessage);
+      console.error(errorMessage);
       return null;
     }
   }
