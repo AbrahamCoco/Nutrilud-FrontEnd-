@@ -20,12 +20,15 @@ jobs:
                 key: ${{ secrets.EC2_KEY }}
                 script: |
                     pm2 stop nutrilud-frontend
+                    
                     cd Nutrilud-FrontEnd-
-                    git reset --hard
+                    git fetch origin
+                    git checkout master
+                    git reset --hard origin/master
                     git clean -fd
-                    git pull
                     npm install
                     npm run build
                     cd ..
 
                     pm2 start nutrilud-frontend
+
