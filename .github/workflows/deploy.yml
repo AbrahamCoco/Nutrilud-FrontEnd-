@@ -21,8 +21,11 @@ jobs:
                 script: |
                     pm2 stop nutrilud-frontend
                     cd Nutrilud-FrontEnd-
+                    git reset --hard
+                    git clean -fd
                     git pull
                     npm install
                     npm run build
                     cd ..
+
                     pm2 start nutrilud-frontend
