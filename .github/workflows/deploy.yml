@@ -21,15 +21,17 @@ jobs:
                 script: |
                     pm2 stop nutrilud-frontend
                     
-                    rm -rf Nutrilud-FrontEnd-
-                    git clone https://github.com/AbrahamCoco/Nutrilud-FrontEnd-.git
                     cd Nutrilud-FrontEnd-
-
-                    npm ci
+                    git fetch origin
+                    git checkout master
+                    git reset --hard origin/master
+                    git clean -fd
+                    npm install
                     npm run build
                     cd ..
 
                     pm2 start nutrilud-frontend
+
 
 
 
