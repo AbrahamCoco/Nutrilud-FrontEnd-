@@ -1,9 +1,8 @@
 "use client";
-
 import dayjs from "dayjs";
 import localeEs from "dayjs/locale/es";
-import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -13,6 +12,7 @@ dayjs.extend(advancedFormat);
 dayjs.locale(localeEs);
 
 interface Evento {
+  id_paciente: number | string;
   id?: number | string;
   title: string;
   description?: string;
@@ -84,31 +84,30 @@ export default function Itinerario({ eventos }: Props) {
       <div className="divide-y divide-gray-100">
         {eventosSemana.length > 0 ? (
           eventosSemana.map((evento, index) => (
-            <div
-              key={evento.id || index}
-              className="p-4 hover:bg-green-50 transition-colors duration-150"
-            >
-              <div className="flex items-start">
-                <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-green-600 text-sm font-medium">
-                    {dayjs(evento.start).format("HH:mm")}
-                  </span>
-                </div>
-                <div>
-                  <h4 className="font-medium text-gray-800">{evento.title}</h4>
-                  <p className="text-sm text-gray-500">
-                    {dayjs(evento.start).format("dddd, D MMMM")} •{" "}
-                    {dayjs(evento.start).format("HH:mm")} -{" "}
-                    {dayjs(evento.end).format("HH:mm")}
-                  </p>
-                  {evento.description && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      {evento.description}
+            <Link href={`/nutriologo/pacientes/consulta/${evento.id_paciente}`} key={evento.id || index}>
+              <div className="p-4 hover:bg-green-50 transition-colors duration-150">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                    <span className="text-green-600 text-sm font-medium">
+                      {dayjs(evento.start).format("HH:mm")}
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-800">{evento.title}</h4>
+                    <p className="text-sm text-gray-500">
+                      {dayjs(evento.start).format("dddd, D MMMM")} •{" "}
+                      {dayjs(evento.start).format("HH:mm")} -{" "}
+                      {dayjs(evento.end).format("HH:mm")}
                     </p>
-                  )}
+                    {evento.description && (
+                      <p className="text-sm text-gray-600 mt-1">
+                        {evento.description}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </Link>
           ))
         ) : (
           <div className="p-6 text-center">

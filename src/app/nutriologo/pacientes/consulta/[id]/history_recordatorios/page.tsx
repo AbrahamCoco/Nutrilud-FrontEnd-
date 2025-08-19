@@ -1,6 +1,7 @@
 "use client";
 import { RecordatorioController } from "@/controllers/nutriologo/recordatorioController";
 import { Utils } from "@/utils/utils";
+import Link from "next/link";
 import { use, useEffect, useState } from "react";
 
 export default function HistoryRecordatorioPage({ params }: { params: Promise<{ id: string }> }) {
@@ -283,33 +284,83 @@ export default function HistoryRecordatorioPage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
+      <div className="flex flex-col justify-between gap-4 mb-8 md:flex-row md:items-center">
+        <div className="space-y-1">
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="w-8 h-8 text-green-600" 
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                strokeWidth={2} 
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" 
+              />
             </svg>
             Historial de Recordatorios
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 text-sm md:text-base">
             Listado completo de recordatorios generados para el paciente
           </p>
         </div>
-        <div className="w-full sm:w-auto">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+
+        <div className="flex flex-col w-full gap-3 sm:flex-row sm:w-auto">
+          <div className="relative flex-grow">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="w-5 h-5 text-gray-400" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+                />
               </svg>
             </div>
             <input
               type="text"
               placeholder="Buscar recordatorios..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+              className="block w-full py-2 pl-10 pr-4 text-sm transition-all duration-200 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 hover:border-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Buscar recordatorios"
             />
           </div>
+
+          <Link href={`/nutriologo/pacientes/consulta/${id}/new_recordatorios`} >
+            <button
+              className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white transition-all duration-200 transform bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 active:bg-green-800 hover:scale-[1.02] active:scale-100"
+              aria-label="Crear nuevo recordatorio"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-5 h-5 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Nuevo Recordatorio
+            </button>
+          </Link>
         </div>
       </div>
 
