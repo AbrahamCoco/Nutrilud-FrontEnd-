@@ -1,6 +1,7 @@
 'use client';
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
 import { PacientesController } from "@/controllers/nutriologo/pacientesController";
+import { getAuthPayload } from "@/utils/auth";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -45,11 +46,13 @@ export default function RegistroNutrisPage() {
   const uploadImage = async () => {
     if (!selectedFile) return null;
 
+    const payload = getAuthPayload();    
+
     const data = new FormData();
     data.append('file', selectedFile);
     data.append("nombre", formData.nombre);
     data.append("apellido", formData.primer_apellido);
-    data.append("id", sessionStorage.getItem("id_nutriologo") || "0");
+    data.append("id", payload?.id_nutriologo || "0");
 
     try {
       const response = await AgregarArticuloController.uploadImage(data);

@@ -1,12 +1,39 @@
 import { ConsultaFormulario } from "@/interfaces/nutriologo/consultaFormulario.d";
 import type { ResponseApi } from "@/interfaces/responseApi";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { getCookie } from "cookies-next";
 
 const baseURL: string = "http://localhost:8080/api/v1";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
 });
+
+// Lista de rutas que NO deben enviar el token
+const excludedRoutes = [
+  "/personal_access_token/login",
+  "/tarticulos/findAllArticles",
+  "/tarticulos/findById",
+];
+
+// Interceptor para agregar token
+axiosInstance.interceptors.request.use((config) => {
+  // Revisar si la URL de la petición está en la lista de exclusión
+  const isExcluded = excludedRoutes.some(route => config.url?.includes(route));
+
+  if (!isExcluded) {
+    // Obtener token desde la cookie
+    const token = getCookie("auth_token");
+
+    if (token && config.headers) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+  }
+
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+})
 
 export const Tarjet = {
   userApi: {

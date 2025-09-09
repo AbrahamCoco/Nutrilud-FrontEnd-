@@ -1,5 +1,7 @@
 "use client";
 import { NavbarController } from "@/controllers/navbarController";
+import { getAuthPayload } from "@/utils/auth";
+import { deleteCookie } from "@/utils/cookie";
 import { Utils } from "@/utils/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,9 +25,11 @@ export default function Navbar(){
   const router = useRouter();
 
   useEffect(() => {
-    const storedRol = sessionStorage.getItem("trol_id");
-    const storedId = sessionStorage.getItem("id");
-    const nombreUsuario = `${sessionStorage.getItem("nombre") || ""} ${sessionStorage.getItem("primer_apellido") || ""}`;
+    const payload = getAuthPayload();
+    
+    const storedRol = payload?.rol_id;
+    const storedId = payload?.id;
+    const nombreUsuario = `${payload?.nombre || ""} ${payload?.primer_apellido || ""}`;
     setNombre(nombreUsuario);
 
     if(storedRol) setRol(parseInt(storedRol));
@@ -75,8 +79,7 @@ export default function Navbar(){
 
   const handleLogout = () => {
     try {
-      sessionStorage.clear();
-      localStorage.clear();
+      deleteCookie("auth_token");
       setRol(null);
       setId(null);
       router.replace("/");

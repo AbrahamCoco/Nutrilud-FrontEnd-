@@ -11,6 +11,7 @@
   "dependencies": {
     "@tinymce/tinymce-react": "^6.3.0",
     "axios": "^1.11.0",
+    "cookies-next": "^6.1.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "jsdom": "^26.1.0",
