@@ -57,10 +57,10 @@ export default function NuevoPaciente({ data }: { data: any }) {
         contrasenia,
         rol_id: 3,
         foto_paciente: imageUrl,
-        alergias,
+        alergias_paciente: alergias,
         id_paciente,
         fecha_nacimiento_paciente: formated,
-        telefono_paciente: telefono,
+        telefono: telefono,
         sexo_paciente: sexo,
       };
 

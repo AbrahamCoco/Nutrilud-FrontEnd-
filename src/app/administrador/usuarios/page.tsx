@@ -10,9 +10,7 @@ type User = {
   primer_apellido: string;
   segundo_apellido?: string;
   correo: string;
-  trols?: {
-    rol?: string;
-  };
+  descripcion?: string;
 };
 
 export default function UsuariosPage() {
@@ -108,16 +106,17 @@ export default function UsuariosPage() {
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 bg-gradient-to-r from-emerald-100 to-teal-100 rounded-full flex items-center justify-center shadow-inner">
                             <span className="text-emerald-800 font-medium text-sm">
-                              {user.nombre.charAt(0)}
-                              {user.primer_apellido.charAt(0)}
-                              {user.segundo_apellido ? user.segundo_apellido.charAt(0) : ""}
+                              {user.nombre
+                                .split(" ") // separa por espacios → ["Abraham", "Cocoletzi", "Zempoalteca"]
+                                .map(word => word.charAt(0)) // toma la primera letra de cada palabra
+                                .join("")} {/* Une las iniciales → "ACZ" */}
                             </span>
                           </div>
                           <div className="ml-4">
                             <div className="text-sm font-semibold text-gray-900">
-                              {user.nombre} {user.primer_apellido} {user.segundo_apellido}
+                              {user.nombre || ""}
                             </div>
-                            <div className="text-xs text-gray-500">{user.trols?.rol || "Sin rol"}</div>
+                            <div className="text-xs text-gray-500">{user?.descripcion || "Sin rol"}</div>
                           </div>
                         </div>
                       </td>
@@ -132,14 +131,14 @@ export default function UsuariosPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            user.trols?.rol === "Administrador" 
+                            user?.descripcion === "Administrador" 
                               ? "bg-emerald-100 text-emerald-800" 
-                              : user.trols?.rol === "Nutriologo" 
+                              : user?.descripcion === "Nutriologo" 
                               ? "bg-blue-100 text-blue-800" 
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {user.trols?.rol || "Sin rol"}
+                          {user?.descripcion || "Sin rol"}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -17,9 +17,9 @@ export default function RegistroNutrisPage() {
     contrasenia: '',
     telefono: '',
     descripcion: '',
-    cedula_profesional: '',
-    direccion: '',
-    trol_id: 2,
+    cedula_profesional_nutriologo: '',
+    direccion_nutriologo: '',
+    rol_id: 2,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -28,7 +28,7 @@ export default function RegistroNutrisPage() {
   };
 
   const handleRoleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, trol_id: parseInt(e.target.value) }));
+    setFormData((prev) => ({ ...prev, rol_id: parseInt(e.target.value) }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,9 +82,9 @@ export default function RegistroNutrisPage() {
           contrasenia: '',
           telefono: '',
           descripcion: '',
-          cedula_profesional: '',
-          direccion: '',
-          trol_id: 2,
+          cedula_profesional_nutriologo: '',
+          direccion_nutriologo: '',
+          rol_id: 2,
         });
         setSelectedFile(null);
         setPreviewImage(null);
@@ -257,7 +257,7 @@ export default function RegistroNutrisPage() {
               <div className="grid grid-cols-2 gap-3">
                 <label
                   className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                    formData.trol_id === 1
+                    formData.rol_id === 1
                       ? "border-green-500 bg-green-50"
                       : "border-gray-200 hover:border-green-300"
                   }`}
@@ -265,9 +265,9 @@ export default function RegistroNutrisPage() {
                   <input
                     type="radio"
                     className="form-radio h-4 w-4 text-green-600"
-                    name="trol_id"
+                    name="rol_id"
                     value={1}
-                    checked={formData.trol_id === 1}
+                    checked={formData.rol_id === 1}
                     onChange={handleRoleChange}
                     required
                   />
@@ -275,7 +275,7 @@ export default function RegistroNutrisPage() {
                 </label>
                 <label
                   className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                    formData.trol_id === 2
+                    formData.rol_id === 2
                       ? "border-green-500 bg-green-50"
                       : "border-gray-200 hover:border-green-300"
                   }`}
@@ -283,9 +283,9 @@ export default function RegistroNutrisPage() {
                   <input
                     type="radio"
                     className="form-radio h-4 w-4 text-green-600"
-                    name="trol_id"
+                    name="rol_id"
                     value={2}
-                    checked={formData.trol_id === 2}
+                    checked={formData.rol_id === 2}
                     onChange={handleRoleChange}
                   />
                   <span className="ml-2 text-gray-700">Nutriólogo</span>
@@ -315,18 +315,19 @@ export default function RegistroNutrisPage() {
               <div className="flex items-center justify-center">
                 <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors overflow-hidden">
                   {previewImage ? (
-                    <>
+                    <div className="relative h-full w-full">
                       <Image
                         src={previewImage}
                         alt="Preview"
-                        className="h-full w-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
                         <span className="bg-white text-green-600 px-3 py-1 rounded-full text-sm font-medium">
                           Cambiar imagen
                         </span>
                       </div>
-                    </>
+                    </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center p-5">
                       <svg
@@ -458,7 +459,7 @@ export default function RegistroNutrisPage() {
           </div>
         </div>
 
-        {formData.trol_id === 1 && (
+        {formData.rol_id === 1 && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="form-group">
               <label
@@ -524,7 +525,7 @@ export default function RegistroNutrisPage() {
           </div>
         )}
 
-        {formData.trol_id === 2 && (
+        {formData.rol_id === 2 && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-5">
               <div className="form-group">
@@ -580,9 +581,9 @@ export default function RegistroNutrisPage() {
                 </label>
                 <input
                   type="text"
-                  id="cedula_profesional"
-                  name="cedula_profesional"
-                  value={formData.cedula_profesional}
+                  id="cedula_profesional_nutriologo"
+                  name="cedula_profesional_nutriologo"
+                  value={formData.cedula_profesional_nutriologo}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                   required
@@ -652,9 +653,9 @@ export default function RegistroNutrisPage() {
                 </label>
                 <input
                   type="text"
-                  id="direccion"
-                  name="direccion"
-                  value={formData.direccion}
+                  id="direccion_nutriologo"
+                  name="direccion_nutriologo"
+                  value={formData.direccion_nutriologo}
                   onChange={handleChange}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all"
                   placeholder="Dirección completa"

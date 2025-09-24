@@ -4,7 +4,7 @@ import { Tarjet } from "@/utils/axiosConfig";
 import { setCookie } from "@/utils/cookie";
 
 export class NavbarController {
-  static async login(usuario: string, contrasenia: string): Promise<DecodeToken | null> {
+  static async login(usuario: string, contrasenia: string): Promise<{ decode: DecodeToken, data: any } | null> {
     try {
       const response = await Tarjet.userApi.login(usuario, contrasenia);
       const token: string = response.data.data;
@@ -13,7 +13,7 @@ export class NavbarController {
 
       setCookie("auth_token", token);
 
-      return decode;
+      return { decode, data: response?.data };
     } catch (error) {
       console.error("Error during login", error);
       return null;

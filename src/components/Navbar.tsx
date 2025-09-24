@@ -21,6 +21,8 @@ export default function Navbar(){
   const [nombre, setNombre] = useState<string>("");
   const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [usuarioError, setUsuarioError] = useState<string | null>(null);
+  const [contraseniaError, setContraseniaError] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -39,22 +41,27 @@ export default function Navbar(){
 
   const handleLogin = async () => {
     try {
-      const response = await NavbarController.login(usuario || "", contrasenia || "");
+      const loginResult = await NavbarController.login(usuario || "", contrasenia || "");
 
-      if (response) {
-        const id_paciente = response.payload.id_paciente;
-        setNombre(`${response.payload.nombre} ${response.payload.primer_apellido}`);
-        setRol(parseInt(response.payload.rol_id.toString()));
-        setId(parseInt(response.payload.id.toString()));
+      if (loginResult && loginResult.decode) {
+        const { decode, data } = loginResult;
+        const id_paciente = decode.payload.id_paciente;
+        
+        setUsuarioError(null);
+        setContraseniaError(null);
+
+        setNombre(`${decode.payload.nombre} ${decode.payload.primer_apellido}`);
+        setRol(parseInt(decode.payload.rol_id.toString()));
+        setId(parseInt(decode.payload.id.toString()));
         setUsuario("");
         setContrasenia("");
         closeModal();
 
-        if (parseInt(response.payload.rol_id.toString()) === 1) {
+        if (parseInt(decode.payload.rol_id.toString()) === 1) {
           router.push("/administrador");
-        } else if (parseInt(response.payload.rol_id.toString()) === 2) {
+        } else if (parseInt(decode.payload.rol_id.toString()) === 2) {
           router.push("/nutriologo");
-        } else if (parseInt(response.payload.rol_id.toString()) === 3) {
+        } else if (parseInt(decode.payload.rol_id.toString()) === 3) {
           router.push(`/paciente/${id_paciente}`);
         } else {
           router.push("/");
@@ -62,11 +69,18 @@ export default function Navbar(){
 
         Utils.swalSuccess("Inicio de sesión exitoso");
       } else {
+        const data = loginResult?.data;
         setRol(null);
         setId(null);
-        setUsuario("");
-        setContrasenia("");
-        closeModal();
+        setUsuarioError(null);
+        setContraseniaError(null);
+
+        if (data?.message === "Usuario no encontrado") {
+          setUsuarioError(data.message);
+        } else if (data?.message === "Contraseña incorrecta") {
+          setContraseniaError(data.message);
+        }
+
         Utils.swalError("Usuario o contraseña incorrectos");
       }
     } catch (error) {
@@ -90,7 +104,13 @@ export default function Navbar(){
   };
 
   const openModal = () => setShowModal(true);
-  const closeModal = () => setShowModal(false);
+  const closeModal = () => {
+    setShowModal(false);
+    setUsuarioError(null);
+    setContraseniaError(null);
+    setUsuario("");
+    setContrasenia("");
+  };
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
@@ -226,33 +246,76 @@ export default function Navbar(){
 
               <div className="mt-3 text-center sm:mt-5">
                 <h3 className="text-lg leading-6 font-medium text-gray-900">Iniciar Sesión</h3>
-                <div className="mt-4">
+                <div className="mt-6 space-y-5">
                   <div className="text-left">
-                    <label htmlFor="usuario" className="block text-sm font-medium text-gray-700">
+                    <label 
+                      htmlFor="usuario" 
+                      className="block text-sm font-medium text-gray-700 mb-1.5 transition-all duration-200 ease-in-out"
+                    >
                       Usuario
                     </label>
                     <input
                       type="text"
                       name="usuario"
                       id="usuario"
-                      className="mt-1 focus:ring-green-600 focus:border-green-600 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                      className={`
+                        w-full px-4 py-3 rounded-lg border transition-all duration-200 ease-in-out
+                        focus:ring-2 focus:ring-offset-1 focus:outline-none
+                        ${usuarioError 
+                          ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                          : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                        }
+                        placeholder-gray-400 text-gray-800
+                        shadow-sm hover:shadow-md
+                      `}
                       value={usuario ?? ""}
                       onChange={(e) => setUsuario(e.target.value)}
+                      placeholder="Ingresa tu nombre de usuario"
                       autoFocus
                     />
+                    {usuarioError && (
+                      <p className="mt-2 text-sm text-red-600 flex items-center">
+                        <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        {usuarioError}
+                      </p>
+                    )}
                   </div>
-                  <div className="mt-4 text-left">
-                    <label htmlFor="contrasenia" className="block text-sm font-medium text-gray-700">
+
+                  <div className="text-left">
+                    <label 
+                      htmlFor="contrasenia" 
+                      className="block text-sm font-medium text-gray-700 mb-1.5 transition-all duration-200 ease-in-out"
+                    >
                       Contraseña
                     </label>
                     <input
                       type="password"
                       name="contrasenia"
                       id="contrasenia"
-                      className="mt-1 focus:ring-green-600 focus:border-green-600 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md p-2 border"
+                      className={`
+                        w-full px-4 py-3 rounded-lg border transition-all duration-200 ease-in-out
+                        focus:ring-2 focus:ring-offset-1 focus:outline-none
+                        ${contraseniaError 
+                          ? "border-red-500 focus:ring-red-500 focus:border-red-500" 
+                          : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                        }
+                        placeholder-gray-400 text-gray-800
+                        shadow-sm hover:shadow-md
+                      `}
                       value={contrasenia ?? ""}
                       onChange={(e) => setContrasenia(e.target.value)}
+                      placeholder="Ingresa tu contraseña"
                     />
+                    {contraseniaError && (
+                      <p className="mt-2 text-sm text-red-600 flex items-center">
+                        <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        {contraseniaError}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
