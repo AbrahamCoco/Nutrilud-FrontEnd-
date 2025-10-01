@@ -14,29 +14,24 @@ jobs:
         with:
           token: ${{ secrets.GH_PAT }}
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
-
-      - name: Bump version and push tag
+      - name: Setup Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Obtener versión actual desde package.json
+      - name: Bump version and push tag
+        run: |
           CURRENT_VERSION=$(jq -r '.version' package.json)
           IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
 
-          # Obtener último tag
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
-          # Commits desde el último tag (o todos si no hay tags)
           if [ -z "$LAST_TAG" ]; then
             COMMIT_MESSAGES=$(git log --pretty=%B)
           else
             COMMIT_MESSAGES=$(git log "$LAST_TAG"..HEAD --pretty=%B)
           fi
 
-          # Flags
           IS_MAJOR=false
           IS_MINOR=false
           IS_PATCH=false
@@ -51,7 +46,6 @@ jobs:
             fi
           done <<< "$COMMIT_MESSAGES"
 
-          # Determinar nueva versión
           if [ "$IS_MAJOR" = true ]; then
             MAJOR_VERSION=$((VERSION_PARTS[0] + 1))
             NEW_VERSION="$MAJOR_VERSION.0.0"
@@ -66,24 +60,16 @@ jobs:
           echo ">>> Versión anterior: $CURRENT_VERSION"
           echo ">>> Nueva versión: $NEW_VERSION"
 
-          # Actualizar package.json con jq (seguro)
           jq --arg v "$NEW_VERSION" '.version=$v' package.json > package.tmp && mv package.tmp package.json
-
-          echo ">>> Contenido final de package.json:"
-          cat package.json
-
-          # Confirmar cambios en git
           git add package.json
-          git status
+          git commit -m "Bump version to $NEW_VERSION" || echo ">>> No hay cambios que commitear."
 
-          # Hacer commit si hay cambios
-          if ! git diff --cached --quiet; then
-            git commit -m "Bump version to $NEW_VERSION"
+          # Validar si el tag ya existe en remoto
+          if git ls-remote --tags origin | grep -q "refs/tags/v$NEW_VERSION$"; then
+            echo ">>> El tag v$NEW_VERSION ya existe en remoto. No se creará de nuevo."
+            git push origin dev
+          else
             git tag "v$NEW_VERSION"
-
-            # Push del commit y del tag por separado
             git push origin dev
             git push origin "v$NEW_VERSION"
-          else
-            echo ">>> No hay cambios en package.json, se omite commit y tag."
           fi
