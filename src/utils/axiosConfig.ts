@@ -3,7 +3,7 @@ import type { ResponseApi } from "@/interfaces/responseApi";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getCookie } from "cookies-next";
 
-const baseURL: string = "http://localhost:8080/api/v1";
+const baseURL: string = "http://54.165.182.210:8080/api/v1";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
