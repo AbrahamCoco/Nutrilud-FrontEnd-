@@ -7,11 +7,8 @@ on:
 
 jobs:
   bump-version:
-    # 👇 Solo ejecutar si no es el bot y el commit no es de versionado
-    if: |
-      github.actor != 'github-actions[bot]' && 
-      !contains(github.event.head_commit.message, 'Bump version') &&
-      !contains(github.event.head_commit.message, 'ci:')
+    # 👇 Condición simplificada - solo evitar el bot de actions
+    if: github.actor != 'github-actions[bot]'
     
     runs-on: ubuntu-latest
 
@@ -34,8 +31,8 @@ jobs:
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           
           if [ -z "$LAST_TAG" ]; then
-            echo ">>> No se encontraron tags previos, analizando todos los commits"
-            COMMITS_TO_ANALYZE=$(git log --oneline -10 --format=%B)  # Solo últimos 10 commits
+            echo ">>> No se encontraron tags previos, analizando últimos commits"
+            COMMITS_TO_ANALYZE=$(git log --oneline -20 --format=%B)
           else
             echo ">>> Último tag: $LAST_TAG"
             COMMITS_TO_ANALYZE=$(git log "${LAST_TAG}..HEAD" --oneline --format=%B)
@@ -47,27 +44,41 @@ jobs:
           HAS_VERSION_KEYWORD=false
           
           while IFS= read -r MSG; do
+            [ -z "$MSG" ] && continue  # Saltar líneas vacías
+            
             MSG_CLEAN=$(echo "$MSG" | tr '[:upper:]' '[:lower:]')
-            # 👇 Solo buscar palabras clave específicas de versionamiento
+            echo ">>> Analizando commit: $MSG_CLEAN"
+            
+            # 👇 Buscar palabras clave específicas de versionamiento
             if echo "$MSG_CLEAN" | grep -qE "\b(major|breaking|hotfix|feat|feature|fix|bugfix|patch)\b"; then
               HAS_VERSION_KEYWORD=true
-              echo ">>> Encontrada palabra clave de versionamiento: '$MSG'"
-              break  # Solo necesitamos una coincidencia
+              echo ">>> ✅ Encontrada palabra clave de versionamiento: '$MSG'"
+              break
             fi
           done <<< "$COMMITS_TO_ANALYZE"
 
           if [ "$HAS_VERSION_KEYWORD" = false ]; then
-            echo ">>> No se encontraron palabras clave de versionamiento en los commits"
+            echo ">>> ❌ No se encontraron palabras clave de versionamiento en los commits"
             echo "should_bump=false" >> $GITHUB_OUTPUT
           else
-            echo ">>> Se encontraron palabras clave de versionamiento"
+            echo ">>> ✅ Se encontraron palabras clave de versionamiento"
             echo "should_bump=true" >> $GITHUB_OUTPUT
           fi
 
       - name: Bump version and push tag
         if: steps.check-commits.outputs.should_bump == 'true'
         run: |
+          echo ">>> Iniciando bump version..."
+          
+          # Verificar si package.json existe
+          if [ ! -f "package.json" ]; then
+            echo ">>> ❌ Error: package.json no encontrado"
+            exit 1
+          fi
+
           CURRENT_VERSION=$(jq -r '.version' package.json)
+          echo ">>> Versión actual: $CURRENT_VERSION"
+          
           IFS='.' read -r -a VERSION_PARTS <<< "$CURRENT_VERSION"
 
           # Obtener commits desde el último tag para determinar el tipo de bump
@@ -84,21 +95,23 @@ jobs:
           IS_PATCH=false
 
           while IFS= read -r MSG; do
+            [ -z "$MSG" ] && continue
+            
             MSG_CLEAN=$(echo "$MSG" | tr '[:upper:]' '[:lower:]')
             
-            # 👇 Lógica específica para determinar el tipo de versionamiento
+            # Lógica específica para determinar el tipo de versionamiento
             if echo "$MSG_CLEAN" | grep -qE "\b(major|breaking)\b"; then
               IS_MAJOR=true
-              echo ">>> Encontrado commit MAJOR: $MSG"
+              echo ">>> 🔥 Encontrado commit MAJOR: $MSG"
             elif echo "$MSG_CLEAN" | grep -q "\bhotfix\b"; then
               IS_PATCH=true
-              echo ">>> Encontrado commit HOTFIX: $MSG"
+              echo ">>> 🔧 Encontrado commit HOTFIX: $MSG"
             elif echo "$MSG_CLEAN" | grep -qE "\b(feat|feature)\b"; then
               IS_MINOR=true
-              echo ">>> Encontrado commit FEATURE: $MSG"
+              echo ">>> ✨ Encontrado commit FEATURE: $MSG"
             elif echo "$MSG_CLEAN" | grep -qE "\b(fix|bugfix|patch)\b"; then
               IS_PATCH=true
-              echo ">>> Encontrado commit FIX: $MSG"
+              echo ">>> 🐛 Encontrado commit FIX: $MSG"
             fi
           done <<< "$COMMIT_MESSAGES"
 
@@ -106,32 +119,35 @@ jobs:
           if [ "$IS_MAJOR" = true ]; then
             MAJOR_VERSION=$((VERSION_PARTS[0] + 1))
             NEW_VERSION="$MAJOR_VERSION.0.0"
-            echo ">>> Incremento MAJOR"
+            echo ">>> 📈 Incremento MAJOR"
           elif [ "$IS_MINOR" = true ]; then
             MINOR_VERSION=$((VERSION_PARTS[1] + 1))
             NEW_VERSION="${VERSION_PARTS[0]}.$MINOR_VERSION.0"
-            echo ">>> Incremento MINOR"
-          else
+            echo ">>> 📈 Incremento MINOR"
+          elif [ "$IS_PATCH" = true ]; then
             PATCH_VERSION=$((VERSION_PARTS[2] + 1))
             NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH_VERSION"
-            echo ">>> Incremento PATCH"
+            echo ">>> 📈 Incremento PATCH"
+          else
+            echo ">>> ❌ No se pudo determinar el tipo de versionamiento"
+            exit 1
           fi
 
           # Validar que la nueva versión es diferente
           if [ "$CURRENT_VERSION" = "$NEW_VERSION" ]; then
-            echo ">>> La versión no ha cambiado ($CURRENT_VERSION -> $NEW_VERSION)"
+            echo ">>> ⚠️ La versión no ha cambiado ($CURRENT_VERSION -> $NEW_VERSION)"
             exit 0
           fi
 
-          echo ">>> Versión anterior: $CURRENT_VERSION"
-          echo ">>> Nueva versión: $NEW_VERSION"
+          echo ">>> 📊 Versión anterior: $CURRENT_VERSION"
+          echo ">>> 🚀 Nueva versión: $NEW_VERSION"
 
           # Actualizar package.json
           jq --arg v "$NEW_VERSION" '.version=$v' package.json > package.tmp && mv package.tmp package.json
           
           # Verificar si realmente hay cambios
           if git diff --quiet package.json; then
-            echo ">>> No hay cambios en package.json después del bump"
+            echo ">>> ⚠️ No hay cambios en package.json después del bump"
             exit 0
           fi
 
@@ -140,14 +156,16 @@ jobs:
           
           # Verificar si el tag ya existe en remoto
           if git ls-remote --tags origin "refs/tags/v$NEW_VERSION" | grep -q "v$NEW_VERSION"; then
-            echo ">>> El tag v$NEW_VERSION ya existe en remoto. Solo push a dev."
+            echo ">>> ⚠️ El tag v$NEW_VERSION ya existe en remoto. Solo push a dev."
             git push origin dev
           else
             git tag "v$NEW_VERSION"
-            echo ">>> Subiendo cambios a dev y tag v$NEW_VERSION"
+            echo ">>> 📤 Subiendo cambios a dev y tag v$NEW_VERSION"
             git push origin dev
             git push origin "v$NEW_VERSION"
           fi
+
+          echo ">>> ✅ Bump version completado exitosamente"
 
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
