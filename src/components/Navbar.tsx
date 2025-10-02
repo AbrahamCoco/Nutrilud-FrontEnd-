@@ -46,11 +46,11 @@ export default function Navbar(){
         setContrasenia("");
         closeModal();
 
-        if (parseInt(response.payload.rol_id.toString()) === 1) {
+        if (response.payload.rol_id === 1) {
           router.push("/administrador");
-        } else if (parseInt(response.payload.rol_id.toString()) === 2) {
+        } else if (response.payload.rol_id === 2) {
           router.push("/nutriologo");
-        } else if (parseInt(response.payload.rol_id.toString()) === 3) {
+        } else if (response.payload.rol_id === 3) {
           router.push(`/paciente/${id_paciente}`);
         } else {
           router.push("/");
