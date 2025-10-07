@@ -1,5 +1,6 @@
 "use client";
 import { RecordatorioController } from "@/controllers/nutriologo/recordatorioController";
+import { getAuthPayload } from "@/utils/auth";
 import { Utils } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import { use, useState } from "react";
@@ -38,8 +39,10 @@ export default function NewRecordatoriosPage({ params }: { params: Promise<{ id:
   };
 
   const handleGuardarRecordatorio = async () => {
+    const payload = getAuthPayload();
+
     const json = {
-      nutriologo_id: Number(sessionStorage.getItem("id_nutriologo")),
+      nutriologo_id: Number(payload?.id_nutriologo),
       paciente_id: Number(id),
       otros,
       observaciones,

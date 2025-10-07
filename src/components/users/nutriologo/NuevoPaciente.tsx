@@ -1,5 +1,6 @@
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
 import { PacientesController } from "@/controllers/nutriologo/pacientesController";
+import { getAuthPayload } from "@/utils/auth";
 import { useState } from "react";
 
 export default function NuevoPaciente({ data }: { data: any }) {
@@ -21,6 +22,8 @@ export default function NuevoPaciente({ data }: { data: any }) {
   const closeModal = () => setShowModal(false);
 
   const uploadImage = async () => {
+    const payload = getAuthPayload();
+
     if (!selectedFile) {
       console.error("No se ha seleccionado ningún archivo.");
       return null;
@@ -30,8 +33,7 @@ export default function NuevoPaciente({ data }: { data: any }) {
     formData.append("file", selectedFile);
     formData.append("nombre", nombre);
     formData.append("apellido", primer_apellido);
-    const id_nutriologo = sessionStorage.getItem("id_nutriologo")
-    formData.append("id", id_nutriologo ?? "");
+    formData.append("id", payload?.id_nutriologo ?? "");
 
     try {
       const response = await AgregarArticuloController.uploadImage(formData);
@@ -55,10 +57,10 @@ export default function NuevoPaciente({ data }: { data: any }) {
         contrasenia,
         rol_id: 3,
         foto_paciente: imageUrl,
-        alergias,
+        alergias_paciente: alergias,
         id_paciente,
         fecha_nacimiento_paciente: formated,
-        telefono_paciente: telefono,
+        telefono: telefono,
         sexo_paciente: sexo,
       };
 
