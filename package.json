@@ -15,7 +15,7 @@
     "dayjs": "^1.11.13",
     "jsdom": "^26.1.0",
     "jsonwebtoken": "^9.0.2",
-    "jspdf": "^4.0.0",
+    "jspdf": "^4.2.0",
     "jspdf-autotable": "^5.0.7",
     "next": "15.5.10",
     "pica": "^9.0.1",
