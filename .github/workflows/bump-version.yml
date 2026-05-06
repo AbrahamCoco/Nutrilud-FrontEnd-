@@ -1,0 +1,216 @@
+name: Bump Version
+
+on:
+  push:
+    branches:
+      - dev
+
+# Prevent concurrent runs on the same branch
+concurrency:
+  group: bump-version-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  bump-version:
+    # Only run if the push was not made by the GitHub Actions bot
+    if: github.actor != 'github-actions[bot]'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+          ref: ${{ github.ref }}
+
+      - name: Validate secrets
+        run: |
+          if [ -z "${{ secrets.GH_PAT }}" ]; then
+            echo ">>> ❌ Error: GH_PAT secret is not set or is empty"
+            exit 1
+          fi
+          echo ">>> ✅ Secrets validated"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # ─────────────────────────────────────────────────────────────
+      # STEP: Analyze commits ONCE and expose bump_type as output.
+      # Priority: major > minor > patch > none
+      # This eliminates the double-analysis issue from the original.
+      # ─────────────────────────────────────────────────────────────
+      - name: Analyze commits and determine bump type
+        id: analyze
+        run: |
+          set -e
+
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            echo ">>> No previous tags found, analyzing last 20 commits"
+            COMMITS=$(git log --format=%B -20)
+          else
+            echo ">>> Last tag: $LAST_TAG"
+            COMMITS=$(git log "${LAST_TAG}..HEAD" --format=%B)
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            echo ">>> No commits to analyze since last tag"
+            echo "bump_type=none" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo ">>> Commits to analyze:"
+          echo "$COMMITS"
+          echo "---"
+
+          BUMP_TYPE="none"
+
+          # Read commits line by line, stop early when highest priority is found
+          while IFS= read -r MSG; do
+            [ -z "$MSG" ] && continue
+
+            MSG_CLEAN=$(echo "$MSG" | tr '[:upper:]' '[:lower:]')
+
+            if echo "$MSG_CLEAN" | grep -qE "\b(major|breaking)\b"; then
+              BUMP_TYPE="major"
+              echo ">>> 🔥 MAJOR keyword found: '$MSG' — stopping analysis"
+              break  # major is the highest priority, no need to keep reading
+            elif echo "$MSG_CLEAN" | grep -qE "\b(feat|feature)\b"; then
+              # Only upgrade to minor, never downgrade from a higher priority
+              if [ "$BUMP_TYPE" != "major" ]; then
+                BUMP_TYPE="minor"
+                echo ">>> ✨ MINOR keyword found: '$MSG'"
+              fi
+            elif echo "$MSG_CLEAN" | grep -qE "\b(fix|bugfix|patch|hotfix)\b"; then
+              # Only set patch if no higher priority has been found yet
+              if [ "$BUMP_TYPE" = "none" ]; then
+                BUMP_TYPE="patch"
+                echo ">>> 🐛 PATCH keyword found: '$MSG'"
+              fi
+            fi
+          done <<< "$COMMITS"
+
+          echo ">>> 📊 Determined bump type: $BUMP_TYPE"
+          echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+
+      # ─────────────────────────────────────────────────────────────
+      # STEP: Bump version using the already-resolved bump_type.
+      # No commit re-analysis here — single source of truth.
+      # ─────────────────────────────────────────────────────────────
+      - name: Bump version and push tag
+        if: steps.analyze.outputs.bump_type != 'none'
+        run: |
+          set -e
+
+          BUMP_TYPE="${{ steps.analyze.outputs.bump_type }}"
+          echo ">>> Starting version bump (type: $BUMP_TYPE)..."
+
+          # Verify package.json exists
+          if [ ! -f "package.json" ]; then
+            echo ">>> ❌ Error: package.json not found"
+            exit 1
+          fi
+
+          # Get and validate current version
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          echo ">>> Current version: $CURRENT_VERSION"
+
+          if ! echo "$CURRENT_VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo ">>> ❌ Error: Invalid semver format in package.json: $CURRENT_VERSION"
+            exit 1
+          fi
+
+          IFS='.' read -r -a V <<< "$CURRENT_VERSION"
+          MAJOR=${V[0]}
+          MINOR=${V[1]}
+          PATCH=${V[2]}
+
+          # Calculate new version using the pre-resolved bump type
+          case "$BUMP_TYPE" in
+            major)
+              NEW_VERSION="$((MAJOR + 1)).0.0"
+              echo ">>> 📈 MAJOR version increment"
+              ;;
+            minor)
+              NEW_VERSION="${MAJOR}.$((MINOR + 1)).0"
+              echo ">>> 📈 MINOR version increment"
+              ;;
+            patch)
+              NEW_VERSION="${MAJOR}.${MINOR}.$((PATCH + 1))"
+              echo ">>> 📈 PATCH version increment"
+              ;;
+          esac
+
+          echo ">>> 📊 Previous version : $CURRENT_VERSION"
+          echo ">>> 🚀 New version      : $NEW_VERSION"
+
+          # Guard: skip if version somehow didn't change
+          if [ "$CURRENT_VERSION" = "$NEW_VERSION" ]; then
+            echo ">>> ⚠️ Version unchanged, nothing to do"
+            exit 0
+          fi
+
+          # Guard: abort if the tag already exists remotely
+          if git ls-remote --tags origin "refs/tags/v$NEW_VERSION" | grep -q "v$NEW_VERSION"; then
+            echo ">>> ❌ Error: Tag v$NEW_VERSION already exists remotely. Aborting to avoid conflicts."
+            exit 1
+          fi
+
+          # Apply version bump to package.json (no git tag yet)
+          npm version "$NEW_VERSION" --no-git-tag-version --allow-same-version=false
+
+          # Verify the change was actually applied
+          UPDATED_VERSION=$(node -p "require('./package.json').version")
+          if [ "$UPDATED_VERSION" != "$NEW_VERSION" ]; then
+            echo ">>> ❌ Error: Version update failed. Expected $NEW_VERSION, got $UPDATED_VERSION"
+            exit 1
+          fi
+
+          # Guard: skip if package.json has no actual diff (edge case)
+          if git diff --quiet package.json; then
+            echo ">>> ⚠️ No changes detected in package.json after bump"
+            exit 0
+          fi
+
+          # Stage files — warn explicitly if package-lock.json is missing
+          git add package.json
+          if [ -f "package-lock.json" ]; then
+            git add package-lock.json
+          else
+            echo ">>> ⚠️ package-lock.json not found, skipping (run 'npm install' locally)"
+          fi
+
+          # Commit the version bump
+          git commit -m "ci: bump version to $NEW_VERSION [skip ci]"
+
+          # Tag AFTER the commit so the tag always points to the correct SHA
+          git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+
+          # Push the commit first, then the tag separately.
+          # No rebase here — if push fails due to a race condition, the workflow
+          # will fail loudly instead of silently mangling history.
+          echo ">>> 📤 Pushing commit to dev..."
+          git push origin dev
+
+          echo ">>> 📤 Pushing tag v$NEW_VERSION..."
+          git push origin "v$NEW_VERSION"
+
+          echo ">>> ✅ Version bump completed successfully: v$CURRENT_VERSION → v$NEW_VERSION"
+
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}

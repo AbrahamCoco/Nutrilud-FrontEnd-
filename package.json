@@ -1,6 +1,6 @@
 {
   "name": "nutrilud-frontend-",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^6.3.0",
+    "cookies-next": "^6.1.0",
     "axios": "^1.15.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",

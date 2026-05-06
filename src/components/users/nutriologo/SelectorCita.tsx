@@ -34,25 +34,19 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
   const getBookedTimes = (date: Date): string[] => {
     const dateStr = format(date, "yyyy-MM-dd");
     return eventos
-      .filter((e) => e.siguiente_consulta.startsWith(dateStr))
-      .map((e) => {
-        const raw = e.siguiente_consulta;
-        try {
-          if (raw.includes("T")) {
-            const d = parse(raw);
-            return format(d, "HH:mm");
-          } else {
-            // Use parse from date-fns v2+ (already imported)
-            const [datePart, timePart] = raw.split(" ");
-            const [year, month, day] = datePart.split("-").map(Number);
-            const [hour, minute, second] = timePart.split(":").map(Number);
-            const d = new Date(year, month - 1, day, hour, minute, second);
-            return format(d, "HH:mm");
-          }
-        } catch {
-          const m = raw.match(/\b\d{2}:\d{2}\b/);
-          return m ? m[0] : "";
+      .filter((e) => {
+        // Si "start" es Date, hay que formatearlo
+        if (e.start instanceof Date) {
+          return format(e.start, "yyyy-MM-dd") === dateStr;
         }
+        return false;
+      })
+      .map((e) => {
+        // Devolver solo la hora de inicio
+        if (e.start instanceof Date) {
+          return format(e.start, "HH:mm");
+        }
+        return "";
       })
       .filter(Boolean);
   };

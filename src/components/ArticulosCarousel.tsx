@@ -35,8 +35,8 @@ export default function ArticulosCarousel({ articulos, primerEncabezado } : { ar
       <div className="relative w-full h-full">
         {articulos.map((articulo, index) => (
           <div key={articulo.id} className={`absolute inset-0 transition-opacity duration-500 ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-            <Link href={`/articulo/${articulo.id}`} className="block w-full h-full">
-              <Image src={`${Tarjet.view}${articulo.foto.replace(/\\/g, "/")}`} fill className="object-cover" alt={primerEncabezado?.[articulo.id] || ""} priority={index === currentIndex} />
+            <Link href={`/articulos/${articulo.id}`} className="block w-full h-full">
+              <Image src={`${Tarjet.view}${articulo.foto?.replace(/\\/g, "/")}`} fill className="object-cover" alt={primerEncabezado?.[articulo.id] || ""} priority={index === currentIndex} />
 
               {/* Overlay con información */}
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm">

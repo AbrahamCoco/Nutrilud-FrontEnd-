@@ -1,5 +1,6 @@
 "use client";
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
+import { getAuthPayload } from "@/utils/auth";
 import { Editor } from "@tinymce/tinymce-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -37,6 +38,8 @@ export default function AgregarArticulo() {
 
     const procesarImagen = (): Promise<void> =>
       new Promise((resolve, reject) => {
+        const payload = getAuthPayload();
+
         img.onload = async () => {
           try {
             const canvas = document.createElement("canvas");
@@ -52,9 +55,9 @@ export default function AgregarArticulo() {
             });
 
             const blob = await generarBlob(canvas);
-            const nombre = sessionStorage.getItem("nombre") || "";
-            const apellido = sessionStorage.getItem("primer_apellido") || "";
-            const id = sessionStorage.getItem("id") || "";
+            const nombre = payload?.nombre || "";
+            const apellido = payload?.primer_apellido || "";
+            const id = payload?.id || "";
 
             formData.append("nombre", nombre);
             formData.append("apellido", apellido);
@@ -82,6 +85,8 @@ export default function AgregarArticulo() {
     setIsSubmitting(true);
     setError("");
 
+    const payload = getAuthPayload();
+
     try {
       const imageUrl = await subirImagen();
       if (!imageUrl) {
@@ -93,7 +98,7 @@ export default function AgregarArticulo() {
       const sendData = {
         contenido,
         foto: imageUrl,
-        nutriologo_id: Number(sessionStorage.getItem("id_nutriologo")) || 0,
+        nutriologo_id: Number(payload?.id_nutriologo) || 0,
       }
 
       await AgregarArticuloController.AddArticulo({sendData});

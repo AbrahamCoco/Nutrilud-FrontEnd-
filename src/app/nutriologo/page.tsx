@@ -2,6 +2,7 @@
 import Clock from "@/components/Clock";
 import Itinerario from "@/components/users/nutriologo/Itinerario";
 import { AgendaController } from "@/controllers/nutriologo/agendaController";
+import { getAuthPayload } from "@/utils/auth";
 import { Utils } from "@/utils/utils";
 import { JSX, useEffect, useState } from "react";
 
@@ -10,8 +11,10 @@ export default function NutriologoPage() {
 
   useEffect(() => {
     const loadAgenda = async () => {
+      const payload = getAuthPayload();
+
       try {
-        const response = await AgendaController.getAgenda(parseInt(sessionStorage.getItem("id_nutriologo") || "0"));
+        const response = await AgendaController.getAgenda(parseInt(payload?.id_nutriologo || "0"));
         setEventos(response || []);
         Utils.swalSuccess("Agenda cargada correctamente.");
       } catch (error) {
