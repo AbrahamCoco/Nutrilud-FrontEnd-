@@ -1,17 +1,21 @@
 export interface ConsultaFormulario {
-  nutriologo_id: number | null;
-  paciente_id: number | null;
-  peso: number | null;
-  estatura: number | null;
-  circunferencia_cintura: number | null;
-  circunferencia_cadera: number | null;
-  circunferencia_brazo: number | null;
-  pliegue_bicipital: number | null;
-  pliegue_tricipital: number | null;
-  glucosa: number | null;
-  colesterol: number | null;
-  trigliceridos: number | null;
-  presion_arterial: string | null;
-  fecha_medicion: string | null;
-  siguiente_consulta: string | null;
+  id?: number;
+  nutriologo_id: number;
+  paciente_id: number;
+  peso: number;
+  estatura: number;
+  circunferencia_cintura: number;
+  circunferencia_cadera: number;
+  circunferencia_brazo: number;
+  pliegue_bicipital: number;
+  pliegue_tricipital: number;
+  glucosa: number;
+  colesterol: number;
+  trigliceridos: number;
+  presion_arterial: string;
+  fecha_medicion: Date;
+  siguiente_consulta: Date;
+  imc?: float;
+  porcentaje_grasa?: float;
+  porcentaje_musculo?: float;
 }

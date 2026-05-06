@@ -14,6 +14,7 @@ export interface DecodeToken {
     segundo_apellido: string;
     rol_id: number;
     role: string;
+    foto_perfil?: string;
   };
   signature: string;
 }

@@ -8,11 +8,76 @@ const axiosInstance: AxiosInstance = axios.create({
   baseURL,
 });
 
+// 🔐 Rutas públicas (sin token)
+const publicRoutes = [
+  "/personal_access_token/login",
+  "/personal_access_token/get_secret_key",
+  "/tarticulos/findAllArticles",
+  "/tarticulos/findById",
+  "/view/",
+  "/files/",
+];
+
+let isRedirecting = false;
+
+// -------------------- REQUEST INTERCEPTOR --------------------
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const url = config.url ?? "";
+
+    const isPublic = publicRoutes.some(route =>
+      url.startsWith(route)
+    );
+
+    if (isPublic) {
+      return config;
+    }
+
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+      // 🔴 Sesión inválida
+      sessionStorage.clear();
+
+      if (!isRedirecting) {
+        isRedirecting = true;
+        window.location.href = '/login';
+      }
+
+      // 🔴 Cancelar request
+      return Promise.reject({
+        isAuthError: true,
+        message: "Sesión expirada o no válida",
+      });
+    }
+
+    // 🟢 Token válido
+    config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// -------------------- RESPONSE INTERCEPTOR --------------------
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      sessionStorage.clear();
+      if (!isRedirecting) {
+        isRedirecting = true;
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+// -------------------- API --------------------
 export const Tarjet = {
   userApi: {
-    
     login: (usuario: string, contrasenia: string): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.post(`/personal_access_token/login`, {usuario, contrasenia}),
+      axiosInstance.post(`/personal_access_token/login`, { usuario, contrasenia }),
 
     register: (data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.post("/users/insert", data, config),
@@ -64,11 +129,11 @@ export const Tarjet = {
       axiosInstance.get(`/t_recordatorios/findRecordatorioByPacienteId`, { params: { id } }),
 
     updatePaciente: (id: number, data: any, config?: AxiosRequestConfig): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.post(`/users/updatePaciente`, data, { params: { id }, ...config } ),
+      axiosInstance.post(`/users/updatePaciente`, data, { params: { id }, ...config }),
   },
 
   pacienteApi: {},
 
   view: `${baseURL}/view/`,
   pdf: `${baseURL}/files/`,
-}
+};

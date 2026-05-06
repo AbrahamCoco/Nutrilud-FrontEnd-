@@ -2,7 +2,11 @@ import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArtic
 import { PacientesController } from "@/controllers/nutriologo/pacientesController";
 import { useState } from "react";
 
-export default function NuevoPaciente({ data }: { data: any }) {
+interface NuevoPacienteProps {
+  data: () => void;
+}
+
+export default function NuevoPaciente({ data }: NuevoPacienteProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [nombre, setNombre] = useState<string>("");
   const [primer_apellido, setPrimer_apellido] = useState<string>("");
@@ -10,8 +14,7 @@ export default function NuevoPaciente({ data }: { data: any }) {
   const [usuario, setUsuario] = useState<string>("");
   const [correo, setCorreo] = useState<string>("");
   const [contrasenia, setContrasenia] = useState<string>("");
-  const [alergias, setAlergias] = useState<string>("");
-  const [id_paciente, setId_paciente] = useState<string>("");
+  const [alergias_paciente, setAlergias_paciente] = useState<string>("");
   const [fecha_nacimiento, setFecha_nacimiento] = useState<string>("");
   const [telefono, setTelefono] = useState<string>("");
   const [sexo, setSexo] = useState<string>("");
@@ -36,7 +39,7 @@ export default function NuevoPaciente({ data }: { data: any }) {
     try {
       const response = await AgregarArticuloController.uploadImage(formData);
       return response?.data;
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -55,19 +58,19 @@ export default function NuevoPaciente({ data }: { data: any }) {
         contrasenia,
         rol_id: 3,
         foto_paciente: imageUrl,
-        alergias,
-        id_paciente,
+        alergias_paciente,
         fecha_nacimiento_paciente: formated,
-        telefono_paciente: telefono,
+        telefono,
         sexo_paciente: sexo,
       };
+
 
       const response = await PacientesController.addPaciente(userData);
 
       data();
       closeModal();
       return response;
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -216,8 +219,8 @@ export default function NuevoPaciente({ data }: { data: any }) {
                         type="text"
                         id="alergias"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-green-500 focus:border-green-500"
-                        value={alergias}
-                        onChange={(e) => setAlergias(e.target.value)}
+                        value={alergias_paciente}
+                        onChange={(e) => setAlergias_paciente(e.target.value)}
                       />
                     </div>
                   </div>

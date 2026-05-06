@@ -5,4 +5,11 @@ export interface PacienteData {
   fechaNacimiento: string,
   correo: string,
   telefono: string,
+  foto: string,
+  nombre: string,
+  primer_apellido: string,
+  segundo_apellido: string,
+  estatura: float,
+  peso: float,
+  imc: float,
 }

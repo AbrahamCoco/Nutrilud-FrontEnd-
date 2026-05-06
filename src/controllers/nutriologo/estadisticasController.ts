@@ -13,6 +13,7 @@ export class EstadisticasController {
         return null;
       }
     } catch (error) {
+      console.error("Error al cargar los datos del paciente:", error);
       Utils.swalError("Error al cargar los datos.");
       return null;
     }

@@ -1,28 +1,42 @@
 import { useEffect, useState } from "react";
 
-type TablaPacientesProps = {
-  columns: any;
-  data: any;
+type Column<T> = {
+  name: string;
+  selector?: (row: T) => string | number;
+  cell?: (row: T) => React.ReactNode;
 };
 
-export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
-  const [sortField, setSortField] = useState<null>(null);
+type TablaPacientesProps<T> = {
+  columns: Column<T>[];
+  data: T[];
+};
+
+export default function TablaPacientes<T extends { id: string | number }>({ columns, data }: TablaPacientesProps<T>) {
+  const [sortField, setSortField] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [searchText, setSearchText] = useState<string>("");
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-  const [filteredData, setFilteredData] = useState<any>(data);
+  const [filteredData, setFilteredData] = useState<T[]>(data);
 
   useEffect(() => {
     let newFilteredData = data;
 
     if (searchText) {
-      newFilteredData = data.filter((row: any) => {
-        const nombreColumn = columns.find((col:any) => col.name.toLowerCase() === "nombre");
-        if (nombreColumn && nombreColumn.selector) {
-          const value = nombreColumn.selector(row)?.toString().toLowerCase();
+      newFilteredData = data.filter((row) => {
+        const nombreColumn = columns.find(
+          (col) => col.name.toLowerCase() === "nombre"
+        );
+
+        if (nombreColumn?.selector) {
+          const value = nombreColumn
+            .selector(row)
+            ?.toString()
+            .toLowerCase();
+
           return value?.includes(searchText.toLowerCase());
         }
+
         return false;
       });
     }
@@ -31,7 +45,7 @@ export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
     setCurrentPage(1);
   }, [searchText, data, columns]);
 
-  const handleSort = (field: any) => {
+  const handleSort = (field: string) => {
     if (sortField === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -40,22 +54,69 @@ export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
     }
   };
 
-  const sortedData = Array.isArray(filteredData)
-    ? [...filteredData].sort((a, b) => {
-        if (!sortField) return 0;
-        const valueA = a[sortField]?.toString().toLowerCase() || "";
-        const valueB = b[sortField]?.toString().toLowerCase() || "";
-        return valueA < valueB ? (sortOrder === "asc" ? -1 : 1) : valueA > valueB ? (sortOrder === "asc" ? 1 : -1) : 0;
-      })
-    : [];
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (!sortField) return 0;
+
+    const valueA = String((a as Record<string, unknown>)[sortField] ?? "").toLowerCase();
+    const valueB = String((b as Record<string, unknown>)[sortField] ?? "").toLowerCase();
+
+    if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
+    if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
+    return 0;
+  });
 
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
 
-  const goToPage = (page: any) => setCurrentPage(page);
+  const goToPage = (page: number) => setCurrentPage(page);
 
   const clearSearch = () => setSearchText("");
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-green-100 overflow-hidden">
+        <div className="p-4 bg-green-50 border-b border-green-100 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h1 className="text-xl font-bold text-green-800"></h1>
+          <div className="relative w-full md:w-72 bg-green-100 h-10 rounded-lg animate-pulse"></div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-green-100">
+            <thead className="bg-green-50">
+              <tr>
+                {columns.map((column, index) => (
+                  <th key={index} scope="col" className="px-6 py-3">
+                    <div className="h-4 bg-green-100 rounded animate-pulse"></div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-green-100">
+              {[...Array(5)].map((_, rowIndex) => (
+                <tr key={rowIndex} className="bg-white">
+                  {columns.map((_, colIndex) => (
+                    <td key={colIndex} className="px-6 py-4 whitespace-nowrap">
+                      <div className="h-4 bg-green-100 rounded animate-pulse"></div>
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="px-4 py-3 bg-green-50 border-t border-green-100 flex justify-between items-center gap-4">
+          <div className="h-4 bg-green-100 rounded w-32 animate-pulse"></div>
+          <div className="flex gap-2">
+            <div className="h-8 w-8 bg-green-100 rounded animate-pulse"></div>
+            <div className="h-4 bg-green-100 rounded w-20 animate-pulse"></div>
+            <div className="h-8 w-8 bg-green-100 rounded animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl shadow-lg border border-green-100 overflow-hidden">
@@ -93,7 +154,7 @@ export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
         <table className="min-w-full divide-y divide-green-100">
           <thead className="bg-green-50">
             <tr>
-              {columns.map((column: any, index: any) => (
+              {columns.map((column, index) => (
                 <th
                   key={index}
                   scope="col"
@@ -124,7 +185,7 @@ export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
             {paginatedData.length > 0 ? (
               paginatedData.map((row, rowIndex) => (
                 <tr key={row.id} className={`hover:bg-green-50 transition-colors ${rowIndex % 2 === 0 ? "bg-white" : "bg-green-50"}`}>
-                  {columns.map((column: any, colIndex: any) => (
+                  {columns.map((column, colIndex) => (
                     <td key={colIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                       {column.cell ? column.cell(row) : column.selector ? column.selector(row) : null}
                     </td>
@@ -160,9 +221,8 @@ export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
           <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
-              currentPage === 1 ? "border-green-200 bg-green-100 text-green-400" : "border-green-300 bg-white text-green-700 hover:bg-green-100"
-            }`}
+            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${currentPage === 1 ? "border-green-200 bg-green-100 text-green-400" : "border-green-300 bg-white text-green-700 hover:bg-green-100"
+              }`}
           >
             Anterior
           </button>
@@ -172,9 +232,8 @@ export default function TablaPacientes({ columns, data }: TablaPacientesProps) {
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
-              currentPage === totalPages ? "border-green-200 bg-green-100 text-green-400" : "border-green-300 bg-white text-green-700 hover:bg-green-100"
-            }`}
+            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${currentPage === totalPages ? "border-green-200 bg-green-100 text-green-400" : "border-green-300 bg-white text-green-700 hover:bg-green-100"
+              }`}
           >
             Siguiente
           </button>

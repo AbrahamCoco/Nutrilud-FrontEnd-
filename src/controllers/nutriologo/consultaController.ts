@@ -32,6 +32,7 @@ export class ConsultaController {
       return response.data || response;
     } catch (error) {
       if (errorMessage) Utils.swalError(errorMessage);
+      console.error(errorMessage, error);
       return null;
     }
   }

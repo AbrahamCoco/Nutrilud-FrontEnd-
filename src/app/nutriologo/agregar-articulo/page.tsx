@@ -1,5 +1,6 @@
 "use client";
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
+import { resizeImage } from "@/utils/imageResize";
 import { Editor } from "@tinymce/tinymce-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -10,69 +11,55 @@ export default function AgregarArticulo() {
   const [error, setError] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [optimizedBlob, setOptimizedBlob] = useState<Blob | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const editorRef = useRef<any>(null);
+  const editorRef = useRef<InstanceType<typeof Editor>['editor']>(null);
   const router = useRouter();
-  const pica = require("pica")();
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (!file) {
+      console.log("No file selected");
+      return;
+    }
+
+    console.log("File selected:", file.name, file.size);
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError("La imagen supera los 5MB");
+      return;
+    }
+
+    try {
+      console.log("Starting resize...");
+      const blob = await resizeImage(file);
+      console.log("Resize done:", blob);
+
       setSelectedFile(file);
-      setPreviewImage(URL.createObjectURL(file));
+      setOptimizedBlob(blob);
+      const previewUrl = URL.createObjectURL(blob);
+      console.log("Preview URL:", previewUrl);
+      setPreviewImage(previewUrl);
+    } catch (err) {
+      console.error("Error in handleImageChange:", err); // 👈 clave
+      setError("Error al procesar la imagen");
     }
   };
 
   const subirImagen = async (): Promise<string | null> => {
-    if (!selectedFile) return null;
-
-    const formData = new FormData();
-    const img = document.createElement("img");
-    img.src = URL.createObjectURL(selectedFile);
-
-    const generarBlob = (canvas: HTMLCanvasElement): Promise<Blob> =>
-      new Promise((resolve) => {
-        canvas.toBlob((blob) => resolve(blob as Blob), "image/jpeg");
-      });
-
-    const procesarImagen = (): Promise<void> =>
-      new Promise((resolve, reject) => {
-        img.onload = async () => {
-          try {
-            const canvas = document.createElement("canvas");
-            const maxWidth = 800;
-            const maxHeight = 400;
-            canvas.width = maxWidth;
-            canvas.height = maxHeight;
-
-            await pica.resize(img, canvas, {
-              unsharpAmount: 80,
-              unsharpThreshold: 2,
-              transferable: true,
-            });
-
-            const blob = await generarBlob(canvas);
-            const nombre = sessionStorage.getItem("nombre") || "";
-            const apellido = sessionStorage.getItem("primer_apellido") || "";
-            const id = sessionStorage.getItem("id") || "";
-
-            formData.append("nombre", nombre);
-            formData.append("apellido", apellido);
-            formData.append("id", id);
-            formData.append("file", blob, selectedFile.name);
-            resolve();
-          } catch (error) {
-            reject(error);
-          }
-        };
-      });
+    if (!optimizedBlob) return null;
 
     try {
-      await procesarImagen();
+      const formData = new FormData();
+      formData.append("file", optimizedBlob, "image.webp");
+      formData.append("nombre", sessionStorage.getItem("nombre") || "");
+      formData.append("apellido", sessionStorage.getItem("primer_apellido") || "");
+      formData.append("id", sessionStorage.getItem("id") || "");
+
       const response = await AgregarArticuloController.uploadImage(formData);
-      return response?.data;
+      return response?.data ?? response;
     } catch (error) {
-      console.error("Error al procesar o subir la imagen", error);
+      console.error(error);
       return null;
     }
   };
@@ -94,16 +81,17 @@ export default function AgregarArticulo() {
         contenido,
         foto: imageUrl,
         nutriologo_id: Number(sessionStorage.getItem("id_nutriologo")) || 0,
-      }
+      };
 
-      await AgregarArticuloController.AddArticulo({sendData});
+      await AgregarArticuloController.AddArticulo(sendData);
 
       setContenido("");
       setSelectedFile(null);
+      setOptimizedBlob(null);
       setPreviewImage(null);
       router.push("/articulos");
     } catch (error) {
-      setError("Error al guardar el artículo");
+      setError(`Error al guardar el artículo: ${error}`);
       setIsSubmitting(false);
     }
   };
@@ -163,7 +151,7 @@ export default function AgregarArticulo() {
                 <div className="space-y-1 text-center">
                   {previewImage ? (
                     <>
-                      <Image src={previewImage} alt="Preview" className="mx-auto h-48 object-cover rounded-md" />
+                      <Image width={400} height={400} src={previewImage} alt="Preview" className="mx-auto h-48 object-cover rounded-md" />
                       <div className="flex text-sm text-gray-600 justify-center mt-2">
                         <button
                           type="button"
@@ -216,9 +204,8 @@ export default function AgregarArticulo() {
                   type="submit"
                   onClick={handleAgregarArticulo}
                   disabled={isSubmitting || !contenido || !selectedFile}
-                  className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-                    isSubmitting || !contenido || !selectedFile ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
+                  className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${isSubmitting || !contenido || !selectedFile ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                 >
                   {isSubmitting ? (
                     <>

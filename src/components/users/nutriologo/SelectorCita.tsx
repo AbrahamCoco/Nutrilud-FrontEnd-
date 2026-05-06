@@ -1,15 +1,16 @@
+import { AgendaData } from "@/interfaces/nutriologo/agenda";
 import { addDays, addMonths, endOfMonth, format, getDay, isWeekend, parse, setDefaultOptions, setHours, setMinutes, startOfMonth } from "date-fns";
 import { es } from "date-fns/locale";
 import { useState } from "react";
 setDefaultOptions({ locale: es });
 
 interface SelectorCitaModalProps {
-  eventos: any[];
-  onSelect: (fecha: string) => void; // <-- nueva prop
+  eventos: AgendaData[];
+  onSelect: (fecha: string) => void;
 }
 
 export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaModalProps) {
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -33,16 +34,20 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
   // Obtener horas ocupadas para la fecha seleccionada (tolera " " o "T")
   const getBookedTimes = (date: Date): string[] => {
     const dateStr = format(date, "yyyy-MM-dd");
+
     return eventos
-      .filter((e) => e.siguiente_consulta.startsWith(dateStr))
-      .map((e) => {
+      .filter(e =>
+        typeof e.siguiente_consulta === "string" &&
+        e.siguiente_consulta.startsWith(dateStr)
+      )
+      .map(e => {
         const raw = e.siguiente_consulta;
+
         try {
           if (raw.includes("T")) {
             const d = parse(raw);
             return format(d, "HH:mm");
           } else {
-            // Use parse from date-fns v2+ (already imported)
             const [datePart, timePart] = raw.split(" ");
             const [year, month, day] = datePart.split("-").map(Number);
             const [hour, minute, second] = timePart.split(":").map(Number);
@@ -152,11 +157,10 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
       <button
         type="button"
         onClick={() => setShowModal(true)}
-        className={`w-full px-4 py-3 text-left border rounded-lg shadow-sm transition-all ${
-          eventos.length > 0 && eventos[0].siguiente_consulta
-            ? "bg-green-50 border-green-500 text-green-700"
-            : "bg-white border-gray-300 text-gray-700 hover:border-gray-400"
-        }`}
+        className={`w-full px-4 py-3 text-left border rounded-lg shadow-sm transition-all ${eventos.length > 0 && eventos[0].siguiente_consulta
+          ? "bg-green-50 border-green-500 text-green-700"
+          : "bg-white border-gray-300 text-gray-700 hover:border-gray-400"
+          }`}
       >
         Seleccionar fecha y hora
       </button>
@@ -237,11 +241,10 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
                         key={day.toISOString()}
                         type="button"
                         onClick={() => handleDateSelect(day)}
-                        className={`py-2 rounded-md text-sm transition-all ${
-                          isSelected
-                            ? "bg-green-600 text-white font-medium"
-                            : "hover:bg-gray-100 text-gray-700"
-                        } ${hasAppointments ? "border border-blue-200" : ""}`}
+                        className={`py-2 rounded-md text-sm transition-all ${isSelected
+                          ? "bg-green-600 text-white font-medium"
+                          : "hover:bg-gray-100 text-gray-700"
+                          } ${hasAppointments ? "border border-blue-200" : ""}`}
                         aria-label={format(day, "PPP")}
                       >
                         {format(day, "d")}
@@ -270,13 +273,12 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
                             type="button"
                             disabled={isBooked}
                             onClick={() => !isBooked && handleTimeSelect(time)}
-                            className={`py-2 text-sm rounded-md border transition-all ${
-                              isSelected
-                                ? "bg-green-600 text-white border-green-700"
-                                : isBooked
+                            className={`py-2 text-sm rounded-md border transition-all ${isSelected
+                              ? "bg-green-600 text-white border-green-700"
+                              : isBooked
                                 ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
                                 : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                            }`}
+                              }`}
                           >
                             {time}
                           </button>

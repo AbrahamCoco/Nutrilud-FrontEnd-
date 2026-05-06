@@ -3,8 +3,19 @@ import { useEffect, useState } from "react";
 import { PerfilController } from "@/controllers/perfilController";
 import Image from "next/image";
 
+interface UserData {
+  foto?: string;
+  nombre: string;
+  especialidad?: string;
+  correo: string;
+  telefono?: string;
+  direccion?: string;
+  cedula?: string;
+  descripcion?: string;
+}
+
 export default function PerfilNutriologo({ id }: { id: number }) {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,7 +34,55 @@ export default function PerfilNutriologo({ id }: { id: number }) {
     fetchPerfil();
   }, [id]);
 
-  if (loading) return <p>Cargando perfil del nutriólogo...</p>;
+  if (loading) return (
+    <div className="mx-auto px-2 sm:px-2 lg:px-3 py-3">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-green-600 to-green-700 p-6 h-32 animate-pulse"></div>
+
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="md:w-1/4 flex flex-col items-center">
+              <div className="w-48 h-48 md:w-64 md:h-64 rounded-full bg-gray-300 animate-pulse"></div>
+              <div className="mt-4 flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <div key={star} className="h-5 w-5 bg-gray-300 rounded animate-pulse"></div>
+                ))}
+              </div>
+            </div>
+
+            <div className="md:w-3/4 space-y-6">
+              <div>
+                <div className="h-8 bg-gray-300 rounded animate-pulse w-1/2 mb-3"></div>
+                <div className="h-6 bg-gray-300 rounded animate-pulse w-1/3"></div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  {[1, 2, 3].map((item) => (
+                    <div key={item} className="bg-gray-50 p-4 rounded-lg">
+                      <div className="h-4 bg-gray-300 rounded animate-pulse w-1/2 mb-2"></div>
+                      <div className="h-5 bg-gray-300 rounded animate-pulse"></div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  {[1, 2, 3].map((item) => (
+                    <div key={item} className="bg-gray-50 p-4 rounded-lg">
+                      <div className="h-4 bg-gray-300 rounded animate-pulse w-1/2 mb-2"></div>
+                      <div className="h-5 bg-gray-300 rounded animate-pulse"></div>
+                    </div>
+                  ))}
+                  <div className="h-12 bg-gray-300 rounded-lg animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+  
   if (!userData) return <p>Error al cargar perfil.</p>;
 
   return (

@@ -1,15 +1,16 @@
 import { PerfilController } from "@/controllers/perfilController";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { PacienteData } from "@/interfaces/nutriologo/pacienteData";
 
-export default function PerfilPaciente({id}:{id : number}) {
-  const [userData, setUserData] = useState<any>(null);
+export default function PerfilPaciente({ id }: { id: string }) {
+  const [userData, setUserData] = useState<PacienteData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPerfil = async () => {
       try {
-        const response = await PerfilController.getUser(id);
+        const response = await PerfilController.getUser(parseInt(id));
         const data = await response?.data;
         setUserData(data);
       } catch (error) {
@@ -34,8 +35,60 @@ export default function PerfilPaciente({id}:{id : number}) {
     }
     fechaNacimiento = nacimiento.toLocaleDateString();
   }
-  
-  if (loading) return <p>Cargando perfil del nutriólogo...</p>;
+
+  if (loading) return (
+    <div className="mx-auto px-2 sm:px-2 lg:px-3 py-3">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
+          <div className="flex items-center justify-between">
+            <div className="w-full">
+              <div className="h-8 bg-green-400 rounded w-1/3 animate-pulse"></div>
+              <div className="h-4 bg-green-400 rounded w-1/4 mt-3 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="md:w-1/4 flex flex-col items-center">
+              <div className="w-48 h-48 md:w-56 md:h-56 rounded-full bg-gray-300 animate-pulse"></div>
+            </div>
+
+            <div className="md:w-3/4 space-y-6">
+              <div>
+                <div className="h-8 bg-gray-300 rounded w-2/3 animate-pulse"></div>
+                <div className="mt-3 flex gap-2">
+                  <div className="h-8 bg-gray-300 rounded-full w-24 animate-pulse"></div>
+                  <div className="h-8 bg-gray-300 rounded-full w-24 animate-pulse"></div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <div className="h-5 bg-gray-300 rounded w-1/2 animate-pulse"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <div className="h-5 bg-gray-300 rounded w-1/2 animate-pulse"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                </div>
+              </div>
+
+              <div className="pt-4">
+                <div className="h-10 bg-gray-300 rounded w-48 animate-pulse"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   if (!userData) return <p>Error al cargar perfil.</p>;
 
   return (
@@ -66,6 +119,8 @@ export default function PerfilPaciente({id}:{id : number}) {
               <div className="relative group">
                 {userData?.foto ? (
                   <Image
+                    width={100}
+                    height={100}
                     src={`http://127.0.0.1:8080/api/v1/view/${userData.foto}`}
                     alt={`${userData.nombre} ${userData.primer_apellido}`}
                     className="w-48 h-48 md:w-56 md:h-56 rounded-full object-cover border-4 border-white shadow-lg transition-all duration-300 group-hover:border-green-400 group-hover:scale-105"
