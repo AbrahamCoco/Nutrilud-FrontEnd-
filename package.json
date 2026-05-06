@@ -10,19 +10,19 @@
   },
   "dependencies": {
     "@tinymce/tinymce-react": "^6.3.0",
-    "axios": "^1.11.0",
     "cookies-next": "^6.1.0",
+    "axios": "^1.15.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "jsdom": "^26.1.0",
     "jsonwebtoken": "^9.0.2",
-    "jspdf": "^3.0.1",
-    "jspdf-autotable": "^5.0.2",
-    "next": "15.4.5",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
+    "next": "16.2.3",
     "pica": "^9.0.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "sweetalert2": "^11.22.2"
+    "sweetalert2": "^11.22.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
