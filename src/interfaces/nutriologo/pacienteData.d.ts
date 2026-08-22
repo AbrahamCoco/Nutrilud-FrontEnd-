@@ -9,7 +9,7 @@ export interface PacienteData {
   nombre: string,
   primer_apellido: string,
   segundo_apellido: string,
-  estatura: float,
-  peso: float,
-  imc: float,
+  estatura: number,
+  peso: number,
+  imc: number,
 }

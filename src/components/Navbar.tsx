@@ -1,6 +1,8 @@
 "use client";
 
 import { NavbarController } from "@/controllers/navbarController";
+import { getAuthPayload } from "@/utils/auth";
+import { deleteCookie } from "@/utils/cookie";
 import { Utils } from "@/utils/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -118,21 +120,25 @@ const UserAvatar = ({ fotoPerfil, nombre, onClick }: UserAvatarProps) => (
 );
 
 export default function Navbar() {
-  const [userState, setUserState] = useState({
-    id: null as number | null,
-    rol: null as number | null,
-    nombre: "",
-    fotoPerfil: "",
-  });
-  const [credentials, setCredentials] = useState({ usuario: "", contrasenia: "" });
-  const [showModal, setShowModal] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [id, setId] = useState<number | null>(null);
+  const [rol, setRol] = useState<number | null>(null);
+  const [usuario, setUsuario] = useState<string | null>(null);
+  const [contrasenia, setContrasenia] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [fotoPerfil, setFotoPerfil] = useState<string>("");
+  const [nombre, setNombre] = useState<string>("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [usuarioError, setUsuarioError] = useState<string | null>(null);
+  const [contraseniaError, setContraseniaError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+
+  // Variable computada para saber si el usuario está autenticado
+  const isAuthenticated = rol !== null;
 
   // Cerrar dropdown al hacer click fuera
   useEffect(() => {
@@ -147,77 +153,89 @@ export default function Navbar() {
 
   // Cargar datos de sesión
   useEffect(() => {
-    const storedRol = sessionStorage.getItem("trol_id");
-    const storedId = sessionStorage.getItem("id");
-    const nombreUsuario = `${sessionStorage.getItem("nombre") || ""} ${sessionStorage.getItem("primer_apellido") || ""}`.trim();
-
-    if (storedRol && storedId) {
-      setUserState({
-        id: parseInt(storedId),
-        rol: parseInt(storedRol),
-        nombre: nombreUsuario || "Usuario",
-        fotoPerfil: sessionStorage.getItem("foto_perfil") || "",
-      });
-    } else {
-      router.push("/");
+    const payload = getAuthPayload();
+    if (payload?.rol_id && payload?.id) {
+      const storedRol = payload.rol_id;
+      const storedId = payload.id;
+      const nombreUsuario = `${payload?.nombre || ""} ${payload?.primer_apellido || ""}`;
+      setNombre(nombreUsuario);
+      setRol(parseInt(storedRol.toString()));
+      setId(parseInt(storedId.toString()));
+      if (payload?.foto_perfil) {
+        setFotoPerfil(payload.foto_perfil);
+      }
     }
-  }, [router]);
-
-  const handleLoginError = useCallback((error?: string) => {
-    setUserState(prev => ({ ...prev, rol: null, id: null }));
-    setCredentials({ usuario: "", contrasenia: "" });
-    closeModal();
-    Utils.swalError(error || "Usuario o contraseña incorrectos");
   }, []);
 
-  const handleLogin = useCallback(async () => {
-    if (!credentials.usuario || !credentials.contrasenia) {
-      Utils.swalError("Por favor ingresa usuario y contraseña");
-      return;
-    }
-
+  const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const response = await NavbarController.login(credentials.usuario, credentials.contrasenia);
+      const loginResult = await NavbarController.login(usuario || "", contrasenia || "");
 
-      if (response?.payload) {
-        const { id, nombre, primer_apellido, rol_id } = response.payload;
-        const nombreCompleto = `${nombre} ${primer_apellido}`;
+      if (loginResult && loginResult.decode) {
+        const { decode } = loginResult;
 
-        setUserState({
-          id: id,
-          rol: rol_id,
-          nombre: nombreCompleto,
-          fotoPerfil: response.payload.foto_perfil || "",
-        });
+        setUsuarioError(null);
+        setContraseniaError(null);
 
-        setCredentials({ usuario: "", contrasenia: "" });
+        setNombre(`${decode.payload.nombre} ${decode.payload.primer_apellido}`);
+        setRol(parseInt(decode.payload.rol_id.toString()));
+        setId(parseInt(decode.payload.id.toString()));
+        setUsuario("");
+        setContrasenia("");
         closeModal();
 
+        if (decode.payload.foto_perfil) {
+          setFotoPerfil(decode.payload.foto_perfil);
+        }
+
         // Redirección basada en rol
+        const decodedRolId = parseInt(decode.payload.rol_id.toString());
+        const decodedId = parseInt(decode.payload.id.toString());
         const redirectMap: Record<number, string> = {
           1: "/administrador",
           2: "/nutriologo",
-          3: `/paciente/${id}`,
+          3: `/paciente/${decodedId}`,
         };
-        router.push(redirectMap[rol_id] || "/");
+        router.push(redirectMap[decodedRolId] || "/");
 
         Utils.swalSuccess("Inicio de sesión exitoso");
       } else {
-        handleLoginError();
+        const data = loginResult?.data;
+        setRol(null);
+        setId(null);
+        setUsuarioError(null);
+        setContraseniaError(null);
+
+        if (data?.message === "Usuario no encontrado") {
+          setUsuarioError(data.message);
+        } else if (data?.message === "Contraseña incorrecta") {
+          setContraseniaError(data.message);
+        }
+
+        Utils.swalError("Usuario o contraseña incorrectos");
       }
     } catch (error) {
-      handleLoginError(error as string);
+      setRol(null);
+      setId(null);
+      setUsuario("");
+      setContrasenia("");
+      closeModal();
+      Utils.swalError("Usuario o contraseña incorrectos");
     } finally {
       setIsLoading(false);
     }
-  }, [credentials, router, handleLoginError]);
+  };
 
   const handleLogout = useCallback(async () => {
     try {
       sessionStorage.clear();
       localStorage.clear();
-      setUserState({ id: null, rol: null, nombre: "", fotoPerfil: "" });
+      deleteCookie("auth_token");
+      setRol(null);
+      setId(null);
+      setNombre("");
+      setFotoPerfil("");
       setIsDropdownOpen(false);
       setIsMobileMenuOpen(false);
       await router.replace("/");
@@ -235,14 +253,14 @@ export default function Navbar() {
 
   const closeModal = () => {
     setShowModal(false);
-    setCredentials({ usuario: "", contrasenia: "" });
-    document.body.style.overflow = "unset";
+    setUsuarioError(null);
+    setContraseniaError(null);
+    setUsuario("");
+    setContrasenia("");
+    document.body.style.overflow = "";
   };
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
-  const isAuthenticated = userState.rol !== null;
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
   return (
     <>
@@ -274,8 +292,8 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <div className="relative" ref={dropdownRef}>
                   <UserAvatar
-                    fotoPerfil={userState.fotoPerfil}
-                    nombre={userState.nombre}
+                    fotoPerfil={fotoPerfil}
+                    nombre={nombre}
                     onClick={() => setIsDropdownOpen(prev => !prev)}
                   />
 
@@ -283,19 +301,19 @@ export default function Navbar() {
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl py-2 z-50 ring-1 ring-black ring-opacity-5 transform transition-all duration-200 ease-out origin-top-right">
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900 truncate">{userState.nombre}</p>
+                        <p className="text-sm font-medium text-gray-900 truncate">{nombre}</p>
                         <p className="text-xs text-gray-500 mt-1">
-                          {userState.rol === 1 ? "Administrador" : userState.rol === 2 ? "Nutriólogo" : "Paciente"}
+                          {rol === 1 ? "Administrador" : rol === 2 ? "Nutriólogo" : "Paciente"}
                         </p>
                       </div>
 
                       <div className="py-1">
-                        {userState.rol === 1 && <MenuAdmin onClose={() => setIsDropdownOpen(false)} />}
-                        {userState.rol === 2 && <MenuNutri onClose={() => setIsDropdownOpen(false)} />}
-                        {userState.rol === 3 && <MenuPaciente id={userState.id} onClose={() => setIsDropdownOpen(false)} />}
+                        {rol === 1 && <MenuAdmin onClose={() => setIsDropdownOpen(false)} />}
+                        {rol === 2 && <MenuNutri onClose={() => setIsDropdownOpen(false)} />}
+                        {rol === 3 && <MenuPaciente id={id} onClose={() => setIsDropdownOpen(false)} />}
 
                         <Link
-                          href={`/perfil/${userState.rol}/${userState.id}`}
+                          href={`/perfil/${rol}/${id}`}
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
                           onClick={() => setIsDropdownOpen(false)}
                         >
@@ -327,10 +345,10 @@ export default function Navbar() {
         {/* Menú móvil */}
         {isMobileMenuOpen && (
           <MobileNavLinks
-            onClose={closeMobileMenu}
+            onClose={() => setIsMobileMenuOpen(false)}
             isAuthenticated={isAuthenticated}
-            rol={userState.rol}
-            id={userState.id}
+            rol={rol}
+            id={id}
           />
         )}
       </nav>
@@ -347,7 +365,7 @@ export default function Navbar() {
           <div className="flex items-center justify-center min-h-screen px-4 py-6">
             <div
               ref={modalRef}
-              className="relative bg-white rounded-2xl shadow-2xl transform transition-all duration-300 max-w-md w-full mx-auto animate-slideUp"
+              className="relative bg-white rounded-2xl shadow-2xl transform transition-all duration-300 max-w-md w-full mx-auto animate-slideUp z-[101]"
             >
               <div className="p-6 sm:p-8">
                 <div className="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-green-100 mb-4">
@@ -367,13 +385,30 @@ export default function Navbar() {
                       <input
                         type="text"
                         id="usuario"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        value={credentials.usuario}
-                        onChange={(e) => setCredentials(prev => ({ ...prev, usuario: e.target.value }))}
-                        placeholder="Ingresa tu usuario"
+                        className={`
+                          w-full px-4 py-3 rounded-lg border transition-all duration-200 ease-in-out
+                          focus:ring-2 focus:ring-offset-1 focus:outline-none
+                          ${usuarioError
+                            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                            : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                          }
+                          placeholder-gray-400 text-gray-800
+                          shadow-sm hover:shadow-md
+                        `}
+                        value={usuario ?? ""}
+                        onChange={(e) => setUsuario(e.target.value)}
+                        placeholder="Ingresa tu nombre de usuario"
                         autoFocus
                         disabled={isLoading}
                       />
+                      {usuarioError && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                          <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                          {usuarioError}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -383,12 +418,29 @@ export default function Navbar() {
                       <input
                         type="password"
                         id="contrasenia"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200 outline-none"
-                        value={credentials.contrasenia}
-                        onChange={(e) => setCredentials(prev => ({ ...prev, contrasenia: e.target.value }))}
+                        className={`
+                          w-full px-4 py-3 rounded-lg border transition-all duration-200 ease-in-out
+                          focus:ring-2 focus:ring-offset-1 focus:outline-none
+                          ${contraseniaError
+                            ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+                            : "border-gray-300 focus:ring-green-500 focus:border-green-500"
+                          }
+                          placeholder-gray-400 text-gray-800
+                          shadow-sm hover:shadow-md
+                        `}
+                        value={contrasenia ?? ""}
+                        onChange={(e) => setContrasenia(e.target.value)}
                         placeholder="Ingresa tu contraseña"
                         disabled={isLoading}
                       />
+                      {contraseniaError && (
+                        <p className="mt-2 text-sm text-red-600 flex items-center">
+                          <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                          </svg>
+                          {contraseniaError}
+                        </p>
+                      )}
                     </div>
                   </div>
 

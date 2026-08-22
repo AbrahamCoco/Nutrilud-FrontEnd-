@@ -1,4 +1,4 @@
-import { AgendaData } from "@/interfaces/nutriologo/agenda";
+import { Articulo } from "@/interfaces/articulo";
 import { Tarjet } from "@/utils/axiosConfig";
 import { Utils } from "@/utils/utils";
 import { AxiosResponse } from "axios";
@@ -8,7 +8,7 @@ export class AgregarArticuloController {
     return this._handleRequest(() => Tarjet.userApi.upluoadImage(data, { headers: { "Content-Type": "multipart/form-data" } }), "No se subio ninguna imagen.", "Imagen guardada");
   }
 
-  static async AddArticulo(data: AgendaData) {
+  static async AddArticulo(data: Articulo) {
     return this._handleRequest(() => Tarjet.nutriologoApi.addArticulo(data), "Error al agregar articulo", "Articulo agregado");
   }
 

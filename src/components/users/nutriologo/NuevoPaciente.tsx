@@ -1,5 +1,6 @@
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
 import { PacientesController } from "@/controllers/nutriologo/pacientesController";
+import { getAuthPayload } from "@/utils/auth";
 import { useState } from "react";
 
 interface NuevoPacienteProps {
@@ -24,6 +25,8 @@ export default function NuevoPaciente({ data }: NuevoPacienteProps) {
   const closeModal = () => setShowModal(false);
 
   const uploadImage = async () => {
+    const payload = getAuthPayload();
+
     if (!selectedFile) {
       console.error("No se ha seleccionado ningún archivo.");
       return null;
@@ -33,8 +36,7 @@ export default function NuevoPaciente({ data }: NuevoPacienteProps) {
     formData.append("file", selectedFile);
     formData.append("nombre", nombre);
     formData.append("apellido", primer_apellido);
-    const id_nutriologo = sessionStorage.getItem("id_nutriologo")
-    formData.append("id", id_nutriologo ?? "");
+    formData.append("id", payload?.id_nutriologo ?? "");
 
     try {
       const response = await AgregarArticuloController.uploadImage(formData);

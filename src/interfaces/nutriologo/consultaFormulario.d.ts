@@ -15,7 +15,7 @@ export interface ConsultaFormulario {
   presion_arterial: string;
   fecha_medicion: Date;
   siguiente_consulta: Date;
-  imc?: float;
-  porcentaje_grasa?: float;
-  porcentaje_musculo?: float;
+  imc?: number;
+  porcentaje_grasa?: number;
+  porcentaje_musculo?: number;
 }

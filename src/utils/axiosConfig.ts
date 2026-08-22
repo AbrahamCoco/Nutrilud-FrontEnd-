@@ -1,6 +1,7 @@
 import { ConsultaFormulario } from "@/interfaces/nutriologo/consultaFormulario.d";
 import type { ResponseApi } from "@/interfaces/responseApi";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { getCookie, deleteCookie } from "./cookie";
 
 const baseURL: string = "http://54.165.182.210:8080/api/v1";
 
@@ -33,11 +34,11 @@ axiosInstance.interceptors.request.use(
       return config;
     }
 
-    const token = sessionStorage.getItem("token");
+    const token = getCookie("auth_token");
 
     if (!token) {
       // 🔴 Sesión inválida
-      sessionStorage.clear();
+      deleteCookie("auth_token", "", 0);
 
       if (!isRedirecting) {
         isRedirecting = true;
@@ -63,7 +64,7 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      sessionStorage.clear();
+      deleteCookie("auth_token");
       if (!isRedirecting) {
         isRedirecting = true;
         window.location.href = '/login';

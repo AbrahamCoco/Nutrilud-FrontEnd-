@@ -2,6 +2,7 @@
 import CalendarMonths from "@/components/users/nutriologo/CalendarMonths";
 import Itinerario from "@/components/users/nutriologo/Itinerario";
 import { AgendaController } from "@/controllers/nutriologo/agendaController";
+import { getAuthPayload } from "@/utils/auth";
 import { Utils } from "@/utils/utils";
 import { useEffect, useState } from "react";
 
@@ -10,8 +11,10 @@ export default function AgendaPage() {
 
   useEffect(() => {
     const loadAgenda = async () => {
+      const payload = getAuthPayload();
+
       try {
-        const response = await AgendaController.getAgenda(Number(sessionStorage.getItem("id_nutriologo")));
+        const response = await AgendaController.getAgenda(Number(payload?.id_nutriologo));
         setEventos(response ?? []);
         Utils.swalSuccess("Agenda cargada correctamente.");
       } catch (error) {

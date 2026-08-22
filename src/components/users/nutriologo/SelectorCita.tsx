@@ -1,4 +1,4 @@
-import { AgendaData } from "@/interfaces/nutriologo/agenda";
+import { AgendaData, AgendaEvento } from "@/interfaces/nutriologo/agenda";
 import { addDays, addMonths, endOfMonth, format, getDay, isWeekend, parse, setDefaultOptions, setHours, setMinutes, startOfMonth } from "date-fns";
 import { es } from "date-fns/locale";
 import { useState } from "react";
@@ -6,7 +6,7 @@ setDefaultOptions({ locale: es });
 
 interface SelectorCitaModalProps {
   eventos: AgendaData[];
-  onSelect: (fecha: string) => void;
+onSelect: (fecha: string) => void;
 }
 
 export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaModalProps) {
@@ -45,12 +45,15 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
 
         try {
           if (raw.includes("T")) {
-            const d = parse(raw);
+            const [datePart, timePart] = raw.split("T");
+            const [year, month, day] = datePart.split("-").map(Number);
+            const [hour, minute, second] = (timePart || "00:00:00").split(":").map(Number);
+            const d = new Date(year, month - 1, day, hour, minute, second);
             return format(d, "HH:mm");
           } else {
             const [datePart, timePart] = raw.split(" ");
             const [year, month, day] = datePart.split("-").map(Number);
-            const [hour, minute, second] = timePart.split(":").map(Number);
+            const [hour, minute, second] = (timePart || "00:00:00").split(":").map(Number);
             const d = new Date(year, month - 1, day, hour, minute, second);
             return format(d, "HH:mm");
           }

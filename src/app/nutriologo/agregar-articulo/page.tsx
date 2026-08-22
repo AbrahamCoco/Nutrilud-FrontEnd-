@@ -1,5 +1,7 @@
 "use client";
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
+import { Articulo } from "@/interfaces/articulo";
+import { getAuthPayload } from "@/utils/auth";
 import { resizeImage } from "@/utils/imageResize";
 import { Editor } from "@tinymce/tinymce-react";
 import Image from "next/image";
@@ -52,9 +54,11 @@ export default function AgregarArticulo() {
     try {
       const formData = new FormData();
       formData.append("file", optimizedBlob, "image.webp");
-      formData.append("nombre", sessionStorage.getItem("nombre") || "");
-      formData.append("apellido", sessionStorage.getItem("primer_apellido") || "");
-      formData.append("id", sessionStorage.getItem("id") || "");
+
+      const payload = getAuthPayload();
+      formData.append("nombre", payload?.nombre || "");
+      formData.append("apellido", payload?.primer_apellido || "");
+      formData.append("id", payload?.id || "");
 
       const response = await AgregarArticuloController.uploadImage(formData);
       return response?.data ?? response;
@@ -69,6 +73,8 @@ export default function AgregarArticulo() {
     setIsSubmitting(true);
     setError("");
 
+    const payload = getAuthPayload();
+
     try {
       const imageUrl = await subirImagen();
       if (!imageUrl) {
@@ -77,11 +83,11 @@ export default function AgregarArticulo() {
         return;
       }
 
-      const sendData = {
+      const sendData: Articulo = {
+        nutriologo_id: Number(payload?.id_nutriologo) || 0,
         contenido,
         foto: imageUrl,
-        nutriologo_id: Number(sessionStorage.getItem("id_nutriologo")) || 0,
-      };
+      }
 
       await AgregarArticuloController.AddArticulo(sendData);
 

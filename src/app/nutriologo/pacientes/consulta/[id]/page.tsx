@@ -5,6 +5,7 @@ import { ConsultaController } from "@/controllers/nutriologo/consultaController"
 import { AgendaEvento } from "@/interfaces/nutriologo/agenda";
 import { ConsultaFormulario } from "@/interfaces/nutriologo/consultaFormulario";
 import { PacienteData } from "@/interfaces/nutriologo/pacienteData";
+import { getAuthPayload } from "@/utils/auth";
 import { Utils } from "@/utils/utils";
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
@@ -62,8 +63,10 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
   }, [id]);
 
   const fetchEventos = useCallback(async () => {
+    const payload = getAuthPayload();
+
     try {
-      const response = await AgendaController.getAgenda(parseInt(sessionStorage.getItem("id_nutriologo") || "0"));
+      const response = await AgendaController.getAgenda(parseInt(payload?.id_nutriologo || "0"));
       setEventos(response || []);
     } catch {
       setEventos([]);
@@ -92,9 +95,11 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
   };
 
   const handleGuardarDatos = async () => {
+    const payload = getAuthPayload();
+
     const updatedDatosFormulario: ConsultaFormulario = {
       ...datosFormulario,
-      nutriologo_id: Number(sessionStorage.getItem("id_nutriologo")),
+      nutriologo_id: Number(payload?.id_nutriologo),
       paciente_id: Number(id),
     };
 
