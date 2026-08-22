@@ -38,7 +38,7 @@ axiosInstance.interceptors.request.use(
 
     if (!token) {
       // 🔴 Sesión inválida
-      deleteCookie("auth_token", "", 0);
+      deleteCookie("auth_token");
 
       if (!isRedirecting) {
         isRedirecting = true;
