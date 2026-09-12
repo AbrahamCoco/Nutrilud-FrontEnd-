@@ -1,12 +1,7 @@
 "use client";
+import { Articulo } from "@/interfaces/articulo";
 import { Utils } from "@/utils/utils";
 import { use, useEffect, useState } from "react";
-
-interface Articulo {
-  nameNutriologo: string;
-  articulocreated: string;
-  [key: string]: any;
-}
 
 export default function ArticuloPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -47,6 +42,36 @@ export default function ArticuloPage({ params }: { params: Promise<{ id: string 
         day: "numeric",
       })
     : "Sin fecha";
+
+  if (!articuloData) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <article className="prose prose-green max-w-none">
+          <div className="h-10 bg-gray-200 rounded-lg animate-pulse mb-6 w-3/4"></div>
+
+          <div className="mb-8 space-y-4">
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-5/6"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-4/5"></div>
+            <div className="h-4 bg-gray-200 rounded animate-pulse w-full"></div>
+          </div>
+
+          <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-300 rounded animate-pulse w-1/3"></div>
+                <div className="h-5 bg-gray-200 rounded animate-pulse w-1/2"></div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-300 rounded animate-pulse w-1/2"></div>
+                <div className="h-5 bg-gray-200 rounded animate-pulse w-2/3"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto">
