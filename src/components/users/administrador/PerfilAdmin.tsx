@@ -4,8 +4,17 @@ import { Utils } from "@/utils/utils";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-export default function PerfilAdmin( {id} : {id: number} ) {
-  const [userData, setUserData] = useState<any>(null);
+interface UserData {
+  foto?: string;
+  nombre: string;
+  primer_apellido: string;
+  segundo_apellido: string;
+  correo: string;
+  telefono?: string;
+}
+
+export default function PerfilAdmin({ id }: { id: number }) {
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -15,7 +24,7 @@ export default function PerfilAdmin( {id} : {id: number} ) {
         const data = await response?.data;
         setUserData(data);
         Utils.swalSuccess("Datos de perfil cargados correctamente");
-      } catch(error) {
+      } catch {
         Utils.swalError("No se pudieron cargar los datos del usuario");
       } finally {
         setLoading(false);
@@ -25,7 +34,49 @@ export default function PerfilAdmin( {id} : {id: number} ) {
     fetchPerfil();
   }, [id]);
 
-  if (loading) return <p>Cargando perfil del nutriólogo...</p>;
+  if (loading) return (
+    <div className="mx-auto px-2 sm:px-2 lg:px-3 py-3">
+      <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div className="bg-gradient-to-r from-green-600 to-green-800 p-6">
+          <div className="flex items-center justify-between">
+            <div className="w-2/3">
+              <div className="h-8 bg-green-700 rounded-lg animate-pulse mb-2"></div>
+              <div className="h-4 bg-green-700/50 rounded-lg animate-pulse w-1/2"></div>
+            </div>
+            <div className="h-12 w-12 bg-green-700/50 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+
+        <div className="p-6 md:p-8">
+          <div className="flex flex-col md:flex-row gap-8">
+            <div className="md:w-1/3 flex flex-col items-center">
+              <div className="w-40 h-40 md:w-48 md:h-48 rounded-full bg-gray-200 animate-pulse"></div>
+            </div>
+
+            <div className="md:w-2/3 space-y-6">
+              <div>
+                <div className="h-8 bg-gray-200 rounded-lg animate-pulse mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded-lg animate-pulse w-1/3"></div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                  <div className="h-5 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                  <div className="h-4 bg-gray-200 rounded animate-pulse w-1/4"></div>
+                  <div className="h-5 bg-gray-200 rounded animate-pulse mb-2"></div>
+                  <div className="h-5 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   if (!userData) return <p>Error al cargar perfil.</p>;
 
   return (
@@ -57,6 +108,8 @@ export default function PerfilAdmin( {id} : {id: number} ) {
               <div className="relative group">
                 {userData?.foto ? (
                   <Image
+                    width={192}
+                    height={192}
                     src={userData.foto}
                     alt={`${userData.nombre} ${userData.primer_apellido}`}
                     className="w-40 h-40 md:w-48 md:h-48 rounded-full object-cover border-4 border-white shadow-lg transition-all duration-300 group-hover:border-green-500 group-hover:scale-105"

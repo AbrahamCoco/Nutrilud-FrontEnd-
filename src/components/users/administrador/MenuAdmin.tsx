@@ -1,11 +1,12 @@
 import Link from "next/link";
 
-export default function MenuAdmin() {
+export default function MenuAdmin({ onClose }: { onClose: () => void }) {
   return (
     <>
       <Link 
         href="/administrador" 
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+        onClick={onClose}
       >
         Dashboard
       </Link>
@@ -13,12 +14,14 @@ export default function MenuAdmin() {
       <Link 
         href="/administrador/registro" 
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+        onClick={onClose}
       >
         Registrar usuarios
       </Link>
       <Link 
         href="/administrador/usuarios" 
         className="block px-4 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+        onClick={onClose}
       >
         Listar usuarios
       </Link>

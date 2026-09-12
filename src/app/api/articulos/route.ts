@@ -1,12 +1,6 @@
+import { Articulo } from "@/interfaces/articulo";
 import { Tarjet } from "@/utils/axiosConfig";
 import { JSDOM } from "jsdom";
-
-// Tipado base de un artículo (ajusta según tu backend)
-interface Articulo {
-  id: number;
-  contenido: string;
-  [key: string]: any; // para campos adicionales
-}
 
 // Extrae el primer encabezado de cualquier tipo <h1>-<h6>
 const extraerPrimerEncabezado = (htmlContent: string): string => {
@@ -62,9 +56,10 @@ export async function GET(request: Request): Promise<Response> {
         titulo,
         contenidoModificado,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error al cargar el artículo:", error);
-      return new Response(JSON.stringify({ error: error.message || "Error del servidor" }), {
+      const errorMessage = error instanceof Error ? error.message : "Error del servidor";
+      return new Response(JSON.stringify({ error: errorMessage }), {
         status: 500,
       });
     }
@@ -85,9 +80,10 @@ export async function GET(request: Request): Promise<Response> {
       articulos,
       encabezados,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error al cargar artículos:", error);
-    return new Response(JSON.stringify({ error: error.message || "Error del servidor" }), {
+    const errorMessage = error instanceof Error ? error.message : "Error del servidor";
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
     });
   }

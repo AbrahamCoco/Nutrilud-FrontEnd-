@@ -18,7 +18,7 @@ export default function PerfilPage() {
     case 2:
       return <PerfilNutriologo id={id} />;
     case 3:
-      return <PerfilPaciente id={id} />;
+      return <PerfilPaciente id={id.toString()} />;
     default:
       return <h1>Rol desconocido</h1>;
   }
