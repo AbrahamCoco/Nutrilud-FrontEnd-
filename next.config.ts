@@ -16,12 +16,7 @@ const nextConfig: NextConfig = {
         pathname: "/api/v1/view/**",
       },
     ],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
+    dangerouslyAllowLocalIP: true,
   },
 };
 
