@@ -3,7 +3,7 @@ name: Bump Version
 on:
   push:
     branches:
-      - dev
+      - qa
 
 # Prevent concurrent runs on the same branch
 concurrency:
@@ -58,7 +58,7 @@ jobs:
         run: |
           set -e
 
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/qa/null || echo "")
 
           if [ -z "$LAST_TAG" ]; then
             echo ">>> No previous tags found, analyzing last 20 commits"
@@ -204,8 +204,8 @@ jobs:
           # Push the commit first, then the tag separately.
           # No rebase here — if push fails due to a race condition, the workflow
           # will fail loudly instead of silently mangling history.
-          echo ">>> 📤 Pushing commit to dev..."
-          git push origin dev
+          echo ">>> 📤 Pushing commit to qa..."
+          git push origin qa
 
           echo ">>> 📤 Pushing tag v$NEW_VERSION..."
           git push origin "v$NEW_VERSION"
