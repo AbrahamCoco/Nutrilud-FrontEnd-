@@ -2,15 +2,21 @@ name: Deploy Nutrilud FrontEnd
 
 on:
   pull_request:
+    types: [closed]
     branches:
       - master
 
+concurrency:
+  group: deploy-master
+  cancel-in-progress: false
+
 jobs:
   deploy:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup SSH Connection
         uses: appleboy/ssh-action@master
@@ -19,6 +25,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_KEY }}
           script: |
+            set -e
             pm2 stop nutrilud-frontend
 
             cd Nutrilud-FrontEnd-
