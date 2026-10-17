@@ -45,5 +45,8 @@
     "@tailwindcss/oxide@4.1.11": true,
     "core-js@3.45.0": true,
     "unrs-resolver@1.11.1": true
+  },
+  "overrides": {
+    "@tiptap/core": "^2.11.2"
   }
 }
