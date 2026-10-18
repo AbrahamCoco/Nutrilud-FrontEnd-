@@ -1,90 +1,54 @@
-import { Articulo } from "@/interfaces/articulo";
-import { Tarjet } from "@/utils/axiosConfig";
-import { JSDOM } from "jsdom";
+import sanitizeHtml from "sanitize-html";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+import type { ArticuloInput } from "@/interfaces/articulo";
+import { ServerBlockNoteEditor } from "@blocknote/server-util";
 
-// Extrae el primer encabezado de cualquier tipo <h1>-<h6>
-const extraerPrimerEncabezado = (htmlContent: string): string => {
-  const dom = new JSDOM(htmlContent);
-  const doc = dom.window.document;
+export const runtime = "nodejs";
 
-  const headingTags = ["h1", "h2", "h3", "h4", "h5", "h6"];
-  for (const tag of headingTags) {
-    const headings = doc.getElementsByTagName(tag);
-    if (headings.length > 0) {
-      return headings[0].textContent || "Sin texto";
-    }
-  }
-  return "No hay encabezado";
+const PROHIBIDAS = new Set(["__proto__", "constructor", "prototype"]);
+const limpiarJson = (input: unknown) =>
+  JSON.parse(JSON.stringify(input), (k, v) => (PROHIBIDAS.has(k) ? undefined : v));
+
+const SANITIZE: sanitizeHtml.IOptions = {
+  allowedTags: [...sanitizeHtml.defaults.allowedTags, "img", "h1", "h2", "h3", "figure", "figcaption"],
+  allowedAttributes: {
+    a: ["href", "target", "rel"],
+    img: ["src", "alt", "width", "height", "loading"],
+  },
+  allowedSchemes: ["https", "http", "mailto"], // quita "http" en producción
+  transformTags: {
+    a: sanitizeHtml.simpleTransform("a", { rel: "noopener noreferrer" }),
+    img: sanitizeHtml.simpleTransform("img", { loading: "lazy" }),
+  },
 };
 
-// Remueve el primer encabezado de cualquier tipo <h1>-<h6>
-const removerPrimerEncabezado = (htmlContent: string): string => {
-  const dom = new JSDOM(htmlContent);
-  const doc = dom.window.document;
-
-  const heading = doc.querySelector("h1, h2, h3, h4, h5, h6");
-  if (heading) {
-    heading.remove();
+export async function POST(req: Request) {
+  const baseURL: string = "http://localhost:8080/api/v1";
+  const token = (await cookies()).get("auth_token")?.value;
+  if (!token) {
+    return NextResponse.json({ success: false, message: "No autorizado" }, { status: 401 });
   }
 
-  return doc.body.innerHTML;
-};
-
-// Método GET
-export async function GET(request: Request): Promise<Response> {
-  const { searchParams } = new URL(request.url);
-  const id = parseInt(searchParams.get("id") || "0", 10);
-
-  // Obtener un solo artículo por ID
-  if (id) {
-    try {
-      const response = await Tarjet.nutriologoApi.getArticuloId(id);
-      const articuloData: Articulo = response.data.data;
-
-      if (!articuloData || !articuloData.contenido) {
-        return new Response(
-          JSON.stringify({ error: "Contenido del artículo no encontrado" }),
-          { status: 404 }
-        );
-      }
-
-      const titulo = extraerPrimerEncabezado(articuloData.contenido);
-      const contenidoModificado = removerPrimerEncabezado(articuloData.contenido);
-
-      return Response.json({
-        articuloData,
-        titulo,
-        contenidoModificado,
-      });
-    } catch (error: unknown) {
-      console.error("Error al cargar el artículo:", error);
-      const errorMessage = error instanceof Error ? error.message : "Error del servidor";
-      return new Response(JSON.stringify({ error: errorMessage }), {
-        status: 500,
-      });
-    }
+  const body = (await req.json()) as ArticuloInput;
+  if (!Array.isArray(body.contenidoJson)) {
+    return NextResponse.json({ success: false, message: "Datos inválidos" }, { status: 400 });
   }
 
-  // Obtener todos los artículos
-  try {
-    const response = await Tarjet.nutriologoApi.getAllArticulos();
-    const articulos: Articulo[] = response.data.data;
+  const contenidoJson = limpiarJson(body.contenidoJson);
+  const editor = ServerBlockNoteEditor.create();
+  const html = await editor.blocksToHTMLLossy(contenidoJson);
+  const contenidoHtml = sanitizeHtml(html, SANITIZE);
 
-    const encabezados: Record<number, string> = articulos.reduce((acc, articulo) => {
-      const encabezado = extraerPrimerEncabezado(articulo.contenido);
-      acc[articulo.id] = encabezado;
-      return acc;
-    }, {} as Record<number, string>);
+  const res = await fetch(`${baseURL}/tarticulos/insert`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ ...body, contenidoJson, contenidoHtml }),
+  });
 
-    return Response.json({
-      articulos,
-      encabezados,
-    });
-  } catch (error: unknown) {
-    console.error("Error al cargar artículos:", error);
-    const errorMessage = error instanceof Error ? error.message : "Error del servidor";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-    });
-  }
+  const data = await res.json().catch(() => null);
+  return NextResponse.json(
+    data ?? { success: false, message: "Respuesta inválida del servidor" },
+    { status: res.status }
+  );
 }

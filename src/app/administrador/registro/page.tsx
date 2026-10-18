@@ -42,11 +42,11 @@ export default function RegistroNutrisPage() {
       reader.readAsDataURL(file);
     }
   };
-  
+
   const uploadImage = async () => {
     if (!selectedFile) return null;
 
-    const payload = getAuthPayload();    
+    const payload = getAuthPayload();
 
     const data = new FormData();
     data.append('file', selectedFile);
@@ -55,7 +55,7 @@ export default function RegistroNutrisPage() {
     data.append("id", payload?.id_nutriologo || "0");
 
     try {
-      const response = await AgregarArticuloController.uploadImage(data);
+      const response = await AgregarArticuloController.uploadUserImage(data);
       return response?.data || null;
     } catch (error) {
       console.error("Error uploading image:", error);
@@ -256,11 +256,10 @@ export default function RegistroNutrisPage() {
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <label
-                  className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                    formData.rol_id === 1
+                  className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.rol_id === 1
                       ? "border-green-500 bg-green-50"
                       : "border-gray-200 hover:border-green-300"
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"
@@ -274,11 +273,10 @@ export default function RegistroNutrisPage() {
                   <span className="ml-2 text-gray-700">Administrador</span>
                 </label>
                 <label
-                  className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${
-                    formData.rol_id === 2
+                  className={`flex items-center p-3 border rounded-lg cursor-pointer transition-colors ${formData.rol_id === 2
                       ? "border-green-500 bg-green-50"
                       : "border-gray-200 hover:border-green-300"
-                  }`}
+                    }`}
                 >
                   <input
                     type="radio"

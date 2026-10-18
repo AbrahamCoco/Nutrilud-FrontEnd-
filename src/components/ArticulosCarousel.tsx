@@ -1,145 +1,101 @@
-import { Tarjet } from "@/utils/axiosConfig";
+"use client";
+import type { Articulo } from "@/interfaces/articulo";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-interface Articulo {
-  id: number;
-  foto: string | null;
-  articulocreated: string;
-}
+const FALLBACK = "/images/Nutricion.png";
 
-export default function ArticulosCarousel({ articulos, primerEncabezado }: { articulos: Articulo[], primerEncabezado: string | null }) {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const [isHovered, setIsHovered] = useState<boolean>(false);
+export default function ArticulosCarousel({ articulos }: { articulos: Articulo[] }) {
+  const [current, setCurrent] = useState(0);
+  const [hovered, setHovered] = useState(false);
+  const total = articulos.length;
 
   useEffect(() => {
-    if (!Array.isArray(articulos) || articulos.length <= 1 || isHovered) return;
+    if (total <= 1 || hovered) return;
+    const id = setInterval(() => setCurrent((p) => (p + 1) % total), 5000);
+    return () => clearInterval(id);
+  }, [total, hovered]);
 
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % articulos.length);
-    }, 5000);
+  if (total === 0) return null;
 
-    return () => clearInterval(interval);
-  }, [articulos, isHovered]);
-
-  const goToPrev = () => {
-    setCurrentIndex((prev) => (prev === 0 ? articulos.length - 1 : prev - 1));
-  }
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % articulos.length);
-  }
-
-  if (!Array.isArray(articulos) || articulos.length === 0) {
-    return (
-      <div className="relative w-full h-96 md:h-[32rem] overflow-hidden rounded-lg shadow-xl">
-        {/* Skeleton del contenedor principal */}
-        <div className="w-full h-full bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-pulse" />
-
-        {/* Skeleton de los controles */}
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 bg-gray-400 rounded-full p-2 w-10 h-10 animate-pulse" />
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 bg-gray-400 rounded-full p-2 w-10 h-10 animate-pulse" />
-
-        {/* Skeleton de los indicadores */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-2 w-2 rounded-full bg-gray-400 animate-pulse" />
-          ))}
-        </div>
-
-        {/* Skeleton del overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50">
-          <div className="h-6 bg-gray-400 rounded animate-pulse mb-2" />
-          <div className="h-4 bg-gray-400 rounded animate-pulse w-3/4 mx-auto" />
-        </div>
-      </div>
-    );
-  }
+  const prev = () => setCurrent((p) => (p === 0 ? total - 1 : p - 1));
+  const next = () => setCurrent((p) => (p + 1) % total);
 
   return (
-    <div className="relative w-full h-96 md:h-[32rem] overflow-hidden rounded-lg shadow-xl" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      {/* Contenedor de slides */}
-      <div className="relative w-full h-full">
-        {articulos.map((articulo, index) => {
-          // ✔ Evita error cuando la foto es null/undefined
-          const fotoSegura = articulo?.foto
-            ? `${Tarjet.view}${articulo.foto.replace(/\\/g, "/")}`
-            : "/images/Nutricion.png"; // imagen por defecto
-
-          return (
-            <div
-              key={articulo.id}
-              className={`absolute inset-0 transition-opacity duration-500 ${index === currentIndex ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-            >
-              <Link href={`/articulos/${articulo.id}`} className="block w-full h-full">
-                <Image
-                  src={fotoSegura}
-                  fill
-                  className="object-cover"
-                  alt={primerEncabezado?.[articulo.id] ?? "Sin título"}
-                  priority={index === currentIndex}
-                />
-
-                {/* Overlay con información */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-sm">
-                  <div
-                    className="text-white text-lg md:text-xl font-medium mb-2 text-center"
-                    dangerouslySetInnerHTML={{
-                      __html: primerEncabezado?.[articulo.id] || "",
-                    }}
-                  />
-                  <p className="text-gray-200 text-sm text-center">
-                    Publicado el{" "}
-                    {new Date(articulo.articulocreated.split(" ")[0]).toLocaleDateString("es-ES", {
+    <section
+      aria-roledescription="carrusel"
+      aria-label="Artículos destacados"
+      className="relative h-96 w-full overflow-hidden rounded-lg shadow-xl md:h-[32rem]"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {articulos.map((a, i) => {
+        const activo = i === current;
+        return (
+          <div
+            key={a.id}
+            aria-hidden={!activo}
+            className={`absolute inset-0 transition-opacity duration-500 ${activo ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
+          >
+            <Link href={`/articulos/${a.slug}`} tabIndex={activo ? 0 : -1} className="block h-full w-full">
+              <Image
+                src={a.imagenPortadaUrl || FALLBACK}
+                alt={a.imagenPortadaAlt ?? a.titulo}
+                fill
+                sizes="100vw"
+                priority={i === 0}
+                className="object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-black/50 p-4 backdrop-blur-sm">
+                <p className="mb-2 text-center text-lg font-medium text-white md:text-xl">{a.titulo}</p>
+                <p className="text-center text-sm text-gray-200">
+                  {a.fechaPublicacion
+                    ? new Date(a.fechaPublicacion).toLocaleDateString("es-MX", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
-                    })}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          );
-        })}
-      </div>
+                    })
+                    : ""}
+                </p>
+              </div>
+            </Link>
+          </div>
+        );
+      })}
 
-      {/* Controles de navegación */}
-      {articulos.length > 1 && (
+      {total > 1 && (
         <>
           <button
-            onClick={goToPrev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300 z-10"
+            type="button"
+            onClick={prev}
             aria-label="Anterior"
+            className="absolute left-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 text-white hover:bg-black/50"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            ‹
           </button>
-
           <button
-            onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full transition-all duration-300 z-10"
+            type="button"
+            onClick={next}
             aria-label="Siguiente"
+            className="absolute right-4 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/30 p-2 text-white hover:bg-black/50"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            ›
           </button>
-
-          {/* Indicadores de posición */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-            {articulos.map((_, index) => (
+          <div className="absolute bottom-16 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+            {articulos.map((a, i) => (
               <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`h-2 w-2 rounded-full transition-all duration-300 ${index === currentIndex ? "bg-white w-4" : "bg-white/50"}`}
-                aria-label={`Ir a slide ${index + 1}`}
+                key={a.id}
+                type="button"
+                onClick={() => setCurrent(i)}
+                aria-label={`Ir al artículo ${i + 1}`}
+                className={`h-2 rounded-full transition-all ${i === current ? "w-4 bg-white" : "w-2 bg-white/50"}`}
               />
             ))}
           </div>
         </>
       )}
-    </div>
+    </section>
   );
 }

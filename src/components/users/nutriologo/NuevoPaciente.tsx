@@ -39,7 +39,7 @@ export default function NuevoPaciente({ data }: NuevoPacienteProps) {
     formData.append("id", payload?.id_nutriologo ?? "");
 
     try {
-      const response = await AgregarArticuloController.uploadImage(formData);
+      const response = await AgregarArticuloController.uploadUserImage(formData);
       return response?.data;
     } catch {
       return null;

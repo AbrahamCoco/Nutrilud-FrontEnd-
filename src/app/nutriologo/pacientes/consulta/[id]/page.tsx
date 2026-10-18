@@ -494,12 +494,20 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
                         {datos.estatura.toFixed(2)} m
                       </td>
                       <td className="py-4 px-4 text-center text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${datos.imc < 18.5 ? 'bg-blue-100 text-blue-800' :
-                          datos.imc >= 18.5 && datos.imc < 25 ? 'bg-green-100 text-green-800' :
-                            datos.imc >= 25 && datos.imc < 30 ? 'bg-yellow-100 text-yellow-800' :
-                              'bg-red-100 text-red-800'
-                          }`}>
-                          {datos.imc.toFixed(1)} kg/m²
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            datos.imc == null
+                              ? "bg-gray-100 text-gray-800"
+                              : datos.imc < 18.5
+                              ? "bg-blue-100 text-blue-800"
+                              : datos.imc < 25
+                              ? "bg-green-100 text-green-800"
+                              : datos.imc < 30
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
+                          }`}
+                        >
+                          {datos.imc != null ? `${datos.imc.toFixed(1)} kg/m²` : "--"}
                         </span>
                       </td>
                       <td className="py-4 px-4 text-center text-sm text-gray-900">
@@ -521,10 +529,10 @@ export default function ConsultaPage({ params }: { params: Promise<{ id: string 
                         {datos.presion_arterial} mmHg
                       </td>
                       <td className="py-4 px-4 text-center text-sm text-gray-900">
-                        {datos.porcentaje_grasa.toFixed(1)} %
+                        {datos.porcentaje_grasa != null ? `${datos.porcentaje_grasa.toFixed(1)} %` : "--"}
                       </td>
                       <td className="py-4 px-4 text-center text-sm text-gray-900">
-                        {datos.porcentaje_musculo.toFixed(1)} kg
+                        {datos.porcentaje_musculo != null ? `${datos.porcentaje_musculo.toFixed(1)} %` : "--"}
                       </td>
                       <td className="py-4 px-4 text-center text-sm text-gray-900">
                         {datos.circunferencia_cintura.toFixed(1)} cm

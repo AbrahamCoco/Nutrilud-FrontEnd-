@@ -3,7 +3,7 @@ import type { ResponseApi } from "@/interfaces/responseApi";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { getCookie, deleteCookie } from "./cookie";
 
-const baseURL: string = "http://54.165.182.210:8080/api/v1";
+const baseURL: string = "http://localhost:8080/api/v1";
 
 const axiosInstance: AxiosInstance = axios.create({
   baseURL,
@@ -98,9 +98,6 @@ export const Tarjet = {
   nutriologoApi: {
     getAllArticulos: (): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.get("/tarticulos/findAllArticles"),
-
-    getArticuloId: (id: number): Promise<AxiosResponse<ResponseApi>> =>
-      axiosInstance.get(`/tarticulos/findById`, { params: { id } }),
 
     getAgenda: (id: number): Promise<AxiosResponse<ResponseApi>> =>
       axiosInstance.get(`/tdatos_consultas/findAgendaByNutriologo`, { params: { id } }),

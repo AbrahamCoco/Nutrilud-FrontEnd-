@@ -5,8 +5,8 @@ import { useState } from "react";
 setDefaultOptions({ locale: es });
 
 interface SelectorCitaModalProps {
-  eventos: AgendaData[];
-onSelect: (fecha: string) => void;
+  eventos: (AgendaEvento | AgendaData)[];
+  onSelect: (fecha: string) => void;
 }
 
 export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaModalProps) {
@@ -31,38 +31,37 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
     });
   };
 
-  // Obtener horas ocupadas para la fecha seleccionada (tolera " " o "T")
+  // Obtener horas ocupadas para la fecha seleccionada
   const getBookedTimes = (date: Date): string[] => {
     const dateStr = format(date, "yyyy-MM-dd");
 
     return eventos
-      .filter(e =>
-        typeof e.siguiente_consulta === "string" &&
-        e.siguiente_consulta.startsWith(dateStr)
-      )
       .map(e => {
-        const raw = e.siguiente_consulta;
-
-        try {
-          if (raw.includes("T")) {
-            const [datePart, timePart] = raw.split("T");
-            const [year, month, day] = datePart.split("-").map(Number);
-            const [hour, minute, second] = (timePart || "00:00:00").split(":").map(Number);
-            const d = new Date(year, month - 1, day, hour, minute, second);
-            return format(d, "HH:mm");
-          } else {
-            const [datePart, timePart] = raw.split(" ");
-            const [year, month, day] = datePart.split("-").map(Number);
-            const [hour, minute, second] = (timePart || "00:00:00").split(":").map(Number);
-            const d = new Date(year, month - 1, day, hour, minute, second);
-            return format(d, "HH:mm");
-          }
-        } catch {
-          const m = raw.match(/\b\d{2}:\d{2}\b/);
-          return m ? m[0] : "";
+        if ("start" in e && e.start) {
+          const d = e.start instanceof Date ? e.start : new Date(e.start);
+          return isNaN(d.getTime()) ? null : d;
         }
+        if ("siguiente_consulta" in e && e.siguiente_consulta) {
+          const raw = e.siguiente_consulta;
+          try {
+            if (raw.includes("T")) {
+              const d = new Date(raw);
+              return isNaN(d.getTime()) ? null : d;
+            } else {
+              const [datePart, timePart] = raw.split(" ");
+              const [year, month, day] = datePart.split("-").map(Number);
+              const [hour, minute, second] = (timePart || "00:00:00").split(":").map(Number);
+              const d = new Date(year, month - 1, day, hour, minute, second);
+              return isNaN(d.getTime()) ? null : d;
+            }
+          } catch {
+            return null;
+          }
+        }
+        return null;
       })
-      .filter(Boolean);
+      .filter((d): d is Date => d !== null && format(d, "yyyy-MM-dd") === dateStr)
+      .map(d => format(d, "HH:mm"));
   };
 
   // Generar celdas del calendario (Lunes a Viernes) con huecos correctos
@@ -160,12 +159,15 @@ export default function SelectorCitaModal({ eventos, onSelect }: SelectorCitaMod
       <button
         type="button"
         onClick={() => setShowModal(true)}
-        className={`w-full px-4 py-3 text-left border rounded-lg shadow-sm transition-all ${eventos.length > 0 && eventos[0].siguiente_consulta
-          ? "bg-green-50 border-green-500 text-green-700"
-          : "bg-white border-gray-300 text-gray-700 hover:border-gray-400"
-          }`}
+        className={`w-full px-4 py-3 text-left border rounded-lg shadow-sm transition-all ${
+          selectedDate && selectedTime
+            ? "bg-green-50 border-green-500 text-green-700"
+            : "bg-white border-gray-300 text-gray-700 hover:border-gray-400"
+        }`}
       >
-        Seleccionar fecha y hora
+        {selectedDate && selectedTime
+          ? `Cita seleccionada: ${format(selectedDate, "dd/MM/yyyy")} a las ${selectedTime}`
+          : "Seleccionar fecha y hora"}
       </button>
 
       {/* Modal */}

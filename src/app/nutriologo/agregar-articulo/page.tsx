@@ -1,234 +1,258 @@
 "use client";
+import RichEditorClient from "@/components/users/nutriologo/editor/RichEditorClient";
+import type { EditorContent } from "@/components/users/nutriologo/editor/RichEditor";
 import { AgregarArticuloController } from "@/controllers/nutriologo/agregarArticuloController";
-import { Articulo } from "@/interfaces/articulo";
-import { getAuthPayload } from "@/utils/auth";
+import type { ArticuloInput, EstadoArticulo } from "@/interfaces/articulo";
+import { blocksToText } from "@/utils/articulo";
 import { resizeImage } from "@/utils/imageResize";
-import { Editor } from "@tinymce/tinymce-react";
+import { Utils } from "@/utils/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
+
+const CATEGORIAS = [
+  { id: 1, nombre: "Nutrición Clínica" },
+  { id: 2, nombre: "Nutrición Deportiva" },
+  { id: 3, nombre: "Pérdida de Peso" },
+];
+
+const MAX_IMAGEN = 5 * 1024 * 1024;
+
+const subirImagen = (blob: Blob) => AgregarArticuloController.uploadImage(blob);
 
 export default function AgregarArticulo() {
-  const [contenido, setContenido] = useState<string>("");
-  const [error, setError] = useState<string>("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const [optimizedBlob, setOptimizedBlob] = useState<Blob | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const editorRef = useRef<InstanceType<typeof Editor>['editor']>(null);
   const router = useRouter();
 
-  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.log("No file selected");
-      return;
-    }
+  const [titulo, setTitulo] = useState("");
+  const [resumen, setResumen] = useState("");
+  const [categoriaId, setCategoriaId] = useState<number | null>(null);
+  const [etiquetasTxt, setEtiquetasTxt] = useState("");
+  const [contenido, setContenido] = useState<EditorContent>([]);
+  const [portada, setPortada] = useState<{ blob: Blob; preview: string } | null>(null);
+  const [portadaAlt, setPortadaAlt] = useState("");
+  const [error, setError] = useState("");
+  const [enviando, setEnviando] = useState<EstadoArticulo | null>(null);
 
-    console.log("File selected:", file.name, file.size);
+  // Libera la URL temporal al cambiar la imagen o al salir de la página
+  useEffect(() => {
+    return () => {
+      if (portada?.preview) URL.revokeObjectURL(portada.preview);
+    };
+  }, [portada?.preview]);
 
-    if (file.size > 5 * 1024 * 1024) {
-      setError("La imagen supera los 5MB");
-      return;
-    }
+  const mostrarError = (mensaje: string) => {
+    setError(mensaje);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const onElegirPortada = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permite volver a elegir el mismo archivo
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) return mostrarError("El archivo debe ser una imagen");
+    if (file.size > MAX_IMAGEN) return mostrarError("La imagen supera los 5 MB");
 
     try {
-      console.log("Starting resize...");
       const blob = await resizeImage(file);
-      console.log("Resize done:", blob);
-
-      setSelectedFile(file);
-      setOptimizedBlob(blob);
-      const previewUrl = URL.createObjectURL(blob);
-      console.log("Preview URL:", previewUrl);
-      setPreviewImage(previewUrl);
-    } catch (err) {
-      console.error("Error in handleImageChange:", err); // 👈 clave
-      setError("Error al procesar la imagen");
+      setPortada({ blob, preview: URL.createObjectURL(blob) });
+      setError("");
+    } catch {
+      mostrarError("No se pudo procesar la imagen");
     }
   };
 
-  const subirImagen = async (): Promise<string | null> => {
-    if (!optimizedBlob) return null;
-
-    try {
-      const formData = new FormData();
-      formData.append("file", optimizedBlob, "image.webp");
-
-      const payload = getAuthPayload();
-      formData.append("nombre", payload?.nombre || "");
-      formData.append("apellido", payload?.primer_apellido || "");
-      formData.append("id", payload?.id || "");
-
-      const response = await AgregarArticuloController.uploadImage(formData);
-      return response?.data ?? response;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
+  const validar = (estado: EstadoArticulo): string | null => {
+    if (titulo.trim().length < 10) return "El título debe tener al menos 10 caracteres";
+    if (estado === "BORRADOR") return null;
+    if (resumen.trim().length < 50) return "El resumen debe tener entre 50 y 160 caracteres";
+    if (!categoriaId) return "Elige una categoría";
+    if (!portada) return "Agrega una imagen de portada";
+    if (portadaAlt.trim().length < 10) return "Describe la imagen de portada (texto alternativo)";
+    if (blocksToText(contenido).length < 300) return "El artículo es demasiado corto (mínimo 300 caracteres)";
+    return null;
   };
 
-  const handleAgregarArticulo = async (event: FormEvent) => {
-    event.preventDefault();
-    setIsSubmitting(true);
+  const guardar = async (estado: EstadoArticulo) => {
+    const problema = validar(estado);
+    if (problema) return mostrarError(problema);
+
+    setEnviando(estado);
     setError("");
 
-    const payload = getAuthPayload();
-
     try {
-      const imageUrl = await subirImagen();
-      if (!imageUrl) {
-        setError("Error al subir la imagen");
-        setIsSubmitting(false);
-        return;
-      }
+      const imagenPortadaUrl = portada ? await subirImagen(portada.blob) : null;
 
-      const sendData: Articulo = {
-        nutriologo_id: Number(payload?.id_nutriologo) || 0,
-        contenido,
-        foto: imageUrl,
-      }
+      const etiquetas = [
+        ...new Set(
+          etiquetasTxt
+            .split(",")
+            .map((t) => t.trim().toLowerCase())
+            .filter(Boolean)
+        ),
+      ].slice(0, 8);
 
-      await AgregarArticuloController.AddArticulo(sendData);
+      const datos: ArticuloInput = {
+        titulo: titulo.trim(),
+        resumen: resumen.trim() || null,
+        categoriaId,
+        etiquetas,
+        contenidoJson: contenido,
+        imagenPortadaUrl,
+        imagenPortadaAlt: portadaAlt.trim() || null,
+        estado,
+      };
 
-      setContenido("");
-      setSelectedFile(null);
-      setOptimizedBlob(null);
-      setPreviewImage(null);
+      await AgregarArticuloController.crear(datos);
+      Utils.swalSuccess(estado === "BORRADOR" ? "Borrador guardado" : "Artículo publicado");
       router.push("/articulos");
-    } catch (error) {
-      setError(`Error al guardar el artículo: ${error}`);
-      setIsSubmitting(false);
+    } catch (e) {
+      mostrarError(e instanceof Error ? e.message : "No se pudo guardar el artículo");
+      setEnviando(null);
     }
   };
 
+  const campo =
+    "w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500";
+
   return (
-    <div className="mx-auto px-2 sm:px-2 lg:px-3 py-3">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">Crear Nuevo Artículo</h1>
+    <div className="mx-auto px-3 py-3">
+      <h1 className="mb-6 text-3xl font-bold text-gray-800">Crear nuevo artículo</h1>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded">
-          <p>{error}</p>
+        <div role="alert" className="mb-6 rounded border-l-4 border-red-500 bg-red-50 p-4 text-red-700">
+          {error}
         </div>
       )}
 
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="lg:w-2/3">
-          <div className="border border-gray-300 rounded-lg overflow-hidden">
-            <Editor
-              apiKey="z2ucrddcmykd18x0265ytd6lhueypl1lr84sa6c4dua7cqk7"
-              onInit={(_evt, editor) => (editorRef.current = editor)}
-              initialValue="<p>Escribe el contenido de tu artículo aquí...</p>"
-              onEditorChange={(content) => setContenido(content)}
-              init={{
-                height: 500,
-                menubar: true,
-                plugins: [
-                  "advlist",
-                  "autolink",
-                  "lists",
-                  "link",
-                  "image",
-                  "charmap",
-                  "preview",
-                  "anchor",
-                  "searchreplace",
-                  "visualblocks",
-                  "code",
-                  "fullscreen",
-                  "insertdatetime",
-                  "media",
-                  "table",
-                  "help",
-                  "wordcount",
-                ],
-                toolbar: "undo redo | blocks | bold italic backcolor | " + "alignleft aligncenter alignright alignjustify | " + "bullist numlist outdent indent | removeformat | help",
-                content_style: "body { font-family:Helvetica,Arial,sans-serif; font-size:16px }",
-              }}
+      <div className="flex flex-col gap-6 lg:flex-row">
+        <div className="space-y-4 lg:w-2/3">
+          <input
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            maxLength={160}
+            placeholder="Título del artículo"
+            aria-label="Título"
+            className={`${campo} text-xl font-semibold`}
+          />
+          <div className="rounded-lg border border-gray-300 py-2">
+            <RichEditorClient
+              onContentChange={setContenido}
+              onUploadFile={async (file) => subirImagen(await resizeImage(file))}
             />
           </div>
         </div>
 
-        <div className="lg:w-1/3">
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Imagen de portada</label>
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
-                <div className="space-y-1 text-center">
-                  {previewImage ? (
-                    <>
-                      <Image width={400} height={400} src={previewImage} alt="Preview" className="mx-auto h-48 object-cover rounded-md" />
-                      <div className="flex text-sm text-gray-600 justify-center mt-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedFile(null);
-                            setPreviewImage(null);
-                          }}
-                          className="font-medium text-red-600 hover:text-red-500 focus:outline-none"
-                        >
-                          Cambiar imagen
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                        <path
-                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                          strokeWidth={2}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      <div className="flex text-sm text-gray-600">
-                        <label
-                          htmlFor="file-upload"
-                          className="relative cursor-pointer bg-white rounded-md font-medium text-green-600 hover:text-green-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-green-500"
-                        >
-                          <span>Sube una imagen aquí</span>
-                          <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageChange} />
-                        </label>
-                      </div>
-                      <p className="text-xs text-gray-500">PNG, JPG, GIF hasta 5MB</p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
+        <aside className="space-y-5 lg:w-1/3">
+          <div>
+            <label htmlFor="resumen" className="mb-1 block text-sm font-medium text-gray-700">
+              Resumen para Google ({resumen.length}/160)
+            </label>
+            <textarea
+              id="resumen"
+              value={resumen}
+              onChange={(e) => setResumen(e.target.value)}
+              maxLength={160}
+              rows={3}
+              className={campo}
+            />
+          </div>
 
-            <div className="pt-2">
-              <div className="flex justify-end space-x-3">
+          <div>
+            <label htmlFor="categoria" className="mb-1 block text-sm font-medium text-gray-700">
+              Categoría
+            </label>
+            <select
+              id="categoria"
+              value={categoriaId ?? ""}
+              onChange={(e) => setCategoriaId(e.target.value ? Number(e.target.value) : null)}
+              className={campo}
+            >
+              <option value="">Selecciona...</option>
+              {CATEGORIAS.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="etiquetas" className="mb-1 block text-sm font-medium text-gray-700">
+              Etiquetas (separadas por coma, máx. 8)
+            </label>
+            <input
+              id="etiquetas"
+              value={etiquetasTxt}
+              onChange={(e) => setEtiquetasTxt(e.target.value)}
+              placeholder="carbohidratos, salud, dieta"
+              className={campo}
+            />
+          </div>
+
+          <div>
+            <span className="mb-1 block text-sm font-medium text-gray-700">Imagen de portada</span>
+            {portada ? (
+              <div className="space-y-2">
+                <Image
+                  src={portada.preview}
+                  alt="Vista previa de la portada"
+                  width={600}
+                  height={315}
+                  unoptimized
+                  className="w-full rounded-md object-cover"
+                />
+                <input
+                  value={portadaAlt}
+                  onChange={(e) => setPortadaAlt(e.target.value)}
+                  maxLength={160}
+                  placeholder="Describe la imagen (texto alternativo)"
+                  aria-label="Texto alternativo de la portada"
+                  className={campo}
+                />
                 <button
                   type="button"
-                  onClick={() => router.push("/articulos")}
-                  className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  onClick={() => setPortada(null)}
+                  className="text-sm font-medium text-red-600 hover:text-red-500"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  onClick={handleAgregarArticulo}
-                  disabled={isSubmitting || !contenido || !selectedFile}
-                  className={`px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${isSubmitting || !contenido || !selectedFile ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Publicando...
-                    </>
-                  ) : (
-                    "Publicar Artículo"
-                  )}
+                  Cambiar imagen
                 </button>
               </div>
-            </div>
+            ) : (
+              <label className="flex cursor-pointer flex-col items-center rounded-lg border-2 border-dashed border-gray-300 px-6 py-8 text-sm text-gray-600 hover:border-green-500">
+                <span className="font-medium text-green-600">Sube una imagen</span>
+                <span className="text-xs text-gray-500">PNG, JPG o WebP hasta 5 MB (ideal 1200×630)</span>
+                <input type="file" accept="image/*" className="sr-only" onChange={onElegirPortada} />
+              </label>
+            )}
           </div>
-        </div>
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => router.push("/articulos")}
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              disabled={enviando !== null}
+              onClick={() => guardar("BORRADOR")}
+              className="rounded-md border border-green-600 px-4 py-2 text-sm font-medium text-green-700 hover:bg-green-50 disabled:opacity-50"
+            >
+              {enviando === "BORRADOR" ? "Guardando..." : "Guardar borrador"}
+            </button>
+            <button
+              type="button"
+              disabled={enviando !== null}
+              onClick={() => guardar("PUBLICADO")}
+              className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              {enviando === "PUBLICADO" ? "Publicando..." : "Publicar"}
+            </button>
+          </div>
+        </aside>
       </div>
     </div>
   );

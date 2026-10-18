@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: [
+    "@blocknote/server-util",
+    "@blocknote/core",
+    "@blocknote/react",
+    "@blocknote/mantine",
+  ],
   images: {
     remotePatterns: [
       {
@@ -17,7 +23,7 @@ const nextConfig: NextConfig = {
       },
     ],
     dangerouslyAllowLocalIP: true,
-  },
+  }
 };
 
 export default nextConfig;
